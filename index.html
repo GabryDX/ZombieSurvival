@@ -1,0 +1,70 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+<head>
+<title>Index</title>
+<script type="text/javascript" src="spinmenu.js"></script>
+
+</head>
+<body background="divisori.jpg">
+<div align="center">
+<br />
+<br />
+<br />
+<h1>
+<span style="font-family: Impact; font-size: 70px; color: white;">BLACK ENTITY</span></h1>
+<br />
+<br />
+<br />
+<p style="font-family: Impact; font-size: 40px; color: #00FF00; "> 
+In 2154 earth was attacked by aliens coming from a dark dimension.
+<br />
+The war last 50 year and ended with the victory of umanity.
+<br />
+But during the conflict the aliens settled in earthly outposts.
+<br />
+So government created a special military division with the task of purify these places from the remaining enemies.
+<br />
+<br />
+They were called Aliens Hunter.
+<br />
+<br />
+<span style="font-family: Impact; ">Select Level:</span>
+<script type="text/javascript">
+
+eye.isVertical = 0; //if it's vertical or horizontal [0|1]
+eye.x = 250; // x offset from point of insertion on page
+eye.y = 10; // y offset from point of insertion on page
+eye.w = 150; // item's width
+eye.h = 30; // height
+eye.r = 100; // menu's radius
+eye.v = 20; // velocity
+eye.s = 5; // scale in space (for 3D effect)
+eye.color = '#000000'; // normal text color
+eye.colorover = '#ff0000'; // mouseover text color
+eye.backgroundcolor = '#00FF00'; // normal background color
+eye.backgroundcolorover = '#FFFF00'; // mouseover background color
+eye.bordercolor = '#FF0000'; //border color
+eye.fontsize = 20; // font size
+eye.fontfamily = 'Impact'; //font family
+if (document.getElementById){
+document.write('<div id="spinanchor" style="height:'+eval(eye.h+20)+'"></div>')
+eye.anchor=document.getElementById('spinanchor')
+eye.spinmenu();
+eye.x+=getposOffset(eye.anchor, "center") //relatively position it
+eye.y+=getposOffset(eye.anchor, "top")  //relatively position it
+
+//menuitem:   eye.spinmenuitem(text, link, target)
+eye.spinmenuitem("Easy","mainEasy.html");
+eye.spinmenuitem("Medium","mainMedium.html");
+eye.spinmenuitem("Hero","mainHard.html");
+eye.spinmenuclose();
+}
+</script>
+<br />
+<br />
+	<p>
+<h1> <a href='tutorial.html'> Tutorial</a> </h1>
+</p>
+</div>
+</body>
+</html>
