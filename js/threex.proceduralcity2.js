@@ -197,7 +197,7 @@ THREEx.ProceduralCity	= function(){
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
 
-		var texture	= THREE.ImageUtils.loadTexture( "lensflare2_alpha.png" );
+		var texture	= THREE.ImageUtils.loadTexture( "resources/lensflare2_alpha.png" );
 		var material	= new THREE.ParticleBasicMaterial({
 			map		: texture,
 			size		: 8,

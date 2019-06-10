@@ -1,12 +1,12 @@
 <!-- <!DOCTYPE html> -->
 <html lang="en">
-<meta charset="UTF-8">
 <head>
 	<title>Index</title>
-	<script type="text/javascript" src="spinmenu.js"></script>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="js/spinmenu.js"></script>
 </head>
 
-<body background="divisori.jpg">
+<body background="resources/divisori.jpg">
 	<div align="center">
 		<br />
 		<br />
@@ -35,17 +35,17 @@
 		eye.isVertical = 0; //if it's vertical or horizontal [0|1]
 		eye.x = 250; // x offset from point of insertion on page
 		eye.y = 10; // y offset from point of insertion on page
-		eye.w = 150; // item's width
-		eye.h = 30; // height
-		eye.r = 100; // menu's radius
+		eye.w = 250; // item's width
+		eye.h = 70; // height
+		eye.r = 120; // menu's radius
 		eye.v = 20; // velocity
-		eye.s = 5; // scale in space (for 3D effect)
+		eye.s = 4; // scale in space (for 3D effect)
 		eye.color = '#000000'; // normal text color
 		eye.colorover = '#ff0000'; // mouseover text color
 		eye.backgroundcolor = '#00FF00'; // normal background color
 		eye.backgroundcolorover = '#FFFF00'; // mouseover background color
 		eye.bordercolor = '#FF0000'; //border color
-		eye.fontsize = 20; // font size
+		eye.fontsize = 50; // font size
 		eye.fontfamily = 'Impact'; //font family
 		if (document.getElementById){
 			document.write('<div id="spinanchor" style="height:'+eval(eye.h+20)+'"></div>')
@@ -57,7 +57,7 @@
 			//menuitem:   eye.spinmenuitem(text, link, target)
 			eye.spinmenuitem("Easy","mainEasy.html");
 			eye.spinmenuitem("Medium","mainMedium.html");
-			eye.spinmenuitem("Hero","mainHard.html");
+			eye.spinmenuitem("Hard","mainHard.html");
 			eye.spinmenuclose();
 		}
 		</script>

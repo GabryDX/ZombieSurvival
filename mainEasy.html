@@ -5,11 +5,11 @@
 </head>
 
 <body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
-  <script src="three.min.js"></script>
-  <script src="threex.proceduralcity2.js"></script>
-  <script src="FirstPersonControls.js"></script>
-  <script src="CylinderGeometry.js"></script>
-  <script src="jquery-1.7.2.min.js"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/threex.proceduralcity2.js"></script>
+  <script src="js/FirstPersonControls.js"></script>
+  <script src="js/CylinderGeometry.js"></script>
+  <script src="js/jquery-1.7.2.min.js"></script>
 
 <p id="time" align="center"></p>
 <p id="ris" align="center"></p>
@@ -90,7 +90,7 @@ DURATIONTIME=92000; //in millisec
 
 
 	// colosseum
-	var texture = THREE.ImageUtils.loadTexture( '800px_COLOURBOX4176774.jpg' );
+	var texture = THREE.ImageUtils.loadTexture( 'resources/800px_COLOURBOX4176774.jpg' );
 	var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
 	var material = new THREE.MeshBasicMaterial( {map: texture, color:0x835C3B} );
     var cylinder = new THREE.Mesh( geometry, material );
@@ -100,7 +100,7 @@ DURATIONTIME=92000; //in millisec
     scene.add( cylinder );
 
     // weapon
-	var texture_weapon = THREE.ImageUtils.loadTexture( 'weapon.png' );
+	var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
 	var geometry_weapon = new THREE.CylinderGeometry(  5, 5, 20, 32 );
 	var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
 	var cylinder_weapon = new THREE.Mesh( geometry_weapon, material_weapon );
@@ -250,7 +250,7 @@ for (var i = bullets.length-1; i >= 0; i--)
 					
 					var geometry_hit1 = new THREE.SphereGeometry(3,50,50); //corpo
 					
-					var texture_hit1 = THREE.ImageUtils.loadTexture( 'spento.png' );
+					var texture_hit1 = THREE.ImageUtils.loadTexture( 'resources/spento.png' );
                     var material_hit1 = new THREE.MeshBasicMaterial( {map: texture_hit1, color:0xffffff} );
                     var geometry_hit1 = new THREE.SphereGeometry(3,50,50);
                     var hit1 = new THREE.Mesh( geometry_hit1, material_hit1 );
@@ -319,7 +319,7 @@ for (var i = bullets.length-1; i >= 0; i--)
 					
 					/*
 					
-					var texture_hit1 = THREE.ImageUtils.loadTexture( 'spento.png' );
+					var texture_hit1 = THREE.ImageUtils.loadTexture( 'resources/spento.png' );
                     var material_hit1 = new THREE.MeshBasicMaterial( {map: texture_hit1, color:0xffffff} );
                     var geometry_hit1 = new THREE.SphereGeometry(3,50,50);
                     var hit1 = new THREE.Mesh( geometry_hit1, material_hit1 );
@@ -397,7 +397,7 @@ for (var i = bullets.length-1; i >= 0; i--)
     var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
 
     var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
-   var texture_enemy9 = THREE.ImageUtils.loadTexture( 'luciAntenna.jpeg' );
+   var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
    var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
     
 	
@@ -418,7 +418,7 @@ function addAI()
 	
 	
 	
-	var texture_enemy1 = THREE.ImageUtils.loadTexture( 'Enemy.jpg' );
+	var texture_enemy1 = THREE.ImageUtils.loadTexture( 'resources/Enemy.jpg' );
 	var material_enemy1 = new THREE.MeshBasicMaterial( {map: texture_enemy1, color:0xffffff} );
 	var enemy1 = new THREE.Mesh( geometry_enemy1, material_enemy1 );
 	var enemy2 = new THREE.Mesh( geometry_enemy2, material_enemy2 );
