@@ -9,7 +9,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	//this.domElement = ( domElement !== undefined ) ? domElement : document;
+	//this.domElement = (document) ? document.body : domElement;
+	this.domElement = domElement || document.body;
 
 	this.enabled = true;
 
@@ -120,8 +122,23 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	};
 
+	var euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
+	var PI_2 = Math.PI / 2;
 	this.onMouseMove = function ( event ) {
 
+		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+		//var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+		euler.setFromQuaternion( camera.quaternion );
+
+		euler.y -= movementX * 0.002;
+		//euler.x -= movementY * 0.002;
+
+		//euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+
+		camera.quaternion.setFromEuler( euler );
+
+		/*
 		if ( this.domElement === document ) {
 
 			this.mouseX = event.pageX - this.viewHalfX;
@@ -132,7 +149,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			this.mouseX = event.pageX - this.domElement.offsetLeft - this.viewHalfX;
 			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
 
-		}
+		}*/
 
 	};
 
@@ -219,7 +236,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			actualLookSpeed = 0;
 
 		}
-
+/*
 		var verticalLookRatio = 1;
 
 		if ( this.constrainVertical ) {
@@ -229,6 +246,13 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		this.lon += this.mouseX * actualLookSpeed;
+		*/
+		/*if (this.mouseX > 0) {
+			this.mouseX -= Math.abs(this.mouseX)*0.03;
+		} else if (this.mouseX < 0) {
+			this.mouseX += Math.abs(this.mouseX)*0.03;
+		}*/
+		/*
 		if ( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
@@ -250,6 +274,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
 
 		this.object.lookAt( targetPosition );
+		*/
 
 	};
 
@@ -297,4 +322,23 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.handleResize();
 
+	this.domElement = domElement || document.body;
+
+	this.lock = function () {
+
+		this.domElement.requestPointerLock();
+
+	};
+
+	this.unlock = function () {
+
+		document.exitPointerLock();
+
+	};
+
+	var lockEvent = { type: 'lock' };
+	this.dispatchEvent(lockEvent);
 };
+
+THREE.FirstPersonControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.FirstPersonControls.prototype.constructor = THREE.FirstPersonControls;

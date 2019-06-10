@@ -5,12 +5,11 @@
 </head>
 
 <body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
-	<script src="three.min.js"></script>
-	<script src="threex.proceduralcity2.js"></script>
-	<script src="FirstPersonControls.js"></script>
-	<script src="CylinderGeometry.js"></script>
-	<script src="jquery-1.7.2.min.js"></script>
-
+  <script src="three.min.js"></script>
+  <script src="threex.proceduralcity2.js"></script>
+  <script src="FirstPersonControls.js"></script>
+  <script src="CylinderGeometry.js"></script>
+  <script src="jquery-1.7.2.min.js"></script>
 
 <p id="time" align="center"></p>
 <p id="ris" align="center"></p>
@@ -28,25 +27,25 @@ var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 7
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 8
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 9
-          	    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 10
+        	    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 10
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], //11
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 12
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 13
            		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 14
-				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 15
-				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 16
-           		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ], //17
-           ], mapW = map.length, mapH = map[0].length;
+      				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 15
+      				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 16
+           		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], //17
+          ], mapW = map.length, mapH = map[0].length;
 
 var enemy5;
- 	var pun = 0;
-  var tempo = 10;
-  var	UNITSIZE = 20,
-	MOVESPEED = 150,
-	LOOKSPEED = 1,
-	BULLETMOVESPEED = MOVESPEED * 5,
-	NUMAI = 100,
-	DURATIONTIME=92000; //in millisec
+var pun = 0;
+var tempo = 10;
+var	UNITSIZE = 20,
+MOVESPEED = 150,
+LOOKSPEED = 1,
+BULLETMOVESPEED = MOVESPEED * 5,
+NUMAI = 100,
+DURATIONTIME=92000; //in millisec
 
   var t = THREE,renderer, clock, projector, model, skin;
 
@@ -63,8 +62,8 @@ var enemy5;
 	scene.fog	= new THREE.FogExp2( 0xd0e0f0, 0.0025 );
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.3, 1000 );
 	camera.position.z = 45;
-	camera.position.x = 45,
-    scene.add(camera);
+	camera.position.x = 45;
+  scene.add(camera);
 
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +75,7 @@ var enemy5;
 	scene.add(mesh)
 
 
-    setupAI();
+  setupAI();
 
 
 
@@ -107,9 +106,9 @@ var enemy5;
 	var cylinder_weapon = new THREE.Mesh( geometry_weapon, material_weapon );
 
 	cylinder_weapon.scale.set(0.05, 0.1, 0.05);
-    cylinder_weapon.rotation.set(29.8, 0, 0);
-    camera.add(cylinder_weapon);
-    cylinder_weapon.position.set(0.7 ,-0.3, -1);
+  cylinder_weapon.rotation.set(29.8, 0, 0);
+  camera.add(cylinder_weapon);
+  cylinder_weapon.position.set(0.7 ,-0.3, -1);
 
 
     // bullets
@@ -126,11 +125,14 @@ var enemy5;
 	//////////////////////////////////////////////////////////////////////////////////
 
     camera.position.y = 1.85;
-	camera.position.z = 200;
+    camera.position.z = 200;
 
     var controls, clock;
-	clock = new THREE.Clock();
+    clock = new THREE.Clock();
     controls = new THREE.FirstPersonControls(camera);
+    document.addEventListener( 'click', function () {
+                  controls.lock();
+                  }, false );
 
     controls.movementSpeed = MOVESPEED;
     controls.lookSpeed = LOOKSPEED;
@@ -160,6 +162,10 @@ document.getElementById("time").innerHTML = "<span style='font-family: Impact; f
 
   // If the count down is finished, write some text
   if (distance < 0) {
+    document.exitPointerLock();
+    document.removeEventListener( 'click', function () {
+                  controls.lock();
+                  }, false );
     clearInterval(x);
     document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
     document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + pun+ "</span>"+ "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>"+"<a href='index.html'> Restart</a>"+"</h1></span>";
@@ -180,52 +186,52 @@ document.getElementById("time").innerHTML = "<span style='font-family: Impact; f
 	var aispeed = delta * MOVESPEED *0.1;
     var time = Date.now() * 0.0005;
     renderer.render( scene, camera );
-    controls.update(clock.getDelta());
+    controls.update(clock.getDelta());  // only if control is FirstPersonControls
     
     castRays();
 
 
-            // SHOOT BULLET
-                    for(var index=0; index<bullets.length; index+=1){
-                    if( bullets[index] === undefined ) continue;
-                    if( bullets[index].alive == false ){
-                    bullets.splice(index,1);
-                    continue;
-                    }
+    // SHOOT BULLET
+    for(var index=0; index<bullets.length; index+=1){
+    if( bullets[index] === undefined ) continue;
+    if( bullets[index].alive == false ){
+    bullets.splice(index,1);
+    continue;
+    }
 
-                    bullets[index].position.add(bullets[index].velocity);
-                    }
+    bullets[index].position.add(bullets[index].velocity);
+    }
 
-                    if(keyboard[32] && canShoot <= 0){ // spacebar key
+    if(keyboard[32] && canShoot <= 0){ // spacebar key
 
-                    // creates a bullet as a Mesh object
-                    var bullet = new THREE.Mesh(
-                                                new THREE.SphereGeometry(0.2,8,8),
-                                                new THREE.MeshBasicMaterial({color:0x42FFFF})
-                                                );
-				bullet.position.set(
-                                       camera.position.x - 0.7*parseInt(-Math.cos(camera.rotation.x)),
-                                        camera.position.y - 0.3,
-                                        camera.position.z
-                                        );
+    // creates a bullet as a Mesh object
+    var bullet = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.2,8,8),
+                                new THREE.MeshBasicMaterial({color:0x42FFFF})
+                                );
+		bullet.position.set(
+                        camera.position.x - 0.7*parseInt(-Math.cos(camera.rotation.x)),
+                        camera.position.y - 0.3,
+                        camera.position.z
+                        );
 				
-                    // set the velocity of the bullet
-                    bullet.velocity = new THREE.Vector3(
-                                                       ((mouse.x*parseInt(Math.cos(camera.rotation.z))) - Math.sin(camera.rotation.y) * 0.75),//*parseInt(-Math.cos(camera.rotation.z)) ,
-                                                        mouse.y,
-                                                        Math.cos(camera.rotation.y)*parseInt(-Math.cos(camera.rotation.z))
-																											).normalize();
-                    bullet.alive = true;
-                    setTimeout(function(){
-                               bullet.alive = false;
-                               scene.remove(bullet);
-                               }, 1000);
-                    // add to scene, array, and set the delay to 10 frames
-                    bullets.push(bullet);
-                    scene.add(bullet);
-                    canShoot = 10;
-                    }
-                    if(canShoot > 0) canShoot -= 1;
+    // set the velocity of the bullet
+    bullet.velocity = new THREE.Vector3(
+                                       ((mouse.x*parseInt(Math.cos(camera.rotation.z))) - Math.sin(camera.rotation.y) * 0.75),//*parseInt(-Math.cos(camera.rotation.z)) ,
+                                        0,//mouse.y,
+                                        Math.cos(camera.rotation.y)*parseInt(-Math.cos(camera.rotation.z))
+																			).normalize();
+    bullet.alive = true;
+    setTimeout(function(){
+               bullet.alive = false;
+               scene.remove(bullet);
+               }, 1000);
+    // add to scene, array, and set the delay to 10 frames
+    bullets.push(bullet);
+    scene.add(bullet);
+    canShoot = 10;
+    }
+    if(canShoot > 0) canShoot -= 1;
 
 					
 
@@ -252,25 +258,25 @@ for (var i = bullets.length-1; i >= 0; i--)
 					var material_hit2 = new THREE.MeshBasicMaterial( {color:0x999999} );
 					
 					var geometry_hit2 = new THREE.SphereGeometry(5,20,2); // base
-    				var geometry_hit3 = new THREE.CubeGeometry(3,9,2); // braccio sx
-    				var geometry_hit4 = new THREE.CubeGeometry(3,9,2); // braccio dx
-    				var geometry_hit5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
-    				var geometry_hit6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
-    				var geometry_hit7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
-    				var geometry_hit8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
-    				var geometry_hit9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
-    				var geometry_hit10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
+  				var geometry_hit3 = new THREE.CubeGeometry(3,9,2); // braccio sx
+  				var geometry_hit4 = new THREE.CubeGeometry(3,9,2); // braccio dx
+  				var geometry_hit5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
+  				var geometry_hit6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
+  				var geometry_hit7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
+  				var geometry_hit8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
+  				var geometry_hit9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
+  				var geometry_hit10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
 					
 					
 					var hit2 = new THREE.Mesh( geometry_hit2, material_hit2 );
-    				var hit3 = new THREE.Mesh( geometry_hit3, material_hit2 );
-    				var hit4 = new THREE.Mesh( geometry_hit4, material_hit2 );
- 				    var hit5 = new THREE.Mesh( geometry_hit5, material_hit2 );
-   					var hit6 = new THREE.Mesh( geometry_hit6, material_hit2 );
-    				var hit7 = new THREE.Mesh( geometry_hit7, material_hit2 );
-   					 var hit8 = new THREE.Mesh( geometry_hit8, material_hit2 );
-    				var hit9 = new THREE.Mesh( geometry_hit9, material_hit1);
-    				var hit10 = new THREE.Mesh( geometry_hit10, material_hit1 );
+  				var hit3 = new THREE.Mesh( geometry_hit3, material_hit2 );
+  				var hit4 = new THREE.Mesh( geometry_hit4, material_hit2 );
+				  var hit5 = new THREE.Mesh( geometry_hit5, material_hit2 );
+ 					var hit6 = new THREE.Mesh( geometry_hit6, material_hit2 );
+  				var hit7 = new THREE.Mesh( geometry_hit7, material_hit2 );
+ 					var hit8 = new THREE.Mesh( geometry_hit8, material_hit2 );
+  				var hit9 = new THREE.Mesh( geometry_hit9, material_hit1);
+  				var hit10 = new THREE.Mesh( geometry_hit10, material_hit1 );
     
     hit2.scale.set(0.9,0.25,0.9);
     hit2.rotation.set(0,0,0);
