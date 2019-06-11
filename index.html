@@ -6,12 +6,12 @@
 	<script type="text/javascript" src="js/spinmenu.js"></script>
 </head>
 
-<body background="resources/divisori.jpg">
+<body background="resources/doom.jpeg" repeat="none" vlink="red">
 	<div align="center">
 		<br />
 		<br />
 		<br />
-		<h1><span style="font-family: Impact; font-size: 70px; color: white;">ZOMBIE SURVIVAL</span></h1>
+		<h1><span style="font-family: Impact; font-size: 70px; color: #f62217;">ZOMBIE SURVIVAL</span></h1>
 		<br />
 		<br />
 		<br />
@@ -32,39 +32,39 @@
 		<span style="font-family: Impact; ">Select Level:</span>
 		<script type="text/javascript">
 
-		eye.isVertical = 0; //if it's vertical or horizontal [0|1]
-		eye.x = 250; // x offset from point of insertion on page
-		eye.y = 10; // y offset from point of insertion on page
-		eye.w = 250; // item's width
-		eye.h = 70; // height
-		eye.r = 120; // menu's radius
-		eye.v = 20; // velocity
-		eye.s = 4; // scale in space (for 3D effect)
-		eye.color = '#000000'; // normal text color
-		eye.colorover = '#ff0000'; // mouseover text color
-		eye.backgroundcolor = '#00FF00'; // normal background color
-		eye.backgroundcolorover = '#FFFF00'; // mouseover background color
-		eye.bordercolor = '#FF0000'; //border color
-		eye.fontsize = 50; // font size
-		eye.fontfamily = 'Impact'; //font family
-		if (document.getElementById){
-			document.write('<div id="spinanchor" style="height:'+eval(eye.h+20)+'"></div>')
-			eye.anchor=document.getElementById('spinanchor')
-			eye.spinmenu();
-			eye.x+=getposOffset(eye.anchor, "center") //relatively position it
-			eye.y+=getposOffset(eye.anchor, "top")  //relatively position it
+			eye.isVertical = 0; 					//if it's vertical or horizontal [0|1]
+			eye.x = 85;  							// x offset from point of insertion on page
+			eye.y = 10;  							// y offset from point of insertion on page
+			eye.w = 250; 							// item's width
+			eye.h = 70;  							// height
+			eye.r = 120; 							// menu's radius
+			eye.v = 20;  							// velocity
+			eye.s = 3.5; 							// scale in space (for 3D effect)
+			eye.color = '#000000'; 					// normal text color
+			eye.colorover = '#ff0000'; 				// mouseover text color
+			eye.backgroundcolor = '#00FF00'; 		// normal background color
+			eye.backgroundcolorover = '#FFFF00'; 	// mouseover background color
+			eye.bordercolor = '#FF0000'; 			//border color
+			eye.fontsize = 50; 						// font size
+			eye.fontfamily = 'Impact'; 				//font family
+			if (document.getElementById){
+				document.write('<div id="spinanchor" style="height:'+eval(eye.h+20)+'"></div>')
+				eye.anchor=document.getElementById('spinanchor')
+				eye.spinmenu();
+				eye.x+=getposOffset(eye.anchor, "center") 	//relatively position it
+				eye.y+=getposOffset(eye.anchor, "top")  	//relatively position it
 
-			//menuitem:   eye.spinmenuitem(text, link, target)
-			eye.spinmenuitem("Easy","mainEasy.html");
-			eye.spinmenuitem("Medium","mainMedium.html");
-			eye.spinmenuitem("Hard","mainHard.html");
-			eye.spinmenuclose();
-		}
+				//menuitem:   eye.spinmenuitem(text, link, target)
+				eye.spinmenuitem("Easy","mainEasy.html");
+				eye.spinmenuitem("Medium","mainMedium.html");
+				eye.spinmenuitem("Hard","mainHard.html");
+				eye.spinmenuclose();
+			}
 		</script>
 		<br />
 		<br />
 		<p>
-		<h1> <a href='tutorial.html'> Tutorial</a> </h1>
+		<h1 style="color: #fff"> <a href='tutorial.html'> Tutorial</a> </h1>
 		</p>
 	</div>
 </body>
