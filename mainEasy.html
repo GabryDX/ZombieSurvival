@@ -8,8 +8,11 @@
   <script src="js/three.min.js"></script>
   <script src="js/threex.proceduralcity2.js"></script>
   <script src="js/FirstPersonControls.js"></script>
-  <script src="js/CylinderGeometry.js"></script>
   <script src="js/jquery-1.7.2.min.js"></script>
+  <script src="js/CylinderGeometry.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>
+  <script src="https://mamboleoo.be/learnThree/demos/OBJLoader.js"></script>
+  
 
 <p id="time" align="center"></p>
 <p id="ris" align="center"></p>
@@ -93,22 +96,50 @@ DURATIONTIME=92000; //in millisec
 	var texture = THREE.ImageUtils.loadTexture( 'resources/800px_COLOURBOX4176774.jpg' );
 	var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
 	var material = new THREE.MeshBasicMaterial( {map: texture, color:0x835C3B} );
-    var cylinder = new THREE.Mesh( geometry, material );
-
-	cylinder.position.set(2, 1.3, 10);
+  var cylinder = new THREE.Mesh( geometry, material );
+  cylinder.position.set(2, 1.3, 10);
 	cylinder.scale.set(3.5, 2, 4);
-    scene.add( cylinder );
+  scene.add( cylinder );
 
-    // weapon
+  //______________________________LOADING WEAPON MODEL____________________________________
+  var loadOBJ = function() {
+  //Manager from ThreeJs to track a loader and its status
+    var manager = new THREE.LoadingManager();
+    //Loader for Obj from Three.js
+    var loader = new THREE.OBJLoader(manager);
+
+    //Launch loading of the obj file, addBananaInScene is the callback when it's ready 
+    loader.load('./desert_eagle_model/deagle for ele.obj', function(object) {
+      weapon = object;  
+      wweapon.scale.set(0.05, 0.1, 0.05);
+      weapon.rotation.set(29.8, 0, 0);
+      weapon.position.set(0.7 ,-0.3, -1);
+      //Go through all children of the loaded object and search for a Mesh
+      object.traverse(function(child) {
+        //This allow us to check if the children is an instance of the Mesh constructor
+        if (child instanceof THREE.Mesh) {
+          child.material.color = new THREE.Color(0X00FF00);
+          //Sometimes there are some vertex normals missing in the .obj files, ThreeJs will compute them
+          child.geometry.computeVertexNormals();
+        }
+      });
+      
+      scene.add(weapon);
+      render();
+    });
+  };
+
+  loadOBJ();
+  
 	var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
-	var geometry_weapon = new THREE.CylinderGeometry(  5, 5, 20, 32 );
-	var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
-	var cylinder_weapon = new THREE.Mesh( geometry_weapon, material_weapon );
+	//var geometry_weapon = new THREE.CylinderGeometry(  5, 5, 20, 32 );
+	//var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
+	//var cylinder_weapon = new THREE.Mesh( geometry_weapon, material_weapon );
 
-	cylinder_weapon.scale.set(0.05, 0.1, 0.05);
-  cylinder_weapon.rotation.set(29.8, 0, 0);
-  camera.add(cylinder_weapon);
-  cylinder_weapon.position.set(0.7 ,-0.3, -1);
+	//weapon.scale.set(0.05, 0.1, 0.05);
+  //weapon.rotation.set(29.8, 0, 0);
+  //camera.add(weapon);
+  //weapon.position.set(0.7 ,-0.3, -1);
 
 
     // bullets
