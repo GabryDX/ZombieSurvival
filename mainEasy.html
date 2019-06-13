@@ -6,20 +6,20 @@
 
 <body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
   <script src="js/three.min.js"></script>
-  <script src="js/threex.proceduralcity2.js"></script>
+  <script src="js/Three.js"></script>
   <script src="js/FirstPersonControls.js"></script>
+  <script src="js/Projector.js"></script>
   <script src="js/jquery-1.7.2.min.js"></script>
-  <script src="js/CylinderGeometry.js"></script>
+  <script src="js/threex.rendererstats.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"></script>
-  <script src="https://mamboleoo.be/learnThree/demos/OBJLoader.js"></script>
-  
+  <script src="https://mamboleoo.be/learnThree/demos/OBJLoader.js"></script>  
 
 <p id="time" align="center"></p>
 <p id="ris" align="center"></p>
 <script>
 
 
-  var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
             		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
              		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
              		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 2
@@ -52,7 +52,7 @@
 
   var t = THREE,renderer, clock, projector, model, skin;
 
-    var renderer	= new THREE.WebGLRenderer
+    var renderer	= new THREE.WebGLRenderer;
     ({
 		antialiasing	: true
 	});
@@ -65,6 +65,7 @@
 	scene.fog	= new THREE.FogExp2( 0xd0e0f0, 0.0025 );
 	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.3, 1000 );
 	camera.position.z = 45;
+  camera.position.y = 45;
 	camera.position.x = 45;
   scene.add(camera);
 
@@ -72,18 +73,18 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
+  /*
+	var proceduralCity = new THREEx.ProceduralCity();
+	var mesh	= proceduralCity.createSquareCity();
+	scene.add(mesh);
+*/
+ 
+  var loader = new THREE.ObjectLoader();
+  loader.load('models/center-city-sci-fi.json', function(city){
+    scene.add(city);
+  });
 
-	var proceduralCity = new THREEx.ProceduralCity()
-	var mesh	= proceduralCity.createSquareCity()
-	scene.add(mesh)
-
-
-  setupAI();
-
-
-
-
-	//////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////
 	//		add an object and make it move					//
 	//////////////////////////////////////////////////////////////////////////////////
 
@@ -104,34 +105,12 @@
 
 
   //______________________________LOADING WEAPON MODEL____________________________________
-  var loadOBJ = function() {
-  //Manager from ThreeJs to track a loader and its status
-    var manager = new THREE.LoadingManager();
-    //Loader for Obj from Three.js
-    var loader = new THREE.OBJLoader(manager);
-
-    //Launch loading of the obj file, addBananaInScene is the callback when it's ready 
-    loader.load('./desert_eagle_model/deagle for ele.obj', function(object) {
-      weapon = object;  
-      wweapon.scale.set(0.05, 0.1, 0.05);
-      weapon.rotation.set(29.8, 0, 0);
-      weapon.position.set(0.7 ,-0.3, -1);
-      //Go through all children of the loaded object and search for a Mesh
-      object.traverse(function(child) {
-        //This allow us to check if the children is an instance of the Mesh constructor
-        if (child instanceof THREE.Mesh) {
-          child.material.color = new THREE.Color(0X00FF00);
-          //Sometimes there are some vertex normals missing in the .obj files, ThreeJs will compute them
-          child.geometry.computeVertexNormals();
-        }
-      });
-      
-      scene.add(weapon);
-      render();
-    });
-  };
-
-  loadOBJ();
+ 
+ 
+  var loader_2 = new THREE.ObjectLoader();
+  loader_2.load('models/deagle.json', function(deagle){
+    scene.add(deagle);
+  });
   
 	var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
 	//var geometry_weapon = new THREE.CylinderGeometry(  5, 5, 20, 32 );
@@ -149,7 +128,7 @@
   var canShoot = 0;
   var keyboard = {};
 
-	projector = new THREE.Projector();
+	//projector = new THREE.Projector();
 	var vector = new THREE.Vector3();
 
 
@@ -162,13 +141,14 @@
 
   var controls, clock;
   clock = new THREE.Clock();
+  /*
   controls = new THREE.FirstPersonControls(camera);
   document.addEventListener( 'click', function () {controls.lock();}, false );
   controls.movementSpeed = MOVESPEED;
   controls.lookSpeed = LOOKSPEED;
 	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
 	controls.noFly = true;
-
+  */
 	// Track mouse position so we know where to shoot
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -214,7 +194,7 @@
 	var aispeed = delta * MOVESPEED *0.1;
   var time = Date.now() * 0.0005;
   renderer.render( scene, camera );
-  controls.update(clock.getDelta());  // only if control is FirstPersonControls
+  //controls.update(clock.getDelta());  // only if control is FirstPersonControls
     
   castRays();
 
@@ -253,7 +233,7 @@
   if(canShoot > 0) canShoot -= 1;
 
 					
-
+/*
 // COLLIDE WITH AI
 for (var i = bullets.length-1; i >= 0; i--){
 		var b = bullets[i], p = b.position;
@@ -379,24 +359,24 @@ for (var i = bullets.length-1; i >= 0; i--){
 		var cc = getMapSector(camera.position);
 	}
 
+  */
 	})
 
-
+  /*
 	// enemies
 	var geometry_enemy1 = new THREE.SphereGeometry(3,50,50); //corpo
 	var geometry_enemy2 = new THREE.SphereGeometry(5,20,2); // base
-    var geometry_enemy3 = new THREE.CubeGeometry(3,9,2); // braccio sx
-    var geometry_enemy4 = new THREE.CubeGeometry(3,9,2); // braccio dx
-    var geometry_enemy5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
-    var geometry_enemy6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
-    var geometry_enemy7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
-    var geometry_enemy8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
-    var geometry_enemy9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
-    var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
-
-    var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
-   var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
-   var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
+  var geometry_enemy3 = new THREE.CubeGeometry(3,9,2); // braccio sx
+  var geometry_enemy4 = new THREE.CubeGeometry(3,9,2); // braccio dx
+  var geometry_enemy5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
+  var geometry_enemy6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
+  var geometry_enemy7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
+  var geometry_enemy8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
+  var geometry_enemy9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
+  var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
+  var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
+  var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
+  var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
     
 	
 	function setupAI()
@@ -460,10 +440,7 @@ function addAI()
     enemy7.add(enemy9);
     enemy8.add(enemy10);
    
-    
-
-
-	do
+  do
 	{
 		var x = getRandBetween(0, mapW-1);
 		var z = getRandBetween(0, mapH-1);
@@ -476,10 +453,8 @@ function addAI()
 	enemy1.lastRandomZ = Math.random();
 		ai.push(enemy1);
 	scene.add(enemy1);
-}
-
-function getMapSector(v)
-{
+}*/
+function getMapSector(v){
 	var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
 	var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
 	return {x: x, z: z};
@@ -532,5 +507,7 @@ function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+
 
 
 
-</script><canvas width="1440" height="757"></canvas>
-</body></html>
+</script>
+<canvas width="1440" height="757"></canvas>
+</body>
+</html>
