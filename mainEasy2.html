@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+</head>
+
+<body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
+  <script src="js/three.min.js"></script>
+  <script src="js/threex.proceduralcity2.js"></script>
+  <script src="js/FirstPersonControls.js"></script>
+  <script src="js/CylinderGeometry.js"></script>
+  <script src="js/jquery-1.7.2.min.js"></script>
+  <script src="models/deagle3.json"></script>
+
+<p id="time" align="center"></p>
+<p id="ris" align="center"></p>
+<script>
+
+
+var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+          		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 2
+         	    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 3
+        	    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 4
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 5
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 6
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 7
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 8
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 9
+        	    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 10
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], //11
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 12
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 13
+           		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 14
+      				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 15
+      				[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 16
+           		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], //17
+          ], mapW = map.length, mapH = map[0].length;
+
+var enemy5;
+var pun = 0;
+var tempo = 10;
+var	UNITSIZE = 20,
+MOVESPEED = 150,
+LOOKSPEED = 1,
+BULLETMOVESPEED = MOVESPEED * 5,
+NUMAI = 100,
+DURATIONTIME=92000; //in millisec
+
+  var t = THREE,renderer, clock, projector, model, skin;
+
+    var renderer	= new THREE.WebGLRenderer
+    ({
+		antialiasing	: true
+	});
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+  var mouse = { x: 0, y: 0 };
+  var ai = [];
+	var updateFcts	= [];
+	var scene	= new THREE.Scene();
+	scene.fog	= new THREE.FogExp2( 0xd0e0f0, 0.0025 );
+	var camera	= new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.3, 1000 );
+	camera.position.z = 45;
+	camera.position.x = 45;
+  scene.add(camera);
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		comment								//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var proceduralCity = new THREEx.ProceduralCity()
+	var mesh	= proceduralCity.createSquareCity()
+	scene.add(mesh)
+
+
+  setupAI();
+
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		add an object and make it move					//
+	//////////////////////////////////////////////////////////////////////////////////
+
+	var light	= new THREE.HemisphereLight( 0xfffff0, 0x101020, 1.25 );
+	light.position.set( 1, 1, 0.25 );
+	scene.add( light );
+
+
+	// colosseum
+  /*
+	var texture = THREE.ImageUtils.loadTexture( 'resources/800px_COLOURBOX4176774.jpg' );
+	var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+	var material = new THREE.MeshBasicMaterial( {map: texture, color:0x835C3B} );
+  var cylinder = new THREE.Mesh( geometry, material );
+
+	cylinder.position.set(2, 1.3, 10);
+	cylinder.scale.set(3.5, 2, 4);
+    scene.add( cylinder );
+*/
+    // weapon
+  /*
+	var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
+	var geometry_weapon = new THREE.CylinderGeometry(  5, 5, 20, 32 );
+	var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
+	var cylinder_weapon = new THREE.Mesh( geometry_weapon, material_weapon );
+
+	cylinder_weapon.scale.set(0.05, 0.1, 0.05);
+  cylinder_weapon.rotation.set(29.8, 0, 0);
+  camera.add(cylinder_weapon);
+  cylinder_weapon.position.set(0.7 ,-0.3, -1);
+  */
+
+  var loader_2 = new THREE.ObjectLoader();
+  var model_path = 'models/gun/gun-pbribl.json';
+  loader_2.load(model_path, function(deagle){
+    /*var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
+    var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
+
+    var mesh = new THREE.Mesh( deagle, material_weapon ); //new THREE.MeshBasicMaterial() );
+    mesh.scale.set(0.05, 0.1, 0.05);
+    mesh.rotation.set(29.8, 0, 0);
+    mesh.position.set(0.7 ,-0.3, -1);
+    scene.add(mesh);*/
+    scene.add(deagle);
+  });
+  
+    // bullets
+    var bullets = [];
+    var canShoot = 0;
+    var keyboard = {};
+
+		projector = new THREE.Projector();
+		var vector = new THREE.Vector3();
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		Camera Controls							//
+	//////////////////////////////////////////////////////////////////////////////////
+
+    camera.position.y = 1.85;
+    camera.position.z = 200;
+
+    var controls, clock;
+    clock = new THREE.Clock();
+    controls = new THREE.FirstPersonControls(camera);
+    document.addEventListener( 'click', function () {
+                  controls.lock();
+                  }, false );
+
+    controls.movementSpeed = MOVESPEED;
+    controls.lookSpeed = LOOKSPEED;
+	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
+	controls.noFly = true;
+
+	// Track mouse position so we know where to shoot
+	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+// Set the date we're counting down to
+var date = new Date().getTime();
+var countDownDate = date + DURATIONTIME;
+
+// Update the count down every 1 second
+var x = setInterval(function()
+{
+tempo -=1;
+  // Get the "now" date
+  var now1 = new Date().getTime();
+
+  // Find the distance between now an the count down date
+  var distance = countDownDate - now1;
+
+var sec = Math.floor(distance/1000);
+document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec +" sec"+"&nbsp&nbsp&nbsp Punteggio: "+pun+"</span>";
+
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    document.exitPointerLock();
+    document.removeEventListener( 'click', function () {
+                  controls.lock();
+                  }, false );
+    clearInterval(x);
+    document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
+    document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + pun+ "</span>"+ "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>"+"<a href='index.html'> Restart</a>"+"</h1></span>";
+    $(renderer.domElement).fadeOut();
+  }
+}, 1000);
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		render the scene						//
+	//////////////////////////////////////////////////////////////////////////////////
+	updateFcts.push(function()
+	{
+  
+	pun =NUMAI - ai.length;
+
+	var delta = clock.getDelta(), speed = delta * BULLETMOVESPEED;
+	var aispeed = delta * MOVESPEED *0.1;
+    var time = Date.now() * 0.0005;
+    renderer.render( scene, camera );
+    controls.update(clock.getDelta());  // only if control is FirstPersonControls
+    
+    castRays();
+
+
+    // SHOOT BULLET
+    for(var index=0; index<bullets.length; index+=1){
+    if( bullets[index] === undefined ) continue;
+    if( bullets[index].alive == false ){
+    bullets.splice(index,1);
+    continue;
+    }
+
+    bullets[index].position.add(bullets[index].velocity);
+    }
+
+    if(keyboard[32] && canShoot <= 0){ // spacebar key
+
+    // creates a bullet as a Mesh object
+    var bullet = new THREE.Mesh(
+                                new THREE.SphereGeometry(0.2,8,8),
+                                new THREE.MeshBasicMaterial({color:0x42FFFF})
+                                );
+		bullet.position.set(
+                        camera.position.x - 0.7*parseInt(-Math.cos(camera.rotation.x)),
+                        camera.position.y - 0.3,
+                        camera.position.z
+                        );
+				
+    // set the velocity of the bullet
+    bullet.velocity = new THREE.Vector3(
+                                       ((mouse.x*parseInt(Math.cos(camera.rotation.z))) - Math.sin(camera.rotation.y) * 0.75),//*parseInt(-Math.cos(camera.rotation.z)) ,
+                                        0,//mouse.y,
+                                        Math.cos(camera.rotation.y)*parseInt(-Math.cos(camera.rotation.z))
+																			).normalize();
+    bullet.alive = true;
+    setTimeout(function(){
+               bullet.alive = false;
+               scene.remove(bullet);
+               }, 1000);
+    // add to scene, array, and set the delay to 10 frames
+    bullets.push(bullet);
+    scene.add(bullet);
+    canShoot = 10;
+    }
+    if(canShoot > 0) canShoot -= 1;
+
+					
+
+// COLLIDE WITH AI
+for (var i = bullets.length-1; i >= 0; i--)
+	{
+		var b = bullets[i], p = b.position;
+		//var hit = false;
+		for (var j = ai.length-1; j >= 0; j--)
+		{
+			var a = ai[j];
+			var v = a.geometry.vertices[0];
+			var c = a.position;
+						if (p.x <= c.x + 2 && p.x >= c.x - 2 && p.z <= c.z + 2 && p.z >= c.z - 2)
+			{
+					
+					var geometry_hit1 = new THREE.SphereGeometry(3,50,50); //corpo
+					
+					var texture_hit1 = THREE.ImageUtils.loadTexture( 'resources/spento.png' );
+                    var material_hit1 = new THREE.MeshBasicMaterial( {map: texture_hit1, color:0xffffff} );
+                    var geometry_hit1 = new THREE.SphereGeometry(3,50,50);
+                    var hit1 = new THREE.Mesh( geometry_hit1, material_hit1 );
+					
+					var material_hit2 = new THREE.MeshBasicMaterial( {color:0x999999} );
+					
+					var geometry_hit2 = new THREE.SphereGeometry(5,20,2); // base
+  				var geometry_hit3 = new THREE.CubeGeometry(3,9,2); // braccio sx
+  				var geometry_hit4 = new THREE.CubeGeometry(3,9,2); // braccio dx
+  				var geometry_hit5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
+  				var geometry_hit6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
+  				var geometry_hit7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
+  				var geometry_hit8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
+  				var geometry_hit9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
+  				var geometry_hit10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
+					
+					
+					var hit2 = new THREE.Mesh( geometry_hit2, material_hit2 );
+  				var hit3 = new THREE.Mesh( geometry_hit3, material_hit2 );
+  				var hit4 = new THREE.Mesh( geometry_hit4, material_hit2 );
+				  var hit5 = new THREE.Mesh( geometry_hit5, material_hit2 );
+ 					var hit6 = new THREE.Mesh( geometry_hit6, material_hit2 );
+  				var hit7 = new THREE.Mesh( geometry_hit7, material_hit2 );
+ 					var hit8 = new THREE.Mesh( geometry_hit8, material_hit2 );
+  				var hit9 = new THREE.Mesh( geometry_hit9, material_hit1);
+  				var hit10 = new THREE.Mesh( geometry_hit10, material_hit1 );
+    
+    hit2.scale.set(0.9,0.25,0.9);
+    hit2.rotation.set(0,0,0);
+    hit2.position.y = -2.3;
+    
+    hit3.scale.set(0.4,0.4,0.4);
+    hit3.position.z = 3.5;
+    
+    hit4.scale.set(0.4,0.4,0.4);
+    hit4.position.z = -3.5;
+    
+    hit5.position.y = 2;
+    hit5.position.z = 2;
+    hit6.position.y = 2;
+	hit6.position.z = -2;
+	hit7.position.y = 3;
+	hit7.position.x = -0.7;
+	hit7.rotation.z+=0.7;
+    hit8.position.y = 3; 
+    hit8.position.x = -0.7;  
+    hit8.rotation.z+=0.7;
+    hit9.position.y = 1;
+    hit10.position.y = 1;
+
+    
+    hit1.add(hit2);
+    hit1.add(hit3);
+    hit1.add(hit4);
+    hit1.add(hit5);
+    hit1.add(hit6);
+    hit5.add(hit7);
+    hit6.add(hit8);
+    hit7.add(hit9);
+    hit8.add(hit10);
+    
+                    hit1.position.x = c.x;
+                    hit1.position.y = c.y;
+                    hit1.position.z = c.z;
+                    scene.add(hit1);
+					
+					/*
+					
+					var texture_hit1 = THREE.ImageUtils.loadTexture( 'resources/spento.png' );
+                    var material_hit1 = new THREE.MeshBasicMaterial( {map: texture_hit1, color:0xffffff} );
+                    var geometry_hit1 = new THREE.SphereGeometry(3,50,50);
+                    var hit1 = new THREE.Mesh( geometry_hit1, material_hit1 );
+                    hit1.position.x = c.x;
+                    hit1.position.y = c.y;
+                    hit1.position.z = c.z;
+                    scene.add(hit1);
+                    
+                    */
+                  var y = setInterval(function()
+                 {
+            	  scene.remove(hit1);
+               	}, 500);
+				ai.splice(j,1);
+				scene.remove(a);
+				bullets.splice(i,1);
+				scene.remove(b);
+				break;
+
+			}
+		}
+	}
+
+// Update AI.
+	for (var i = ai.length-1; i >= 0; i--)
+	{
+		var a = ai[i];
+		// Move AI
+		var r = Math.random();
+		if (r > 0.995) {
+			a.lastRandomX = Math.random() * 2 - 1;
+			a.lastRandomZ = Math.random() * 2 - 1;
+		}
+		
+		a.translateX(aispeed * a.lastRandomX);
+		a.translateZ(aispeed * a.lastRandomZ);
+		a.rotation._z+=0.5;
+		a.children[3].rotation.y+=0.05; //antenna1 rotation
+		a.children[4].rotation.y-=0.05; //antenna2 rotation
+		a.children[1].rotation.z+=0.05; //arm rotation
+		a.children[2].rotation.z+=0.05; //arm rotation
+		
+		var c = getMapSector(a.position);
+		if (c.x < 0 || c.x >= mapW || c.y < 0 || c.y >= mapH ) {
+			a.translateX(-2 * aispeed * a.lastRandomX);
+			a.translateZ(-2 * aispeed * a.lastRandomZ);
+			a.lastRandomX = Math.random() * 2 - 1;
+			a.lastRandomZ = Math.random() * 2 - 1;
+		}
+		if (c.x < -1 || c.x > mapW || c.z < -1 || c.z > mapH) {
+			ai.splice(i, 1);
+			scene.remove(a);
+			addAI();
+		}
+
+		var cc = getMapSector(camera.position);
+	}
+
+	})
+
+
+	    // enemies
+	
+
+
+	var geometry_enemy1 = new THREE.SphereGeometry(3,50,50); //corpo
+	var geometry_enemy2 = new THREE.SphereGeometry(5,20,2); // base
+    var geometry_enemy3 = new THREE.CubeGeometry(3,9,2); // braccio sx
+    var geometry_enemy4 = new THREE.CubeGeometry(3,9,2); // braccio dx
+    var geometry_enemy5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
+    var geometry_enemy6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
+    var geometry_enemy7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
+    var geometry_enemy8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
+    var geometry_enemy9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
+    var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
+
+    var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
+   var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
+   var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
+    
+	
+	function setupAI()
+	{
+		for (var i=0; i<NUMAI; i++)
+		{
+			addAI();
+			
+		}
+	}
+
+
+function addAI()
+{
+	var c = getMapSector(camera.position);
+	
+	
+	
+	
+	var texture_enemy1 = THREE.ImageUtils.loadTexture( 'resources/Enemy.jpg' );
+	var material_enemy1 = new THREE.MeshBasicMaterial( {map: texture_enemy1, color:0xffffff} );
+	var enemy1 = new THREE.Mesh( geometry_enemy1, material_enemy1 );
+	var enemy2 = new THREE.Mesh( geometry_enemy2, material_enemy2 );
+    var enemy3 = new THREE.Mesh( geometry_enemy3, material_enemy2 );
+    var enemy4 = new THREE.Mesh( geometry_enemy4, material_enemy2 );
+    enemy5 = new THREE.Mesh( geometry_enemy5, material_enemy2 );
+    var enemy6 = new THREE.Mesh( geometry_enemy6, material_enemy2 );
+    var enemy7 = new THREE.Mesh( geometry_enemy7, material_enemy2 );
+    var enemy8 = new THREE.Mesh( geometry_enemy8, material_enemy2 );
+    var enemy9 = new THREE.Mesh( geometry_enemy9, material_enemy9);
+    var enemy10 = new THREE.Mesh( geometry_enemy10, material_enemy9 );
+    
+    enemy2.scale.set(0.9,0.25,0.9);
+    enemy2.rotation.set(0,0,0);
+    enemy2.position.y = -2.3;
+    
+    enemy3.scale.set(0.4,0.4,0.4);
+    enemy3.position.z = 3.5;
+    
+    enemy4.scale.set(0.4,0.4,0.4);
+    enemy4.position.z = -3.5;
+    
+    enemy5.position.y = 2;
+    enemy5.position.z = 2;
+    enemy6.position.y = 2;
+	enemy6.position.z = -2;
+	enemy7.position.y = 3;
+	enemy7.position.x = -0.7;
+	enemy7.rotation.z+=0.7;
+    enemy8.position.y = 3; 
+    enemy8.position.x = -0.7;  
+    enemy8.rotation.z+=0.7;
+    enemy9.position.y = 1;
+    enemy10.position.y = 1;
+
+    
+    enemy1.add(enemy2);
+    enemy1.add(enemy3);
+    enemy1.add(enemy4);
+    enemy1.add(enemy5);
+    enemy1.add(enemy6);
+    enemy5.add(enemy7);
+    enemy6.add(enemy8);
+    enemy7.add(enemy9);
+    enemy8.add(enemy10);
+   
+    
+
+
+	do
+	{
+		var x = getRandBetween(0, mapW-1);
+		var z = getRandBetween(0, mapH-1);
+	}
+	while (map[x][z] > 0 || (x == c.x && z == c.z));
+	x = Math.floor(x - mapW/2) * UNITSIZE;
+	z = Math.floor(z - mapW/2) * UNITSIZE;
+	enemy1.position.set(x, UNITSIZE * 0.15, z);
+	enemy1.pathPos = 1;
+	enemy1.lastRandomX = Math.random();
+	enemy1.lastRandomZ = Math.random();
+		ai.push(enemy1);
+	scene.add(enemy1);
+}
+/*
+function getAIpath(a)
+{
+	var p = getMapSector(a.position);
+	do { // Cop-out
+		do {
+			var x = getRandBetween(0, mapW-1);
+			var z = getRandBetween(0, mapH-1);
+		} while (map[x][z] > 0 || distance(p.x, p.z, x, z) < 3);
+		var path = findAIpath(p.x, p.z, x, z);
+	} while (path.length == 0);
+	return path;
+}
+
+
+function findAIpath(sX, sZ, eX, eZ)
+{
+	var backupGrid = grid.clone();
+	var path = finder.findPath(sX, sZ, eX, eZ, grid);
+	grid = backupGrid;
+	return path;
+}
+
+function distance(x1, y1, x2, y2)
+{
+	return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+}
+enemy5.rotation.z+=0.5;
+*/
+function getMapSector(v)
+{
+	var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
+	var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
+	return {x: x, z: z};
+}
+
+function getRandBetween(lo, hi)
+{
+ return parseInt(Math.floor(Math.random()*(hi-lo+1))+lo, 10);
+}
+
+
+
+	//////////////////////////////////////////////////////////////////////////////////
+	//		loop runner							//
+	//////////////////////////////////////////////////////////////////////////////////
+	var lastTimeMsec= null
+	requestAnimationFrame(function animate(nowMsec){
+		// keep looping
+		requestAnimationFrame( animate );
+		// measure time
+		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+		lastTimeMsec	= nowMsec
+
+		                  function keyDown(event)
+		                  {
+                          keyboard[event.keyCode] = true;
+                          }
+
+                          function keyUp(event){
+                          keyboard[event.keyCode] = false;
+                          }
+
+                          window.addEventListener('keydown', keyDown);
+                          window.addEventListener('keyup', keyUp);
+
+
+
+
+        // call each update function
+		updateFcts.forEach(function(updateFn)
+		{
+			updateFn(deltaMsec/1000, nowMsec/1000)
+		})
+
+
+	})
+
+
+
+    function castRays()
+    {
+            // rays
+
+            var direction = new THREE.Vector3(1000, 5500, 1000);
+            var startPoint = camera.position.clone();
+            var directionVector = direction.sub( startPoint );
+            var ray = new THREE.Raycaster(startPoint, directionVector.clone(). normalize());
+            scene.updateMatrixWorld();		 // required, since you haven't rendered yet
+            var rayIntersects = ray.intersectObjects(scene.children, true);
+            if (rayIntersects.length > 0)
+            {
+                                 camera.position.z = camera.position.z - 5;
+								 camera.position.x = camera.position.x - 5;
+
+			}
+
+		}
+
+					function onDocumentMouseMove(e)
+					{
+						e.preventDefault();
+						mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+						mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+					}
+
+
+
+
+</script><canvas width="1440" height="757"></canvas>
+</body></html>
