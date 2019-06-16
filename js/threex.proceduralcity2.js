@@ -17,7 +17,7 @@ THREEx.ProceduralCity	= function(){
 	geometry.faceVertexUvs[0][2][0].set( 0, 0 );
 	geometry.faceVertexUvs[0][2][1].set( 0, 0 );
 	geometry.faceVertexUvs[0][2][2].set( 0, 0 );
-	geometry.faceVertexUvs[0][2][3].set( 0, 0 );
+	//geometry.faceVertexUvs[0][2][3].set( 0, 0 );
 
 	// buildMesh
 	var buildingMesh= new THREE.Mesh( geometry );
