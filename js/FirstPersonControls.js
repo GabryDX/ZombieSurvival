@@ -288,9 +288,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 	function contextmenu( event ) {
-
 		event.preventDefault();
-
 	}
 
 	this.dispose = function () {
@@ -320,13 +318,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	window.addEventListener( 'keyup', _onKeyUp, false );
 
 	function bind( scope, fn ) {
-
 		return function () {
-
 			fn.apply( scope, arguments );
-
 		};
-
 	}
 
 	this.handleResize();
@@ -334,15 +328,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.domElement = domElement || document.body;
 
 	this.lock = function () {
-
 		this.domElement.requestPointerLock();
-
 	};
 
 	this.unlock = function () {
-
 		document.exitPointerLock();
-
 	};
 
 	var lockEvent = { type: 'lock' };

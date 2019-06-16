@@ -160,8 +160,8 @@ DURATIONTIME=92000; //in millisec
 
     controls.movementSpeed = MOVESPEED;
     controls.lookSpeed = LOOKSPEED;
-	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
-	controls.noFly = true;
+  	controls.lookVertical = false; // Temporary solution; play on flat surfaces only
+  	controls.noFly = true;
 
 	// Track mouse position so we know where to shoot
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
@@ -230,21 +230,32 @@ document.getElementById("time").innerHTML = "<span style='font-family: Impact; f
 
     // creates a bullet as a Mesh object
     var bullet = new THREE.Mesh(
-                                new THREE.SphereGeometry(0.2,8,8),
-                                new THREE.MeshBasicMaterial({color:0x42FFFF})
+                                new THREE.SphereGeometry(0.1,8,8),
+                                new THREE.MeshBasicMaterial({color:0xAF9B60})
                                 );
-		bullet.position.set(
-                        camera.position.x - 0.7*parseInt(-Math.cos(camera.rotation.x)),
-                        camera.position.y - 0.3,
+
+    // must change to weapon position later
+    bullet.position.set(
+                        camera.position.x + 0.15,
+                        camera.position.y + 0.15,
                         camera.position.z
                         );
-				
+		
     // set the velocity of the bullet
+    var cameraroty;
+    if (camera.rotation.z == 0) {
+      cameraroty = Math.PI - camera.rotation.y;
+    } else {
+      cameraroty = camera.rotation.y;
+    }
     bullet.velocity = new THREE.Vector3(
-                                       ((mouse.x*parseInt(Math.cos(camera.rotation.z))) - Math.sin(camera.rotation.y) * 0.75),//*parseInt(-Math.cos(camera.rotation.z)) ,
-                                        0,//mouse.y,
-                                        Math.cos(camera.rotation.y)*parseInt(-Math.cos(camera.rotation.z))
-																			).normalize();
+                                        -Math.sin(cameraroty),
+                                        0,
+                                        Math.cos(cameraroty)
+                                  		 );//.normalize();
+    console.log(bullet.velocity)
+    console.log(camera.rotation)
+
     bullet.alive = true;
     setTimeout(function(){
                bullet.alive = false;
@@ -315,10 +326,10 @@ for (var i = bullets.length-1; i >= 0; i--)
     hit5.position.y = 2;
     hit5.position.z = 2;
     hit6.position.y = 2;
-	hit6.position.z = -2;
-	hit7.position.y = 3;
-	hit7.position.x = -0.7;
-	hit7.rotation.z+=0.7;
+  	hit6.position.z = -2;
+  	hit7.position.y = 3;
+  	hit7.position.x = -0.7;
+  	hit7.rotation.z+=0.7;
     hit8.position.y = 3; 
     hit8.position.x = -0.7;  
     hit8.rotation.z+=0.7;
@@ -336,10 +347,10 @@ for (var i = bullets.length-1; i >= 0; i--)
     hit7.add(hit9);
     hit8.add(hit10);
     
-                    hit1.position.x = c.x;
-                    hit1.position.y = c.y;
-                    hit1.position.z = c.z;
-                    scene.add(hit1);
+    hit1.position.x = c.x;
+    hit1.position.y = c.y;
+    hit1.position.z = c.z;
+    scene.add(hit1);
 					
 					/*
 					
@@ -411,18 +422,18 @@ for (var i = bullets.length-1; i >= 0; i--)
 
 	var geometry_enemy1 = new THREE.SphereGeometry(3,50,50); //corpo
 	var geometry_enemy2 = new THREE.SphereGeometry(5,20,2); // base
-    var geometry_enemy3 = new THREE.CubeGeometry(3,9,2); // braccio sx
-    var geometry_enemy4 = new THREE.CubeGeometry(3,9,2); // braccio dx
-    var geometry_enemy5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
-    var geometry_enemy6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
-    var geometry_enemy7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
-    var geometry_enemy8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
-    var geometry_enemy9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
-    var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
+  var geometry_enemy3 = new THREE.CubeGeometry(3,9,2); // braccio sx
+  var geometry_enemy4 = new THREE.CubeGeometry(3,9,2); // braccio dx
+  var geometry_enemy5 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna1 - giù
+  var geometry_enemy6 = new THREE.CylinderGeometry(0.3,0.5,4); // antenna2 - giù
+  var geometry_enemy7 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna1 - su
+  var geometry_enemy8 = new THREE.CylinderGeometry(0.3,0.3,3); // antenna2 - su
+  var geometry_enemy9 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 1
+  var geometry_enemy10 = new THREE.SphereGeometry(0.7,8,8); // sfera antenna 2
 
-    var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
-   var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
-   var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
+  var material_enemy2 = new THREE.MeshBasicMaterial( {color:0x999999} );
+  var texture_enemy9 = THREE.ImageUtils.loadTexture( 'resources/luciAntenna.jpeg' );
+  var material_enemy9 = new THREE.MeshBasicMaterial( {map: texture_enemy9} );
     
 	
 	function setupAI()
@@ -446,51 +457,50 @@ function addAI()
 	var material_enemy1 = new THREE.MeshBasicMaterial( {map: texture_enemy1, color:0xffffff} );
 	var enemy1 = new THREE.Mesh( geometry_enemy1, material_enemy1 );
 	var enemy2 = new THREE.Mesh( geometry_enemy2, material_enemy2 );
-    var enemy3 = new THREE.Mesh( geometry_enemy3, material_enemy2 );
-    var enemy4 = new THREE.Mesh( geometry_enemy4, material_enemy2 );
-    enemy5 = new THREE.Mesh( geometry_enemy5, material_enemy2 );
-    var enemy6 = new THREE.Mesh( geometry_enemy6, material_enemy2 );
-    var enemy7 = new THREE.Mesh( geometry_enemy7, material_enemy2 );
-    var enemy8 = new THREE.Mesh( geometry_enemy8, material_enemy2 );
-    var enemy9 = new THREE.Mesh( geometry_enemy9, material_enemy9);
-    var enemy10 = new THREE.Mesh( geometry_enemy10, material_enemy9 );
-    
-    enemy2.scale.set(0.9,0.25,0.9);
-    enemy2.rotation.set(0,0,0);
-    enemy2.position.y = -2.3;
-    
-    enemy3.scale.set(0.4,0.4,0.4);
-    enemy3.position.z = 3.5;
-    
-    enemy4.scale.set(0.4,0.4,0.4);
-    enemy4.position.z = -3.5;
-    
-    enemy5.position.y = 2;
-    enemy5.position.z = 2;
-    enemy6.position.y = 2;
+  var enemy3 = new THREE.Mesh( geometry_enemy3, material_enemy2 );
+  var enemy4 = new THREE.Mesh( geometry_enemy4, material_enemy2 );
+  enemy5 = new THREE.Mesh( geometry_enemy5, material_enemy2 );
+  var enemy6 = new THREE.Mesh( geometry_enemy6, material_enemy2 );
+  var enemy7 = new THREE.Mesh( geometry_enemy7, material_enemy2 );
+  var enemy8 = new THREE.Mesh( geometry_enemy8, material_enemy2 );
+  var enemy9 = new THREE.Mesh( geometry_enemy9, material_enemy9);
+  var enemy10 = new THREE.Mesh( geometry_enemy10, material_enemy9 );
+  
+  enemy2.scale.set(0.9,0.25,0.9);
+  enemy2.rotation.set(0,0,0);
+  enemy2.position.y = -2.3;
+  
+  enemy3.scale.set(0.4,0.4,0.4);
+  enemy3.position.z = 3.5;
+  
+  enemy4.scale.set(0.4,0.4,0.4);
+  enemy4.position.z = -3.5;
+  
+  enemy5.position.y = 2;
+  enemy5.position.z = 2;
+  enemy6.position.y = 2;
 	enemy6.position.z = -2;
 	enemy7.position.y = 3;
 	enemy7.position.x = -0.7;
 	enemy7.rotation.z+=0.7;
-    enemy8.position.y = 3; 
-    enemy8.position.x = -0.7;  
-    enemy8.rotation.z+=0.7;
-    enemy9.position.y = 1;
-    enemy10.position.y = 1;
+  enemy8.position.y = 3; 
+  enemy8.position.x = -0.7;  
+  enemy8.rotation.z+=0.7;
+  enemy9.position.y = 1;
+  enemy10.position.y = 1;
 
-    
-    enemy1.add(enemy2);
-    enemy1.add(enemy3);
-    enemy1.add(enemy4);
-    enemy1.add(enemy5);
-    enemy1.add(enemy6);
-    enemy5.add(enemy7);
-    enemy6.add(enemy8);
-    enemy7.add(enemy9);
-    enemy8.add(enemy10);
+  
+  enemy1.add(enemy2);
+  enemy1.add(enemy3);
+  enemy1.add(enemy4);
+  enemy1.add(enemy5);
+  enemy1.add(enemy6);
+  enemy5.add(enemy7);
+  enemy6.add(enemy8);
+  enemy7.add(enemy9);
+  enemy8.add(enemy10);
    
     
-
 
 	do
 	{
@@ -555,65 +565,62 @@ function getRandBetween(lo, hi)
 	//////////////////////////////////////////////////////////////////////////////////
 	var lastTimeMsec= null
 	requestAnimationFrame(function animate(nowMsec){
-		// keep looping
-		requestAnimationFrame( animate );
-		// measure time
-		lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
-		var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
-		lastTimeMsec	= nowMsec
 
-		                  function keyDown(event)
-		                  {
-                          keyboard[event.keyCode] = true;
-                          }
+  	// keep looping
+  	requestAnimationFrame( animate );
+  	// measure time
+  	lastTimeMsec	= lastTimeMsec || nowMsec-1000/60
+  	var deltaMsec	= Math.min(200, nowMsec - lastTimeMsec)
+  	lastTimeMsec	= nowMsec
 
-                          function keyUp(event){
-                          keyboard[event.keyCode] = false;
-                          }
+    function keyDown(event)
+    {
+    keyboard[event.keyCode] = true;
+    }
 
-                          window.addEventListener('keydown', keyDown);
-                          window.addEventListener('keyup', keyUp);
+    function keyUp(event){
+    keyboard[event.keyCode] = false;
+    }
+
+    window.addEventListener('keydown', keyDown);
+    window.addEventListener('keyup', keyUp);
 
 
 
-
-        // call each update function
-		updateFcts.forEach(function(updateFn)
-		{
-			updateFn(deltaMsec/1000, nowMsec/1000)
-		})
-
+    // call each update function
+    updateFcts.forEach(function(updateFn)
+    {
+    	updateFn(deltaMsec/1000, nowMsec/1000)
+    })
 
 	})
 
 
 
-    function castRays()
+  function castRays()
+  {
+    // rays
+
+    var direction = new THREE.Vector3(1000, 5500, 1000);
+    var startPoint = camera.position.clone();
+    var directionVector = direction.sub( startPoint );
+    var ray = new THREE.Raycaster(startPoint, directionVector.clone(). normalize());
+    scene.updateMatrixWorld();		 // required, since you haven't rendered yet
+    var rayIntersects = ray.intersectObjects(scene.children, true);
+    if (rayIntersects.length > 0)
     {
-            // rays
-
-            var direction = new THREE.Vector3(1000, 5500, 1000);
-            var startPoint = camera.position.clone();
-            var directionVector = direction.sub( startPoint );
-            var ray = new THREE.Raycaster(startPoint, directionVector.clone(). normalize());
-            scene.updateMatrixWorld();		 // required, since you haven't rendered yet
-            var rayIntersects = ray.intersectObjects(scene.children, true);
-            if (rayIntersects.length > 0)
-            {
-                                 camera.position.z = camera.position.z - 5;
-								 camera.position.x = camera.position.x - 5;
-
-			}
-
+        camera.position.z = camera.position.z - 5;
+				camera.position.x = camera.position.x - 5;
 		}
 
-					function onDocumentMouseMove(e)
-					{
-						e.preventDefault();
-						mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-						mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
-					}
+	}
 
+	function onDocumentMouseMove(e)
+	{
+		e.preventDefault();
+		mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
+	}
 
 
 
