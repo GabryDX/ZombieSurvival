@@ -176,6 +176,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		}
 
+		if ( event.shiftKey ) {
+			this.movementSpeed = 300.0;
+		}
+
 	};
 
 	this.onKeyUp = function ( event ) {
@@ -199,6 +203,10 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		}
 
+		if ( !event.shiftKey ) {
+			this.movementSpeed = 150.0;
+		}
+
 	};
 
 	this.update = function ( delta ) {
@@ -219,6 +227,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		var actualMoveSpeed = delta * this.movementSpeed;
+		console.log(this.movementSpeed);
 
 		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );

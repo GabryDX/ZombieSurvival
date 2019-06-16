@@ -115,7 +115,8 @@ DURATIONTIME=92000; //in millisec
   */
 
   var loader_2 = new THREE.ObjectLoader();
-  var model_path = 'models/gun/gun-pbribl.json';
+  //var model_path = 'models/gun/gun-pbribl.json';
+  var model_path = 'models/bsmnt-gun-depre.json';
   loader_2.load(model_path, function(deagle){
     /*var texture_weapon = THREE.ImageUtils.loadTexture( 'resources/weapon.png' );
     var material_weapon = new THREE.MeshBasicMaterial( {map: texture_weapon, color:0xffffff} );
@@ -127,6 +128,12 @@ DURATIONTIME=92000; //in millisec
     scene.add(mesh);*/
     scene.add(deagle);
   });
+
+  /*var loader = new THREE.JSONLoader();
+  loader.load( model_path, function ( geometry, materials ) {
+      var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+      scene.add( mesh );
+  });*/
   
     // bullets
     var bullets = [];
