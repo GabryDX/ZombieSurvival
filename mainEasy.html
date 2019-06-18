@@ -7,19 +7,20 @@
 <body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.js" integrity="sha256-NncZTBhUdU+UoOVS7s+6ou1L+4zhUVvFcLxV6q3oubw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js" integrity="sha256-Mc6q7xXvKBXW87eVjSASXbPqfuc9tHqbn6AHp1R97J4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.module.js" integrity="sha256-Is6nOTHl1vGG3RgNJq+Ed3wVLOe+0cnj3+OQsBD0uCQ=" crossorigin="anonymous"></script>
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.module.js" integrity="sha256-Is6nOTHl1vGG3RgNJq+Ed3wVLOe+0cnj3+OQsBD0uCQ=" crossorigin="anonymous"></script>
     <script src="js/threex.proceduralcity2.js"></script>
     <script src="js/FirstPersonControls.js"></script>
     <script type="module" src="js/CylinderGeometry.js" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
+    <script src="js/MTLLoader.js"></script>
+    <script src="js/OBJLoader.js"></script>
 
 
 <p id="time" align="center"></p>
 <p id="ris" align="center"></p>
 <script>
 
-  console.log(THREE.REVISION);
+  //console.log(THREE.REVISION); prints three.js version
   var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
@@ -41,71 +42,129 @@
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], //17
             ], mapW = map.length, mapH = map[0].length;
 
+  var scene, camera, renderer, mesh, clock, controls;
+  var bullets = [];
+  var canShoot = 0;
+  var keyboard = {};
   var enemy5;
   var pun = 0;
   var tempo = 10;
-  var UNITSIZE = 20,
-  MOVESPEED = 150,
-  LOOKSPEED = 1,
-  BULLETMOVESPEED = MOVESPEED * 5,
-  NUMAI = 100,
-  DURATIONTIME=92000; //in millisec
+  var UNITSIZE = 20, MOVESPEED = 150, LOOKSPEED = 1, BULLETMOVESPEED = MOVESPEED * 5, NUMAI = 100, DURATIONTIME=92000; //in millisec
   var width = window.innerWidth;
   var height = window.innerHeight;
-  
-  var t = THREE,renderer, clock, projector, model, skin;
-
-  var renderer  = new THREE.WebGLRenderer({antialiasing  : true});
-  renderer.setSize( width, height );
-  document.body.appendChild( renderer.domElement );
   
   var mouse = { x: 0, y: 0 };
   var ai = [];
   var updateFcts  = [];
-  //____________________________SCENE & CAMERA_______________________________________
-  var scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.0025 );
-  
-  var camera  = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000 );
-  camera.position.z = 45;
-  camera.position.x = 45;
-  scene.add(camera);
 
-  //___________________________PROCEDURAL CITY_______________________________________
-  var proceduralCity = new THREEx.ProceduralCity();
-  //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
-  var city  = proceduralCity.createSquareCity();
-  scene.add(city);
+  var loadingScreen = {
+    scene: new THREE.Scene(),
+    camera: new THREE.PerspectiveCamera(45, width/height, 0.3, 100),
+    box: new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5), new THREE.MeshBasicMaterial({ color:0x4444ff }) )
+  };
 
-  //setupAI();
+  var player = { height:1.8, speed:0.2, turnSpeed:Math.PI*0.02 };
+  var meshes = {};
+  var loadingManager = null;
+  var RESOURCES_LOADED = false;
 
-  //_____________________________________LIGHT________________________________________
-  var light = new THREE.HemisphereLight( 0xfffff0, 0x101020, 1.25 );
-  light.position.set( 1, 1, 0.25 );
-  scene.add( light );
-
-  //________________________________WEAPON_____________________________________________
   var models = { 
     uzi: {
       obj:"models/uziGold.obj",
       mtl:"models/uziGold.mtl",
       mesh: null,
       castShadow:false
+    },
+    city: {
+      //obj:"models/city1/Street environment_V01.obj",
+      //mtl:"models/city1/Street environment_V01.mtl",
+      obj:"models/city5/sehir.obj",
+      mtl:"models/city5/sehir.mtl",
+      mesh: null,
+      castShadow: false
     }
   };
+  
+function init(){
+  //____________________________SCENE & CAMERA_______________________________________
+  scene = new THREE.Scene();
+  camera  = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000 );
+  scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.0025 );
+  
+  loadingScreen.box.position.set(0,0,5);
+  loadingScreen.camera.lookAt(loadingScreen.box.position);
+  loadingScreen.scene.add(loadingScreen.box);
+  
+  loadingManager = new THREE.LoadingManager();
+  loadingManager.onProgress = function(item, loaded, total){console.log(item, loaded, total);};
+  loadingManager.onLoad = function(){
+    console.log("loaded all resources");
+    RESOURCES_LOADED = true;
+    onResourcesLoaded();
+  };
+  
+  //camera.position.z = 45;
+  //camera.position.x = 45;
+  //scene.add(camera);
 
+  //___________________________PROCEDURAL CITY_______________________________________
+  //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
+  //var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
+  //scene.add(proceduralCity);
 
-  // bullets
-  var bullets = [];
-  var canShoot = 0;
-  var keyboard = {};
-  projector = new THREE.Raycaster();
+  //_____________________________________LIGHT________________________________________
+  var light = new THREE.HemisphereLight( 0xfffff0, 0x101020, 1.25 );
+  light.position.set( 1, 1, 0.25 );
+  scene.add( light );
+
+  for( var _key in models ){
+    (function(key){
+      
+      var mtlLoader = new THREE.MTLLoader(loadingManager);
+      mtlLoader.load(models[key].mtl, function(materials){
+        materials.preload();
+        
+        var objLoader = new THREE.OBJLoader(loadingManager);
+        
+        objLoader.setMaterials(materials);
+        objLoader.load(models[key].obj, function(mesh){
+          
+          mesh.traverse(function(node){
+            if( node instanceof THREE.Mesh ){
+              if('castShadow' in models[key])
+                node.castShadow = models[key].castShadow;
+              else
+                node.castShadow = true;
+              
+              if('receiveShadow' in models[key])
+                node.receiveShadow = models[key].receiveShadow;
+              else
+                node.receiveShadow = true;
+            }
+          });
+          models[key].mesh = mesh;
+          
+        });
+      });
+      
+    })(_key);
+  }
+
+  camera.position.set(0, player.height, -5);
+  camera.lookAt(new THREE.Vector3(0, player.height, 0));
+
+  renderer  = new THREE.WebGLRenderer({antialiasing  : true});
+  renderer.setSize( width, height );
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.BasicShadowMap;
+  document.body.appendChild( renderer.domElement );
+  
+  //projector = new THREE.Raycaster();
   var vector = new THREE.Vector3();
 
-  camera.position.y = 1.85;
-  camera.position.z = 200;
+  //camera.position.y = 1.85;
+  //camera.position.z = 200;
 
-  var controls, clock;
   clock = new THREE.Clock();
   controls = new THREE.FirstPersonControls(camera);
   document.addEventListener( 'click', function () {controls.lock();}, false );
@@ -147,21 +206,61 @@
     }
   }, 1000);
 
+  animate();
+}
+   
+          
+function onResourcesLoaded(){
+  //_________________________________CITY SETTINGS____________________________
+  meshes["city"] = models.city.mesh.clone();
+  meshes["city"].position.set(-5, 10, 4);
+  scene.add(meshes["city"]);
+  //_________________________________WEAPONG SETTINGS_________________________
+  meshes["playerweapon"] = models.uzi.mesh.clone();
+  meshes["playerweapon"].position.set(0,2,0);
+  meshes["playerweapon"].scale.set(10,10,10);
+  scene.add(meshes["playerweapon"]);
+}
 
-  //////////////////////////////////////////////////////////////////////////////////
-  //    render the scene            //
-  //////////////////////////////////////////////////////////////////////////////////
-  updateFcts.push(function(){
-  
-    pun =NUMAI - ai.length;
+function getMapSector(v){
+  var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
+  var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
+  return {x: x, z: z};
+}
 
-    var delta = clock.getDelta(), speed = delta * BULLETMOVESPEED;
-    var aispeed = delta * MOVESPEED *0.1;
-    var time = Date.now() * 0.0005;
-    renderer.render( scene, camera );
-    controls.update(clock.getDelta());  // only if control is FirstPersonControls
-     
+function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+1))+lo, 10);}
+
+
+function animate(){
+ 
     castRays();
+
+    //__________________________________________BULLET CREATION_____________________________________________
+    if(keyboard[32] && canShoot <= 0){ 
+      // creates a bullet as a Mesh object
+      var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8), new THREE.MeshBasicMaterial({color:0x42FFFF}) );
+     // must change to weapon position later
+      bullet.position.set(camera.position.x - 1.5, camera.position.y - 1.25, camera.position.z);
+      // set the velocity of the bullet
+      var cameraroty;
+      if (camera.rotation.z == 0) 
+        cameraroty = Math.PI - camera.rotation.y;
+      else 
+        cameraroty = camera.rotation.y;
+      bullet.velocity = new THREE.Vector3(-Math.sin(cameraroty), 0, Math.cos(cameraroty));//.normalize();
+      console.log(bullet.velocity)
+      console.log(camera.rotation)
+      bullet.alive = true;
+      setTimeout(function(){
+        bullet.alive = false;
+        scene.remove(bullet);
+      }, 1000);
+      // add to scene, array, and set the delay to 10 frames
+      bullets.push(bullet);
+      scene.add(bullet);
+      canShoot = 10;
+    }
+    if(canShoot > 0) canShoot -= 1;
 
 
     // SHOOT BULLET
@@ -173,93 +272,47 @@
       }
 
       bullets[index].position.add(bullets[index].velocity);
+    }   
+    
+    requestAnimationFrame(animate)
+    // Play the loading screen until resources are loaded.
+    if( RESOURCES_LOADED == false ){
+      requestAnimationFrame(animate);
+      
+      loadingScreen.box.position.x -= 0.05;
+      if( loadingScreen.box.position.x < -10 ) loadingScreen.box.position.x = 10;
+      loadingScreen.box.position.y = Math.sin(loadingScreen.box.position.x);
+      
+      renderer.render(loadingScreen.scene, loadingScreen.camera);
+      return;
     }
-
-    if(keyboard[32] && canShoot <= 0){ // spacebar key
-
-    // creates a bullet as a Mesh object
-    var bullet = new THREE.Mesh(
-                                new THREE.SphereGeometry(0.2,8,8),
-                                new THREE.MeshBasicMaterial({color:0x42FFFF})
-                                );
-    bullet.position.set(
-                        camera.position.x - 0.7*parseInt(-Math.cos(camera.rotation.x)),
-                        camera.position.y - 0.3,
-                        camera.position.z
-                        );
-        
-    // set the velocity of the bullet
-    bullet.velocity = new THREE.Vector3(
-                                       ((mouse.x*parseInt(Math.cos(camera.rotation.z))) - Math.sin(camera.rotation.y) * 0.75),//*parseInt(-Math.cos(camera.rotation.z)) ,
-                                        0,//mouse.y,
-                                        Math.cos(camera.rotation.y)*parseInt(-Math.cos(camera.rotation.z))
-                                      ).normalize();
-    bullet.alive = true;
-    setTimeout(function(){
-               bullet.alive = false;
-               scene.remove(bullet);
-               }, 1000);
-    // add to scene, array, and set the delay to 10 frames
-    bullets.push(bullet);
-    scene.add(bullet);
-    canShoot = 10;
-    }
-    if(canShoot > 0) canShoot -= 1;
-  });
-          
-function getMapSector(v){
-  var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
-  var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
-  return {x: x, z: z};
+    
+    var delta = clock.getDelta(), speed = delta * BULLETMOVESPEED;
+    var aispeed = delta * MOVESPEED *0.1;
+    var time = Date.now() * 0.0005;
+    controls.update(clock.getDelta());  // only if control is FirstPersonControls
+    
+    meshes["playerweapon"].position.set(
+      camera.position.x - Math.sin(camera.rotation.y + Math.PI/6) * 0.75,
+      camera.position.y - 0.5 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01,
+      camera.position.z + Math.cos(camera.rotation.y + Math.PI/6) * 0.75
+    );
+    meshes["playerweapon"].rotation.set(
+      camera.rotation.x,
+      camera.rotation.y - Math.PI,
+      camera.rotation.z
+    );
+  
+  renderer.render(scene, camera);
+    // call each update function
+    //updateFcts.forEach(function(updateFn){updateFn(deltaMsec/1000, nowMsec/1000)});
 }
-
-function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+1))+lo, 10);}
-
-
-
-  //////////////////////////////////////////////////////////////////////////////////
-  //    loop runner             //
-  //////////////////////////////////////////////////////////////////////////////////
-  var lastTimeMsec= null
-  requestAnimationFrame(function animate(nowMsec){
-    // keep looping
-    requestAnimationFrame( animate );
-    // measure time
-    lastTimeMsec  = lastTimeMsec || nowMsec-1000/60
-    var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
-    lastTimeMsec  = nowMsec
-
-                      function keyDown(event)
-                      {
-                          keyboard[event.keyCode] = true;
-                          }
-
-                          function keyUp(event){
-                          keyboard[event.keyCode] = false;
-                          }
-
-                          window.addEventListener('keydown', keyDown);
-                          window.addEventListener('keyup', keyUp);
-
-
-
-
-        // call each update function
-    updateFcts.forEach(function(updateFn)
-    {
-      updateFn(deltaMsec/1000, nowMsec/1000)
-    })
-
-
-  })
-
-
 
   function castRays(){
     var direction = new THREE.Vector3(1000, 5500, 1000);
     var startPoint = camera.position.clone();
     var directionVector = direction.sub( startPoint );
-    var ray = new THREE.Raycaster(startPoint, directionVector.clone(). normalize());
+    var ray = new THREE.Raycaster(startPoint, directionVector.clone().normalize());
     scene.updateMatrixWorld();     // required, since you haven't rendered yet
     var rayIntersects = ray.intersectObjects(scene.children, true);
     if (rayIntersects.length > 0){
@@ -274,8 +327,15 @@ function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+
     mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
   }
 
+function keyDown(event){keyboard[event.keyCode] = true;}
+function keyUp(event){keyboard[event.keyCode] = false;}
+window.addEventListener('keydown', keyDown);
+window.addEventListener('keyup', keyUp);
+
+window.onload = init();
 
 
-
-</script><canvas width="1440" height="757"></canvas>
-</body></html>
+</script>
+<canvas width="1440" height="757"></canvas>
+</body>
+</html>

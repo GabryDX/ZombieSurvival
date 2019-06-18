@@ -29,39 +29,39 @@ THREEx.ProceduralCity	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		buildingTexture							//
 	//////////////////////////////////////////////////////////////////////////////////
-
+			
 	// generate the texture
 	var buildingTexture		= new THREE.Texture( generateTextureCanvas() );
 	buildingTexture.anisotropy	= renderer.getMaxAnisotropy();
 	buildingTexture.needsUpdate	= true;
-
-
+	
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		lamp								//
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 	var lampGeometry= new THREE.CubeGeometry( 0.1, 3, 0.1)
 	var lampMesh	= new THREE.Mesh(lampGeometry)
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 	var nBlockX	= 10
 	var nBlockZ	= 10
 	var blockSizeX	= 50
 	var blockSizeZ	= 50
 	var blockDensity= 20
-	var roadW	= 20
+	var roadW	= 8
 	var roadD	= 8
-	var buildingMaxW= 20
-	var buildingMaxD= 20
+	var buildingMaxW= 15
+	var buildingMaxD= 15
 	var sidewalkW	= 2
 	var sidewalkH	= 0.1
 	var sidewalkD	= 2
-	var lampDensityW= 1
-	var lampDensityD= 1
-	var lampH	= 7
+	var lampDensityW= 4
+	var lampDensityD= 4
+	var lampH	= 3
 
 	this.createSquareGround	= function(){
 		var geometry	= new THREE.PlaneGeometry( 1, 1, 1 );
@@ -72,12 +72,12 @@ THREEx.ProceduralCity	= function(){
 		ground.lookAt(new THREE.Vector3(0,1,0))
 		ground.scale.x	= (nBlockZ)*blockSizeZ
 		ground.scale.y	= (nBlockX)*blockSizeX
-
+		
 		return ground
 	}
 	this.createSquareLamps	= function(){
 		var object3d	= new THREE.Object3D()
-
+		
 		var lampGeometry= new THREE.CubeGeometry(1,1,1)
 		lampGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
 		var lampMesh	= new THREE.Mesh(lampGeometry)
@@ -92,7 +92,7 @@ THREEx.ProceduralCity	= function(){
 					//////////////////////////////////////////////////////////////////////////////////
 					//		light								//
 					//////////////////////////////////////////////////////////////////////////////////
-
+					
 					var lightPosition	= position.clone()
 					lightPosition.y		= sidewalkH+lampH+0.1
 					// set position for block
@@ -103,60 +103,60 @@ THREEx.ProceduralCity	= function(){
 					//////////////////////////////////////////////////////////////////////////////////
 					//		head								//
 					//////////////////////////////////////////////////////////////////////////////////
-
+					
 					// set base position
 					lampMesh.position.copy(position)
 					lampMesh.position.y	= sidewalkH+lampH
-					// add poll offset
+					// add poll offset				
 					lampMesh.scale.set(0.2,0.2,0.2)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
 						lampMesh.geometry.faces[i].color.set('white' );
-					}
+					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )
-
+					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )	
+								
 					//////////////////////////////////////////////////////////////////////////////////
 					//		poll								//
 					//////////////////////////////////////////////////////////////////////////////////
-
+					
 					// set base position
 					lampMesh.position.copy(position)
 					lampMesh.position.y	+= sidewalkH
-					// add poll offset
+					// add poll offset				
 					lampMesh.scale.set(0.1,lampH,0.1)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
 						lampMesh.geometry.faces[i].color.set('grey' );
-					}
+					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )
-
+					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )	
+								
 					//////////////////////////////////////////////////////////////////////////////////
 					//		base								//
-					//////////////////////////////////////////////////////////////////////////////////
+					//////////////////////////////////////////////////////////////////////////////////		
 					// set base position
 					lampMesh.position.copy(position)
 					lampMesh.position.y	+= sidewalkH
-					// add poll offset
+					// add poll offset				
 					lampMesh.scale.set(0.12,0.4,0.12)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
 						lampMesh.geometry.faces[i].color.set('maroon' );
-					}
+					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh );
+					THREE.GeometryUtils.merge( lampsGeometry, lampMesh );					
 				}
-				// south
+				// south							
 				var position	= new THREE.Vector3()
 				for(var i = 0; i < lampDensityW+1; i++){
 					position.x	= (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW)
@@ -185,22 +185,22 @@ THREEx.ProceduralCity	= function(){
 
 			}
 		}
-
+		
 		// build the lamps Mesh
 		var material	= new THREE.MeshLambertMaterial({
 			vertexColors	: THREE.VertexColors
 		});
 		var lampsMesh	= new THREE.Mesh(lampsGeometry, material );
 		object3d.add(lampsMesh)
-
+	
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
-
-		var texture	= THREE.ImageUtils.loadTexture( "resources/lensflare2_alpha.png" );
+		
+		var texture	= THREE.ImageUtils.loadTexture( "../images/lensflare2_alpha.png" );
 		var material	= new THREE.ParticleBasicMaterial({
 			map		: texture,
-			size		: 8,
+			size		: 8, 
 			transparent	: true
 		});
 		var lightParticles	= new THREE.ParticleSystem( lightsGeometry, material );
@@ -209,7 +209,89 @@ THREEx.ProceduralCity	= function(){
 
 		return object3d
 	}
+	this.createSquareCarLights	= function(){
+		var carLightsDensityD	= 4
+		var carW		= 1
+		var carH		= 2
 
+		var geometry	= new THREE.Geometry();
+		var position	= new THREE.Vector3()
+		position.y	= carH/2
+		
+		var colorFront		= new THREE.Color('white')
+		var colorBack		= new THREE.Color('red')
+
+		for( var blockX = 0; blockX < nBlockX; blockX++){
+			for( var blockZ = 0; blockZ < nBlockZ; blockZ++){	
+				function addCarLights(position){
+					//////////////////////////////////////////////////////////////////////////////////
+					//		comment								//
+					//////////////////////////////////////////////////////////////////////////////////
+					
+					var positionL	= position.clone()
+					positionL.x	+= -carW/2
+					// set position for block
+					positionL.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
+					positionL.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+					geometry.vertices.push( positionL );
+					geometry.colors.push( colorFront )
+
+					var positionR	= position.clone()
+					positionR.x	+= +carW/2
+					// set position for block
+					positionR.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
+					positionR.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+					geometry.vertices.push( positionR );
+					geometry.colors.push( colorFront )
+
+					//////////////////////////////////////////////////////////////////////////////////
+					//		comment								//
+					//////////////////////////////////////////////////////////////////////////////////
+					position.x	= -position.x
+					
+					var positionL	= position.clone()
+					positionL.x	+= -carW/2
+					// set position for block
+					positionL.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
+					positionL.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+					geometry.vertices.push( positionL );
+					geometry.colors.push( colorBack )
+
+					var positionR	= position.clone()
+					positionR.x	+= +carW/2
+					// set position for block
+					positionR.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
+					positionR.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+					geometry.vertices.push( positionR );
+					geometry.colors.push( colorBack )
+				}
+				// east
+				for(var i = 0; i < carLightsDensityD+1; i++){
+					position.x	= +0.5*blockSizeX-roadW/4
+					position.z	= (i/carLightsDensityD-0.5)*(blockSizeZ-roadD)
+					addCarLights(position)
+				}
+			}
+		}
+		//////////////////////////////////////////////////////////////////////////////////
+		//		comment								//
+		//////////////////////////////////////////////////////////////////////////////////
+
+		var object3d	= new THREE.Object3D
+		
+		var texture	= THREE.ImageUtils.loadTexture( "../images/lensflare2_alpha.png" );
+		var material	= new THREE.ParticleBasicMaterial({
+			map		: texture,
+			size		: 6, 
+			transparent	: true,
+			vertexColors	: THREE.VertexColors
+		});
+		var particles	= new THREE.ParticleSystem( geometry, material );
+		particles.sortParticles = true;
+		object3d.add(particles)
+		
+		return object3d
+	}
 	this.createSquareSideWalks	= function(){
 		var buildingMesh= this.createBuilding()
 		var sidewalksGeometry= new THREE.Geometry();
@@ -224,9 +306,9 @@ THREEx.ProceduralCity	= function(){
 				buildingMesh.scale.z	= blockSizeZ-roadD
 
 				// merge it with cityGeometry - very important for performance
-				THREE.GeometryUtils.merge( sidewalksGeometry, buildingMesh );
+				THREE.GeometryUtils.merge( sidewalksGeometry, buildingMesh );					
 			}
-		}
+		}		
 		// build the mesh
 		var material	= new THREE.MeshLambertMaterial({
 			color	: 0x444444
@@ -256,11 +338,11 @@ THREEx.ProceduralCity	= function(){
 						this.colorifyBuilding(buildingMesh)
 
 						// merge it with cityGeometry - very important for performance
-						THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
+						THREE.GeometryUtils.merge( cityGeometry, buildingMesh );					
 					}
-			}
+			}		
 		}
-
+		
 		// build the city Mesh
 		var material	= new THREE.MeshLambertMaterial({
 			map		: buildingTexture,
@@ -272,26 +354,29 @@ THREEx.ProceduralCity	= function(){
 
 	this.createSquareCity	= function(){
 		var object3d		= new THREE.Object3D()
-
-    var lampsMesh		= this.createSquareLamps()
+		
+		var carLightsMesh	= this.createSquareCarLights()
+		object3d.add(carLightsMesh)
+		
+		var lampsMesh		= this.createSquareLamps()
 		object3d.add(lampsMesh)
 
 		var sidewalksMesh	= this.createSquareSideWalks()
 		object3d.add(sidewalksMesh)
-
+		
 		var buildingsMesh	= this.createSquareBuildings()
-		object3d.add(buildingsMesh)
+		object3d.add(buildingsMesh)	
 
 		var groundMesh	= this.createSquareGround()
-		object3d.add(groundMesh)
-
+		object3d.add(groundMesh)	
+		
 		return object3d
 	}
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 	this.createMrDoobCity	= function(){
 		var buildingMesh= this.createBuilding()
 		var cityGeometry= new THREE.Geometry();
@@ -300,7 +385,7 @@ THREEx.ProceduralCity	= function(){
 			buildingMesh.position.x	= Math.floor( Math.random() * 200 - 100 ) * 10;
 			buildingMesh.position.z	= Math.floor( Math.random() * 200 - 100 ) * 10;
 			// put a random rotation
-			buildingMesh.rotation.y	= Math.random()*Math.PI*2;
+			buildingMesh.rotation.y	= Math.random()*Math.PI*2;		
 
 			// put a random scale
 			buildingMesh.scale.x	= Math.random() * Math.random() * Math.random() * Math.random() * 50 + 10;
@@ -319,11 +404,11 @@ THREEx.ProceduralCity	= function(){
 		var cityMesh	= new THREE.Mesh(cityGeometry, material );
 		return cityMesh
 	}
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 	// base colors for vertexColors. light is for vertices at the top, shaddow is for the ones at the bottom
 	var light	= new THREE.Color( 0xffffff )
 	var shadow	= new THREE.Color( 0x303050 )
@@ -335,7 +420,7 @@ THREEx.ProceduralCity	= function(){
 		var topColor	= baseColor.clone().multiply( light );
 		var bottomColor	= baseColor.clone().multiply( shadow );
 		// set .vertexColors for each face
-		var geometry	= buildingMesh.geometry;
+		var geometry	= buildingMesh.geometry;		
 		for ( var j = 0, jl = geometry.faces.length; j < jl; j ++ ) {
 			if ( j === 2 ) {
 				// set face.vertexColors on root face
@@ -344,15 +429,15 @@ THREEx.ProceduralCity	= function(){
 				// set face.vertexColors on sides faces
 				geometry.faces[ j ].vertexColors = [ topColor, bottomColor, bottomColor, topColor ];
 			}
-		}
+		}		
 	}
-
+	
 	return
-
+	
 	//////////////////////////////////////////////////////////////////////////////////
 	//		comment								//
 	//////////////////////////////////////////////////////////////////////////////////
-
+	
 
 	function generateTextureCanvas(){
 		// build a small canvas 32x64 and paint it in white
