@@ -1,0 +1,9 @@
+# Created by Kenney (www.kenney.nl) 
+
+newmtl skeleton
+Ka 0.000000 0.000000 0.000000 
+Kd 1 1 1 
+Ks 0.330000 0.330000 0.330000 
+map_Ka Textures/skeleton.png 
+map_Kd Textures/skeleton.png 
+
