@@ -292,17 +292,9 @@ function animate(){
     var time = Date.now() * 0.0005;
     controls.update(clock.getDelta());  // only if control is FirstPersonControls
     
-    meshes["playerweapon"].position.set(
-      camera.position.x - Math.sin(camera.rotation.y + Math.PI/6) * 0.75,
-      camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01,
-      camera.position.z + Math.cos(camera.rotation.y + Math.PI/6) * 0.75
-    );
-    meshes["playerweapon"].rotation.set(
-      camera.rotation.x,
-      camera.rotation.y - Math.PI,
-      camera.rotation.z
-    );
-  renderer.render(scene, camera);
+    meshes["playerweapon"].position.set(camera.position.x - Math.sin(camera.rotation.y + Math.PI/6) * 0.75, camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01, camera.position.z + Math.cos(camera.rotation.y + Math.PI/6) * 0.75);
+    meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
+    renderer.render(scene, camera);
 }
 
   function castRays(){
