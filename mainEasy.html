@@ -74,7 +74,7 @@
       mtl:"models/uziGold.mtl",
       mesh: null,
       castShadow:false
-    },
+    }/*
     city: {
       //obj:"models/city1/Street environment_V01.obj",
       //mtl:"models/city1/Street environment_V01.mtl",
@@ -82,7 +82,7 @@
       mtl:"models/city5/sehir.mtl",
       mesh: null,
       castShadow: false
-    }
+    }*/
   };
   
 function init(){
@@ -109,8 +109,8 @@ function init(){
 
   //___________________________PROCEDURAL CITY_______________________________________
   //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
-  //var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
-  //scene.add(proceduralCity);
+  var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
+  scene.add(proceduralCity);
 
   //_____________________________________LIGHT________________________________________
   var light = new THREE.HemisphereLight( 0xfffff0, 0x101020, 1.25 );
@@ -212,9 +212,9 @@ function init(){
           
 function onResourcesLoaded(){
   //_________________________________CITY SETTINGS____________________________
-  meshes["city"] = models.city.mesh.clone();
-  meshes["city"].position.set(-5, 10, 4);
-  scene.add(meshes["city"]);
+  //meshes["city"] = models.city.mesh.clone();
+  ///meshes["city"].position.set(-5, 10, 4);
+  //scene.add(meshes["city"]);
   //_________________________________WEAPONG SETTINGS_________________________
   meshes["playerweapon"] = models.uzi.mesh.clone();
   meshes["playerweapon"].position.set(0,2,0);
@@ -294,7 +294,7 @@ function animate(){
     
     meshes["playerweapon"].position.set(
       camera.position.x - Math.sin(camera.rotation.y + Math.PI/6) * 0.75,
-      camera.position.y - 0.5 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01,
+      camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01,
       camera.position.z + Math.cos(camera.rotation.y + Math.PI/6) * 0.75
     );
     meshes["playerweapon"].rotation.set(
@@ -302,10 +302,7 @@ function animate(){
       camera.rotation.y - Math.PI,
       camera.rotation.z
     );
-  
   renderer.render(scene, camera);
-    // call each update function
-    //updateFcts.forEach(function(updateFn){updateFn(deltaMsec/1000, nowMsec/1000)});
 }
 
   function castRays(){

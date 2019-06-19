@@ -32,7 +32,7 @@ THREEx.ProceduralCity	= function(){
 			
 	// generate the texture
 	var buildingTexture		= new THREE.Texture( generateTextureCanvas() );
-	buildingTexture.anisotropy	= renderer.getMaxAnisotropy();
+	//buildingTexture.anisotropy	= renderer.getMaxAnisotropy();
 	buildingTexture.needsUpdate	= true;
 	
 	
