@@ -29,7 +29,9 @@ THREEx.ProceduralCity	= function(){
 	//////////////////////////////////////////////////////////////////////////////////
 	//		buildingTexture							//
 	//////////////////////////////////////////////////////////////////////////////////
-			
+
+	var textureLoader = new THREE.TextureLoader();
+
 	// generate the texture
 	var buildingTexture		= new THREE.Texture( generateTextureCanvas() );
 	//buildingTexture.anisotropy	= renderer.getMaxAnisotropy();
@@ -196,14 +198,13 @@ THREEx.ProceduralCity	= function(){
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
-		
-		var texture	= THREE.ImageUtils.loadTexture( "../images/lensflare2_alpha.png" );
-		var material	= new THREE.ParticleBasicMaterial({
+		var texture	= textureLoader.load( "../images/lensflare2_alpha.png" );
+		var material	= new THREE.PointsMaterial({
 			map		: texture,
 			size		: 8, 
 			transparent	: true
 		});
-		var lightParticles	= new THREE.ParticleSystem( lightsGeometry, material );
+		var lightParticles	= new THREE.Points( lightsGeometry, material );
 		lightParticles.sortParticles = true;
 		object3d.add( lightParticles );
 
@@ -279,14 +280,14 @@ THREEx.ProceduralCity	= function(){
 
 		var object3d	= new THREE.Object3D
 		
-		var texture	= THREE.ImageUtils.loadTexture( "../images/lensflare2_alpha.png" );
-		var material	= new THREE.ParticleBasicMaterial({
+		var texture	= textureLoader.load( "../images/lensflare2_alpha.png" );
+		var material	= new THREE.PointsMaterial({
 			map		: texture,
 			size		: 6, 
 			transparent	: true,
 			vertexColors	: THREE.VertexColors
 		});
-		var particles	= new THREE.ParticleSystem( geometry, material );
+		var particles	= new THREE.Points( geometry, material );
 		particles.sortParticles = true;
 		object3d.add(particles)
 		
@@ -466,7 +467,7 @@ THREEx.ProceduralCity	= function(){
 		// disable smoothing
 		context.imageSmoothingEnabled		= false;
 		context.webkitImageSmoothingEnabled	= false;
-		context.mozImageSmoothingEnabled	= false;
+		context.ImageSmoothingEnabled	= false;
 		// then draw the image
 		context.drawImage( canvas, 0, 0, canvas2.width, canvas2.height );
 		// return the just built canvas2
