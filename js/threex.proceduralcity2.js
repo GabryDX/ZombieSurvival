@@ -119,7 +119,9 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )	
+					//THREE.GeometryUtils.merge( lampsGeometry, lampMesh )  // old method
+					lampMesh.updateMatrix();
+					lampsGeometry.merge(lampMesh.geometry, lampMesh.matrix);	
 								
 					//////////////////////////////////////////////////////////////////////////////////
 					//		poll								//
@@ -138,7 +140,9 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh )	
+					//THREE.GeometryUtils.merge( lampsGeometry, lampMesh )  // old method
+					lampMesh.updateMatrix();
+					lampsGeometry.merge(lampMesh.geometry, lampMesh.matrix);	
 								
 					//////////////////////////////////////////////////////////////////////////////////
 					//		base								//
@@ -156,7 +160,9 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
 					lampMesh.position.z	+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 					// merge it with cityGeometry - very important for performance
-					THREE.GeometryUtils.merge( lampsGeometry, lampMesh );					
+					//THREE.GeometryUtils.merge( lampsGeometry, lampMesh )  // old method
+					lampMesh.updateMatrix();
+					lampsGeometry.merge(lampMesh.geometry, lampMesh.matrix);					
 				}
 				// south							
 				var position	= new THREE.Vector3()
@@ -198,7 +204,23 @@ THREEx.ProceduralCity	= function(){
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
-		var texture	= textureLoader.load( "../images/lensflare2_alpha.png" );
+		var texture	= textureLoader.load( "resources/lensflare2_alpha.png",
+			function ( texture ) {
+		        // do something with the texture
+		        var material = new THREE.MeshBasicMaterial( {
+		            map: texture
+		         } );
+		    },
+		    // Function called when download progresses
+		    function ( xhr ) {
+		        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+		    },
+		    // Function called when download errors
+		    function ( xhr ) {
+		    	console.log(xhr);
+		        console.log( 'An error happened' );
+		    }
+		);
 		var material	= new THREE.PointsMaterial({
 			map		: texture,
 			size		: 8, 
@@ -280,7 +302,23 @@ THREEx.ProceduralCity	= function(){
 
 		var object3d	= new THREE.Object3D
 		
-		var texture	= textureLoader.load( "../images/lensflare2_alpha.png" );
+		var texture	= textureLoader.load( "resources/lensflare2_alpha.png",
+			function ( texture ) {
+		        // do something with the texture
+		        var material = new THREE.MeshBasicMaterial( {
+		            map: texture
+		         } );
+		    },
+		    // Function called when download progresses
+		    function ( xhr ) {
+		        console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+		    },
+		    // Function called when download errors
+		    function ( xhr ) {
+		    	console.log(xhr);
+		        console.log( 'An error happened' );
+		    }
+		);
 		var material	= new THREE.PointsMaterial({
 			map		: texture,
 			size		: 6, 
@@ -307,7 +345,9 @@ THREEx.ProceduralCity	= function(){
 				buildingMesh.scale.z	= blockSizeZ-roadD
 
 				// merge it with cityGeometry - very important for performance
-				THREE.GeometryUtils.merge( sidewalksGeometry, buildingMesh );					
+				//THREE.GeometryUtils.merge( sidewalksGeometry, buildingMesh );  // old method
+				buildingMesh.updateMatrix();
+				sidewalksGeometry.merge(buildingMesh.geometry, buildingMesh.matrix);
 			}
 		}		
 		// build the mesh
@@ -339,7 +379,9 @@ THREEx.ProceduralCity	= function(){
 						this.colorifyBuilding(buildingMesh)
 
 						// merge it with cityGeometry - very important for performance
-						THREE.GeometryUtils.merge( cityGeometry, buildingMesh );					
+						//THREE.GeometryUtils.merge( cityGeometry, buildingMesh );  // old method
+						buildingMesh.updateMatrix();
+						cityGeometry.merge(buildingMesh.geometry, buildingMesh.matrix);
 					}
 			}		
 		}
@@ -356,8 +398,8 @@ THREEx.ProceduralCity	= function(){
 	this.createSquareCity	= function(){
 		var object3d		= new THREE.Object3D()
 		
-		var carLightsMesh	= this.createSquareCarLights()
-		object3d.add(carLightsMesh)
+		// var carLightsMesh	= this.createSquareCarLights()
+		// object3d.add(carLightsMesh)
 		
 		var lampsMesh		= this.createSquareLamps()
 		object3d.add(lampsMesh)
@@ -395,7 +437,9 @@ THREEx.ProceduralCity	= function(){
 
 			this.colorifyBuilding(buildingMesh)
 			// merge it with cityGeometry - very important for performance
-			THREE.GeometryUtils.merge( cityGeometry, buildingMesh );
+			//THREE.GeometryUtils.merge( cityGeometry, buildingMesh );  // old method
+			buildingMesh.updateMatrix();
+			cityGeometry.merge(buildingMesh.geometry, buildingMesh.matrix);
 		}
 		// build the mesh
 		var material	= new THREE.MeshLambertMaterial({

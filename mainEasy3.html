@@ -196,12 +196,12 @@ function init(){
 
   // Update the count down every 1 second
   var x = setInterval(function(){
-    tempo -=1;
+    tempo -= 1;
     // Get the "now" date
     var now1 = new Date().getTime();
 
     if (overlayIsOn) {
-    	now1 = date;
+    	countDownDate += 1000;
     }
 
     // Find the distance between now an the count down date
@@ -213,6 +213,7 @@ function init(){
 
     // If the count down is finished, write some text
     if (distance < 0) {
+      overlay_off();
       document.exitPointerLock();
       document.removeEventListener( 'click', function () {
                     controls.lock();
@@ -293,8 +294,8 @@ function animate(){
     for(var index=0; index<bullets.length; index+=1){
       if( bullets[index] === undefined ) continue;
       if( bullets[index].alive == false ){
-      bullets.splice(index,1);
-      continue;
+	      bullets.splice(index,1);
+	      continue;
       }
 
       bullets[index].position.add(bullets[index].velocity);
@@ -319,7 +320,7 @@ function animate(){
     if (!overlayIsOn) {
 	    controls.update(clock.getDelta());  // only if control is FirstPersonControls
 	}
-	
+
     // Set gun in front of camera
     meshes["playerweapon"].position.set(
     									camera.position.x - Math.sin(camerarotation_y + Math.PI/6) * 0.75, 
