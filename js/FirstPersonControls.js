@@ -53,6 +53,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.viewHalfY = 0;
 
 	this.shoot = false;
+	this.zoom = false;
 
 	if ( this.domElement !== document ) {
 
@@ -96,6 +97,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				// case 0: this.moveForward = true; break;
 				// case 2: this.moveBackward = true; break;
 				case 0: /*left*/ this.shoot = true; break;
+				case 2: /*right*/ this.zoom = true; break;
 
 			}
 
@@ -117,6 +119,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 				// case 0: this.moveForward = false; break;
 				// case 2: this.moveBackward = false; break;
 				case 0: /*left*/ this.shoot = false; break;
+				case 2: /*right*/ this.zoom = false; break;
 
 			}
 

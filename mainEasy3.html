@@ -252,11 +252,22 @@ function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+
 
 function animate(){
 
-	/*if (keyboard[27]) {
-		overlay_on();
-	}*/
-
     castRays();
+
+    //_________WEAPON ZOOM__________
+	var handGunRightPos = Math.PI/6;
+	var bulletRightPos = 0.5;
+    if (meshes["playerweapon"] != undefined) {
+		if (controls.zoom) {
+			handGunRightPos = 0;
+	  		meshes["playerweapon"].scale.set(11.5,11.5,11.5);
+	  		bulletRightPos = 0;
+		} else {
+			handGunRightPos = Math.PI/6;
+	  		meshes["playerweapon"].scale.set(10,10,10);
+	  		bulletRightPos = 0.5;
+		}
+	}
 
     var camerarotation_y;
       if (camera.rotation.z == 0) 
@@ -272,7 +283,7 @@ function animate(){
                                 new THREE.MeshBasicMaterial({color:0xAF9B60})
                                 );
       // must change to weapon position later
-      bullet.position.set(meshes["playerweapon"].position.x - 0.5, meshes["playerweapon"].position.y, meshes["playerweapon"].position.z);
+      bullet.position.set(meshes["playerweapon"].position.x - bulletRightPos, meshes["playerweapon"].position.y, meshes["playerweapon"].position.z);
       // set the velocity of the bullet
       bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y));//.normalize();
       //console.log(bullet.velocity)
@@ -323,9 +334,9 @@ function animate(){
 
     // Set gun in front of camera
     meshes["playerweapon"].position.set(
-    									camera.position.x - Math.sin(camerarotation_y + Math.PI/6) * 0.75, 
+    									camera.position.x - Math.sin(camerarotation_y + handGunRightPos) * 0.75, 
     									camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01, 
-    									camera.position.z + Math.cos(camerarotation_y+ Math.PI/6) * 0.75);
+    									camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
     renderer.render(scene, camera);
 }
