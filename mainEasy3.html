@@ -265,7 +265,7 @@ function animate(){
         camerarotation_y = camera.rotation.y;
 
     //__________________________________________BULLET CREATION_____________________________________________
-    if(keyboard[32] && canShoot <= 0 && !overlayIsOn){ 
+    if(controls.shoot && canShoot <= 0 && !overlayIsOn){ 
       // creates a bullet as a Mesh object
       var bullet = new THREE.Mesh(
                                 new THREE.SphereGeometry(0.1,8,8),

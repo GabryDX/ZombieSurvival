@@ -52,6 +52,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
 
+	this.shoot = false;
+
 	if ( this.domElement !== document ) {
 
 		this.domElement.setAttribute( 'tabindex', - 1 );
@@ -91,8 +93,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = true; break;
-				case 2: this.moveBackward = true; break;
+				// case 0: this.moveForward = true; break;
+				// case 2: this.moveBackward = true; break;
+				case 0: /*left*/ this.shoot = true; break;
 
 			}
 
@@ -111,8 +114,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			switch ( event.button ) {
 
-				case 0: this.moveForward = false; break;
-				case 2: this.moveBackward = false; break;
+				// case 0: this.moveForward = false; break;
+				// case 2: this.moveBackward = false; break;
+				case 0: /*left*/ this.shoot = false; break;
 
 			}
 
@@ -159,6 +163,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		switch ( event.keyCode ) {
 
+			case 32: /*space*/ this.shoot = true; break;
+
 			case 38: /*up*/
 			case 87: /*W*/ this.moveForward = true; break;
 
@@ -185,6 +191,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.onKeyUp = function ( event ) {
 
 		switch ( event.keyCode ) {
+
+			case 32: /*space*/ this.shoot = false; break;
 
 			case 38: /*up*/
 			case 87: /*W*/ this.moveForward = false; break;
