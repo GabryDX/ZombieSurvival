@@ -261,11 +261,14 @@ function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+
 
 function animate(){
   
+  
+  window.addEventListener('resize', onWindowResize, false);
+
+
   var time = Date.now() * 0.0005; 
   var delta = clock.getDelta(), speed = delta * BULLETMOVESPEED;
   var aispeed = delta * MOVESPEED *0.1;
   
-
   // Play the loading screen until resources are loaded.
     if( RESOURCES_LOADED == false ){
       requestAnimationFrame(animate);
@@ -370,13 +373,20 @@ function animate(){
     mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (e.clientY / window.innerHeight) * 2 + 1;
   }
+  
+  function onWindowResize(){
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-function keyDown(event){keyboard[event.keyCode] = true;}
-function keyUp(event){keyboard[event.keyCode] = false;}
-window.addEventListener('keydown', keyDown);
-window.addEventListener('keyup', keyUp);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
-window.onload = init();
+  function keyDown(event){keyboard[event.keyCode] = true;}
+  function keyUp(event){keyboard[event.keyCode] = false;}
+  window.addEventListener('keydown', keyDown);
+  window.addEventListener('keyup', keyUp);
+
+  window.onload = init();
 
 
 </script>
