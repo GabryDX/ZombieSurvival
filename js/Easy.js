@@ -207,8 +207,7 @@ function init() {
         distance = countDownDate - now1;
 
         var sec = Math.floor(distance / 1000);
-        document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Punteggio: " + pun + "</span>";
-
+        document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + pun + "</span>";
 
         // If the count down is finished, write some text
         if (distance < 0) {
