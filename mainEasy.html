@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 
-<body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
+<body style="margin: 0px; background-color: #000; overflow: hidden;">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.js" integrity="sha256-NncZTBhUdU+UoOVS7s+6ou1L+4zhUVvFcLxV6q3oubw=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js" integrity="sha256-Mc6q7xXvKBXW87eVjSASXbPqfuc9tHqbn6AHp1R97J4=" crossorigin="anonymous"></script>
     <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.module.js" integrity="sha256-Is6nOTHl1vGG3RgNJq+Ed3wVLOe+0cnj3+OQsBD0uCQ=" crossorigin="anonymous"></script>
@@ -26,7 +26,7 @@
 <script>
   overlay_on();
 
-  //console.log(THREE.REVISION); prints three.js version
+  /*console.log(THREE.REVISION); prints three.js version
   var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
@@ -47,6 +47,7 @@
                 [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 16
                 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], //17
             ], mapW = map.length, mapH = map[0].length;
+            */
 
   var scene, camera, renderer, mesh, clock, controls;
   var bullets = [];
@@ -94,6 +95,9 @@
 function init(){
   //____________________________SCENE & CAMERA_______________________________________
   scene = new THREE.Scene();
+  var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture){scene.background = texture});
+
+  //scene.background = new THREE.Color(0xff4500);
   camera  = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000 );
   scene.fog = new THREE.FogExp2( 0xd0e0f0, 0.0025 );
   
@@ -102,9 +106,9 @@ function init(){
   loadingScreen.scene.add(loadingScreen.box);
   
   loadingManager = new THREE.LoadingManager();
-  loadingManager.onProgress = function(item, loaded, total){console.log(item, loaded, total);};
+  //loadingManager.onProgress = function(item, loaded, total){console.log(item, loaded, total);};
   loadingManager.onLoad = function(){
-    console.log("loaded all resources");
+    //console.log("loaded all resources");
     RESOURCES_LOADED = true;
     onResourcesLoaded();
   };
@@ -241,11 +245,13 @@ function onResourcesLoaded(){
   scene.add(meshes["playerweapon"]);
 }
 
+/*
 function getMapSector(v){
   var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
   var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
   return {x: x, z: z};
 }
+*/
 
 function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+1))+lo, 10);}
 
