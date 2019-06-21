@@ -56,7 +56,7 @@
   var enemy5;
   var pun = 0;
   var tempo = 10;
-  var UNITSIZE = 20, MOVESPEED = 150, LOOKSPEED = 1, BULLETMOVESPEED = MOVESPEED * 5, NUMAI = 100, DURATIONTIME=92000; //in millisec
+  var UNITSIZE = 20, MOVESPEED = 30, LOOKSPEED = 1, BULLETMOVESPEED = MOVESPEED * 5, NUMAI = 100, DURATIONTIME=92000; //in millisec
   var width = window.innerWidth;
   var height = window.innerHeight;
   
@@ -174,15 +174,18 @@ function init(){
 
   //camera.position.y = 1.85;
   //camera.position.z = 200;
+  var distance = 1;
   clock = new THREE.Clock();
   controls = new THREE.FirstPersonControls(camera);
   document.addEventListener( 'click', function () {
-                            controls.lock();
+                            if (distance > 0) {
+                              controls.lock();
+                            }
                             overlay_off();
                             }, false );
   document.addEventListener( 'pointerlockchange', function () {
                             //controls.unlock();
-                            if (document.pointerLockElement == null) {
+                            if (document.pointerLockElement == null && distance > 0) {
                               overlay_on();
                             }
                             }, false );
@@ -209,7 +212,7 @@ function init(){
     }
 
     // Find the distance between now an the count down date
-    var distance = countDownDate - now1;
+    distance = countDownDate - now1;
 
     var sec = Math.floor(distance/1000);
     document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec +" sec"+"&nbsp&nbsp&nbsp Punteggio: "+pun+"</span>";

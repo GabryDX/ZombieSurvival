@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
-	<link rel="stylesheet" href="styles.css">
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body style="margin: 0px; background-color: #3f3f3f; overflow: hidden;">
@@ -55,7 +55,7 @@
   var enemy5;
   var pun = 0;
   var tempo = 10;
-  var UNITSIZE = 20, MOVESPEED = 150, LOOKSPEED = 1, BULLETMOVESPEED = MOVESPEED * 5, NUMAI = 100, DURATIONTIME=92000; //in millisec
+  var UNITSIZE = 20, MOVESPEED = 30/*150*/, LOOKSPEED = 1, BULLETMOVESPEED = MOVESPEED * 5, NUMAI = 100, DURATIONTIME=92000; //in millisec
   var width = window.innerWidth;
   var height = window.innerHeight;
   
@@ -174,17 +174,17 @@ function init(){
   clock = new THREE.Clock();
   controls = new THREE.FirstPersonControls(camera);
   document.addEventListener( 'click', function () {
-  													if (distance > 0) {
-	  													controls.lock();
-	  												}
-  													overlay_off();
-  												  }, false );
+                            if (distance > 0) {
+                              controls.lock();
+                            }
+                            overlay_off();
+                            }, false );
   document.addEventListener( 'pointerlockchange', function () {
-  													//controls.unlock();
-  													if (document.pointerLockElement == null && distance > 0) {
-  														overlay_on();
-  													}
-  												  }, false );
+                            //controls.unlock();
+                            if (document.pointerLockElement == null && distance > 0) {
+                              overlay_on();
+                            }
+                            }, false );
   controls.movementSpeed = MOVESPEED;
   controls.lookSpeed = LOOKSPEED;
   controls.lookVertical = false; // Temporary solution; play on flat surfaces only
@@ -204,7 +204,7 @@ function init(){
     var now1 = new Date().getTime();
 
     if (overlayIsOn) {
-    	countDownDate += 1000;
+      countDownDate += 1000;
     }
 
     // Find the distance between now an the count down date
@@ -254,37 +254,64 @@ function getRandBetween(lo, hi){return parseInt(Math.floor(Math.random()*(hi-lo+
 
 
 function animate(){
+  
+  var time = Date.now() * 0.0005; 
+  var delta = clock.getDelta(), speed = delta * BULLETMOVESPEED;
+  var aispeed = delta * MOVESPEED *0.1;
+  
 
-    castRays();
+  // Play the loading screen until resources are loaded.
+    if( RESOURCES_LOADED == false ){
+      requestAnimationFrame(animate);
+      
+      loadingScreen.box.position.x -= 0.05;
+      if( loadingScreen.box.position.x < -10 ) loadingScreen.box.position.x = 10;
+      loadingScreen.box.position.y = Math.sin(loadingScreen.box.position.x);
+      
+      renderer.render(loadingScreen.scene, loadingScreen.camera);
+      return;
+  }
 
-    //_________WEAPON ZOOM__________
-	var handGunRightPos = Math.PI/6;
-	var bulletRightPos = 0.5;
+  requestAnimationFrame(animate);
+    
+  castRays();
+
+  // SHOOT BULLET
+  for(var index=0; index<bullets.length; index+=1){
+    if( bullets[index] === undefined ) continue;
+    if( bullets[index].alive == false ){
+      bullets.splice(index,1);
+      continue;
+    }
+
+    bullets[index].position.add(bullets[index].velocity);
+  }   
+
+  //________________________________WEAPON ZOOM___________________________
+  var handGunRightPos = Math.PI/6;
+  var bulletRightPos = 0.5;
     if (meshes["playerweapon"] != undefined) {
-		if (controls.zoom) {
-			handGunRightPos = 0;
-	  		meshes["playerweapon"].scale.set(11.5,11.5,11.5);
-	  		bulletRightPos = 0;
-		} else {
-			handGunRightPos = Math.PI/6;
-	  		meshes["playerweapon"].scale.set(10,10,10);
-	  		bulletRightPos = 0.5;
-		}
-	}
+    if (controls.zoom) {
+      handGunRightPos = 0;
+        meshes["playerweapon"].scale.set(11.5,11.5,11.5);
+        bulletRightPos = 0;
+    } else {
+      handGunRightPos = Math.PI/6;
+        meshes["playerweapon"].scale.set(10,10,10);
+        bulletRightPos = 0.5;
+    }
+  }
 
-    var camerarotation_y;
-      if (camera.rotation.z == 0) 
-        camerarotation_y = Math.PI - camera.rotation.y;
-      else 
-        camerarotation_y = camera.rotation.y;
+  var camerarotation_y;
+  if (camera.rotation.z == 0) 
+    camerarotation_y = Math.PI - camera.rotation.y;
+  else 
+    camerarotation_y = camera.rotation.y;
 
     //__________________________________________BULLET CREATION_____________________________________________
     if(controls.shoot && canShoot <= 0 && !overlayIsOn){ 
       // creates a bullet as a Mesh object
-      var bullet = new THREE.Mesh(
-                                new THREE.SphereGeometry(0.1,8,8),
-                                new THREE.MeshBasicMaterial({color:0xAF9B60})
-                                );
+      var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8),new THREE.MeshBasicMaterial({color:0xAF9B60}) );
       // must change to weapon position later
       bullet.position.set(meshes["playerweapon"].position.x - bulletRightPos, meshes["playerweapon"].position.y, meshes["playerweapon"].position.z);
       // set the velocity of the bullet
@@ -304,43 +331,18 @@ function animate(){
     if(canShoot > 0) canShoot -= 1;
 
 
-    // SHOOT BULLET
-    for(var index=0; index<bullets.length; index+=1){
-      if( bullets[index] === undefined ) continue;
-      if( bullets[index].alive == false ){
-	      bullets.splice(index,1);
-	      continue;
-      }
-
-      bullets[index].position.add(bullets[index].velocity);
-    }   
+  console.log(controls.movementSpeed);
+  
     
-    requestAnimationFrame(animate);
-    // Play the loading screen until resources are loaded.
-    if( RESOURCES_LOADED == false ){
-      requestAnimationFrame(animate);
-      
-      loadingScreen.box.position.x -= 0.05;
-      if( loadingScreen.box.position.x < -10 ) loadingScreen.box.position.x = 10;
-      loadingScreen.box.position.y = Math.sin(loadingScreen.box.position.x);
-      
-      renderer.render(loadingScreen.scene, loadingScreen.camera);
-      return;
-    }
-    
-    var delta = clock.getDelta();
-    var speed = delta * BULLETMOVESPEED;
-    var aispeed = delta * MOVESPEED *0.1;
-    var time = Date.now() * 0.0005;
-    if (!overlayIsOn) {
-	    controls.update(clock.getDelta());  // only if control is FirstPersonControls
-	}
+   if (!overlayIsOn) 
+      controls.update(clock.getDelta());  // only if control is FirstPersonControls
+  
 
     // Set gun in front of camera
     meshes["playerweapon"].position.set(
-    									camera.position.x - Math.sin(camerarotation_y + handGunRightPos) * 0.75, 
-    									camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01, 
-    									camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
+                      camera.position.x - Math.sin(camerarotation_y + handGunRightPos) * 0.75, 
+                      camera.position.y - 0.3 + Math.sin(time*4 + camera.position.x + camera.position.z)*0.01, 
+                      camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
     renderer.render(scene, camera);
 }
