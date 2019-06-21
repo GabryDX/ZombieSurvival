@@ -215,7 +215,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		if ( !event.shiftKey ) {
-			this.movementSpeed = 150.0;
+			this.movementSpeed = 30.0;
 		}
 
 	};
