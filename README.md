@@ -7,9 +7,9 @@ The player have to kill as many enemies as possible before the timer expire. Ene
 
 The game includes also 3 degrees of difficulty: the greater the difficulty the less is the time available to the player to hit the enemies. 
 
-Demo link: https://marcoschaerfcourses.github.io/REPO_NAME/
+Demo link: https://gabrydx.github.io/ZombieSurvival/index.html (in future https://marcoschaerfcourses.github.io/REPO_NAME/)
 
-Project realized by: NOMI.
+Project realized by: Nicolò Mantovani, Gabriele Nicosanti.
 
 =======
 # ZombieSurvival
