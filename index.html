@@ -41,18 +41,12 @@
 						|| document.documentElement.clientHeight
 						|| document.body.clientHeight;
 
-			console.log(width);
-
-			// (250*width)/1920
-			// (-450+width)/1024
-
-			//(y*width/1920)+(y*width/1024)/2
-			var eye_x = (1920*1024*2)/(width*(1920+1024));
-			var calc = (250*1920*(1920+1024))/(1920*1024*2);
-			var calc2 = (-450*1024*(1920+1024))/(1920*1024*2);
-			console.log(eye_x);
-			console.log("calc " + Math.round(calc));
-			console.log("calc2 " + Math.round(calc2));
+			// var eye_x = (1920*1024*2)/(width*(1920+1024));
+			// var calc = (250*1920*(1920+1024))/(1920*1024*2);
+			// var calc2 = (-450*1024*(1920+1024))/(1920*1024*2);
+			// console.log(eye_x);
+			// console.log("calc " + Math.round(calc));
+			// console.log("calc2 " + Math.round(calc2));
 
 			eye.isVertical = 0; 					//if it's vertical or horizontal [0|1]
 			eye.x = (210*width)/1920;				// x offset from point of insertion on page
