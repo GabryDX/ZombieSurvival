@@ -313,15 +313,13 @@ function animate() {
     //__________________________________________BULLET CREATION_____________________________________________
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
         // creates a bullet as a Mesh object
-        var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({
+        var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({
             color: 0xAF9B60
         }));
         // must change to weapon position later
-        bullet.position.set(meshes["playerweapon"].position.x - bulletRightPos, meshes["playerweapon"].position.y, meshes["playerweapon"].position.z);
+        bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
         // set the velocity of the bullet
-        bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y)); //.normalize();
-        //console.log(bullet.velocity)
-        //console.log(camera.rotation)
+        bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y)).normalize();
         bullet.alive = true;
         setTimeout(function() {
             bullet.alive = false;
