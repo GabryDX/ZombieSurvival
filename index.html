@@ -15,12 +15,8 @@
 	<div align="center">
 		<br />
 		<br />
-		<br />
-		<h1><span style="font-family: Impact; font-size: 70px; color: #f62217;">ZOMBIE SURVIVAL</span></h1>
-		<br />
-		<br />
-		<br />
-		<p style="font-family: Impact; font-size: 40px; color: #00FF00;"> 
+		<h1><span style="font-family: Impact; font-size: 5vw; color: #f62217;">ZOMBIE SURVIVAL</span></h1>
+		<p style="font-family: Impact; font-size: 2.5vw; color: #00FF00;"> 
 		Year 3019: a group of scientists developed a bacteria able to bring dead paople back to life.
 		<br />
 		Unluckily things got quickly out of control, and the result was the creation of undead
@@ -37,8 +33,29 @@
 		<span style="font-family: Impact; ">Select Level:</span>
 		<script type="text/javascript">
 
+			var width = window.innerWidth
+						|| document.documentElement.clientWidth
+						|| document.body.clientWidth;
+
+			var height = window.innerHeight
+						|| document.documentElement.clientHeight
+						|| document.body.clientHeight;
+
+			console.log(width);
+
+			// (250*width)/1920
+			// (-450+width)/1024
+
+			//(y*width/1920)+(y*width/1024)/2
+			var eye_x = (1920*1024*2)/(width*(1920+1024));
+			var calc = (250*1920*(1920+1024))/(1920*1024*2);
+			var calc2 = (-450*1024*(1920+1024))/(1920*1024*2);
+			console.log(eye_x);
+			console.log("calc " + Math.round(calc));
+			console.log("calc2 " + Math.round(calc2));
+
 			eye.isVertical = 0; 					//if it's vertical or horizontal [0|1]
-			eye.x = 85;  							// x offset from point of insertion on page
+			eye.x = (210*width)/1920;				// x offset from point of insertion on page
 			eye.y = 10;  							// y offset from point of insertion on page
 			eye.w = 250; 							// item's width
 			eye.h = 70;  							// height
