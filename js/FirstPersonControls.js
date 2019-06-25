@@ -238,16 +238,30 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		var actualMoveSpeed = delta * this.movementSpeed;
-		//console.log(this.movementSpeed);
+		//console.log(this.object.position);
+		//console.log(actualMoveSpeed);
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) )
+			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
+				this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		
+		if ( this.moveBackward ) 
+			//if ( this.object.position.x + actualMoveSpeed > -248.5 && this.object.position.x + actualMoveSpeed < 248.5 && this.object.position.z + actualMoveSpeed> -248.5 && this.object.position.z + actualMoveSpeed < 248.5)
+				this.object.translateZ( actualMoveSpeed );
+		
 
-		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
-		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
+		if ( this.moveLeft )
+			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
+				this.object.translateX( - actualMoveSpeed );
+		
+		if ( this.moveRight )
+			//if ( this.object.position.x + actualMoveSpeed > -248.5 && this.object.position.x + actualMoveSpeed < 248.5 && this.object.position.z + actualMoveSpeed> -248.5 && this.object.position.z + actualMoveSpeed < 248.5)
+				this.object.translateX( actualMoveSpeed );
 
-		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
 		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+
+		
+
 
 		var actualLookSpeed = delta * this.lookSpeed;
 

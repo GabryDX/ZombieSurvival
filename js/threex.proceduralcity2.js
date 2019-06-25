@@ -65,6 +65,49 @@ THREEx.ProceduralCity	= function(){
 	var lampDensityD= 4
 	var lampH	= 3
 
+	this.createWalls = function(){
+		var object3d	= new THREE.Object3D()
+		//Store vertices clock-wisely
+		var roofVertices = [
+			new THREE.Vector3(-250,0,-250), new THREE.Vector3(-250,50,-250),new THREE.Vector3(250,50,-250),new THREE.Vector3(250,0,-250),
+			new THREE.Vector3(250,0, -250), new THREE.Vector3(250,50,-250),new THREE.Vector3(250,50,250),new THREE.Vector3(250,0,250),
+			new THREE.Vector3(250, 0,250), new THREE.Vector3(250,50,250),new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,0,250),
+			new THREE.Vector3(-250,0,250), new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,50,-250),new THREE.Vector3(-250,0,-250)
+		];
+		var material = new THREE.MeshBasicMaterial({
+   			color: 0xffffff,
+    		side: THREE.DoubleSide,
+    		transparent: true,
+    		opacity: 0
+		});
+
+		for (var i = 0; i < roofVertices.length; i++) {
+
+    		var v1 = roofVertices[i];
+		    var v2 = roofVertices[(i+1)%roofVertices.length];//wrap last vertex back to start
+
+		    var wallGeometry = new THREE.Geometry();
+
+		    wallGeometry.vertices = [
+		        v1,
+		        v2,
+		        new THREE.Vector3(v1.x, 0, v1.z),
+		        new THREE.Vector3(v2.x, 0, v2.z)
+		    ];
+
+		    //always the same for simple 2-triangle plane
+		    wallGeometry.faces = [new THREE.Face3(0, 1, 2), new THREE.Face3(1, 2, 3)];
+
+		    wallGeometry.computeFaceNormals();
+		    wallGeometry.computeVertexNormals();
+
+		    var wallMesh = new THREE.Mesh(wallGeometry, material);
+		    object3d.add(wallMesh)
+  
+		}
+		return object3d
+	}
+
 	this.createSquareGround	= function(){
 		var geometry	= new THREE.PlaneGeometry( 1, 1, 1 );
 		var material	= new THREE.MeshLambertMaterial({
@@ -412,6 +455,9 @@ THREEx.ProceduralCity	= function(){
 
 		var groundMesh	= this.createSquareGround()
 		object3d.add(groundMesh)	
+
+		var wallMesh = this.createWalls()
+		object3d.add(wallMesh)
 		
 		return object3d
 	}

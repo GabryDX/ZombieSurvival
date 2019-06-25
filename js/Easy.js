@@ -352,8 +352,8 @@ function castRays() {
     scene.updateMatrixWorld(); // required, since you haven't rendered yet
     var rayIntersects = ray.intersectObjects(scene.children, true);
     if (rayIntersects.length > 0) {
-        camera.position.z = camera.position.z - 5;
-        camera.position.x = camera.position.x - 5;
+        camera.position.z = camera.position.z - 1.5;
+        camera.position.x = camera.position.x - 1.5;
     }
 }
 
