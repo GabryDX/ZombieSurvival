@@ -19,7 +19,10 @@ var left_leg_Id = 3;
 var right_leg_Id = 4;
 var left_arm_Id = 5;
 var right_arm_Id = 6;
-
+var left_eye_Id = 7;
+var right_eye_Id = 8;
+var nose_Id = 9;
+var numNodes = 10;
 var zombie_1 = [];
 
 var bullets = [];
@@ -33,13 +36,11 @@ var BULLETMOVESPEED = MOVESPEED * 5;
 var DURATIONTIME = 150000; //in millisec
 var NZOMBIE = 10;
 var zombie = [];
+
 var width = window.innerWidth;
 var height = window.innerHeight;
 
 var mouse = new THREE.Vector2(0,0);
-var ai = [];
-var updateFcts = [];
-
 var loadingScreen = {
     scene: new THREE.Scene(),
     camera: new THREE.PerspectiveCamera(45, width / height, 0.3, 100),
@@ -47,7 +48,6 @@ var loadingScreen = {
         color: 0x4444ff
     }))
 };
-
 var player = {
     height: 1.8,
     speed: 0.2,
@@ -80,29 +80,22 @@ window.onload = init();
 function init() {
     //____________________________SCENE & CAMERA_______________________________________
     scene = new THREE.Scene();
-    var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {
-        scene.background = texture
-    });
-
-    //scene.background = new THREE.Color(0xff4500);
     camera = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000);
+    
+    var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
     scene.fog = new THREE.FogExp2(0xd0e0f0, 0.0025);
+    
+    
+    
 
     loadingScreen.box.position.set(0, 0, 5);
     loadingScreen.camera.lookAt(loadingScreen.box.position);
     loadingScreen.scene.add(loadingScreen.box);
-
     loadingManager = new THREE.LoadingManager();
-    //loadingManager.onProgress = function(item, loaded, total){console.log(item, loaded, total);};
     loadingManager.onLoad = function() {
-        //console.log("loaded all resources");
         RESOURCES_LOADED = true;
         onResourcesLoaded();
     };
-
-    //camera.position.z = 45;
-    //camera.position.x = 45;
-    //scene.add(camera);
 
     //___________________________PROCEDURAL CITY_______________________________________
     //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
@@ -160,14 +153,16 @@ function init() {
     
     //for ( var i = 0; i < NZOMBIE; i++){
 
-        var body_geometry      = new THREE.BoxGeometry( 0.5, 0.8, 0.5);
-        var neck_geometry      = new THREE.BoxGeometry( 0.15, 0.15, 0.15);
-        var head_geometry      = new THREE.BoxGeometry( 1, 1.5, 0.5);
-        var left_leg_geometry  = new THREE.BoxGeometry( 0.3, 3, 0.5);
-        var right_leg_geometry = new THREE.BoxGeometry( 0.3, 3, 0.5);
-        var left_arm_geometry  = new THREE.BoxGeometry( 0.6, 2, 0.5);
-        var right_arm_geometry = new THREE.BoxGeometry( 0.6, 2, 0.5);
-        
+        var body_geometry      = new THREE.BoxGeometry( 0.4, 0.55, 0.25);
+        var neck_geometry      = new THREE.BoxGeometry( 0.1, 0.05, 0.085);
+        var head_geometry      = new THREE.BoxGeometry( 0.4, 0.25, 0.35);
+        var left_leg_geometry  = new THREE.BoxGeometry( 0.2, 0.6, 0.25);
+        var right_leg_geometry = new THREE.BoxGeometry( 0.2, 0.6, 0.25);
+        var left_arm_geometry  = new THREE.BoxGeometry( 0.19, 0.65, 0.25);
+        var right_arm_geometry = new THREE.BoxGeometry( 0.19, 0.65, 0.25);
+        var left_eye_geometry  = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
+        var right_eye_geometry = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
+        var nose_geometry      = new THREE.BoxGeometry( 0.09, 0.045, 0.1)
 
         var body_material      = new THREE.MeshLambertMaterial({color: 0x00ff00});
         var neck_material      = new THREE.MeshLambertMaterial({color: 0x000000});
@@ -176,8 +171,10 @@ function init() {
         var right_leg_material = new THREE.MeshLambertMaterial({color: 0x2a4acd});
         var left_arm_material  = new THREE.MeshLambertMaterial({color: 0xfeff11});
         var right_arm_material = new THREE.MeshLambertMaterial({color: 0xfeff11});
+        var left_eye_material  = new THREE.MeshLambertMaterial({color: 0x000000});
+        var right_eye_material = new THREE.MeshLambertMaterial({color: 0x000000});
+        var nose_material = new THREE.MeshLambertMaterial({color: 0x000000});
         
-
         var body      = new THREE.Mesh( body_geometry, body_material);
         var neck      = new THREE.Mesh( neck_geometry, neck_material);
         var head      = new THREE.Mesh( head_geometry, head_material);
@@ -185,6 +182,9 @@ function init() {
         var right_leg = new THREE.Mesh( right_leg_geometry, right_leg_material);
         var left_arm  = new THREE.Mesh( left_arm_geometry, left_arm_material);
         var right_arm = new THREE.Mesh( right_arm_geometry, right_arm_material);
+        var left_eye  = new THREE.Mesh(left_eye_geometry, left_eye_material);
+        var right_eye = new THREE.Mesh(right_eye_geometry, right_eye_material);
+        var nose      = new THREE.Mesh(nose_geometry, nose_material); 
 
         zombie_1[body_Id]      = body;
         zombie_1[neck_Id]      = neck;
@@ -193,7 +193,10 @@ function init() {
         zombie_1[right_leg_Id] = right_leg;
         zombie_1[left_arm_Id]  = left_arm;
         zombie_1[right_arm_Id] = right_arm;
-
+        zombie_1[left_eye_Id]  = left_eye;
+        zombie_1[right_eye_Id] = right_eye;
+        zombie_1[nose_Id]      = nose;
+        /*
         scene.add(body);
         scene.add(neck);
         scene.add(head);
@@ -201,6 +204,13 @@ function init() {
         scene.add(right_leg);
         scene.add(left_arm);
         scene.add(right_arm);
+        */
+        for ( var i = 0; i < numNodes; i++)
+            scene.add(zombie_1[i]);
+        
+        //___________________HIERACHICAL OBJECT_________________
+        //Parent.attach(son): method that joints parent and son
+        //Parent.detach(son): method that disjoints parent and son
 
         body.attach(neck);
         neck.attach(head);
@@ -208,14 +218,20 @@ function init() {
         body.attach(right_leg);
         body.attach(left_arm);
         body.attach(right_arm);
+        head.attach(left_eye);
+        head.attach(right_eye);
+        head.attach(nose);
         
         body.position.set(0, 1.5, 0);
-        neck.position.set(0, body.position.y - 1.05, 0);
-        head.position.set();
-        left_leg.position.set();
-        right_leg.position.set();
-        left_arm.position.set();
-        right_arm.position.set();
+        neck.position.set(0, 0.3, 0);
+        head.position.set(0, 0.15, 0);
+        left_leg.position.set(-0.3, -0.02, 0);
+        right_leg.position.set(0.3, -0.02, 0);
+        left_arm.position.set(-0.1, -0.6, 0);
+        right_arm.position.set(0.1, -0.6, 0);
+        left_eye.position.set(-0.1, 0, -0.15);
+        right_eye.position.set(0.1, 0, -0.15);
+        nose.position.set(0, -0.04, -0.15)
 
         //body.updateMatrixWorld();
         
@@ -390,10 +406,18 @@ function animate() {
     renderer.render(scene, camera);
 
     //console.log(body.position.z);
+    /*
     if ( zombie_1[body_Id].position.z < 50){
+        if ( zombie_1[left_leg_Id].rotation.z < 0.5){
+            zombie_1[right_leg_Id].rotation.z += 0.02;   
+            zombie_1[left_leg_Id].rotation.z += 0.02;
+        }else{
+            zombie_1[right_leg_Id].rotation.z -= 0.02;   
+            zombie_1[left_leg_Id].rotation.z -= 0.02;
+        }
         zombie_1[body_Id].position.z += 0.03;
-    }
-
+    }*/
+    
 }
 
 /*
