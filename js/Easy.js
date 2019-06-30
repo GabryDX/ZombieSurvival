@@ -1,45 +1,42 @@
-/*console.log(THREE.REVISION); prints three.js version
-var map = [ // 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
-              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], // 0
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 1
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 2
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 3
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 4
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 5
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 6
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 7
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 8
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 9
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 10
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], //11
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 12
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 13
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 14
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 15
-              [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,], // 16
-              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,], //17
-          ], mapW = map.length, mapH = map[0].length;
-          */
+//import { Zombie } from "js/Zombie.js";
+/*
+Zombie = function(){
+    var geometry = new THREE.BoxGeometry( 1, 5, 1);
+    var material = new THREE.MeshBasicMaterial({color: 0x4aa02c});
+    var parallelepiped = new THREE.Mesh( geometry, material);
+
+    //scene.add(parallelepiped);
+    return parallelepiped
+}*/
+
+
 var scene, camera, renderer, mesh, clock, controls;
+
+var body_Id = 0;
+var neck_Id = 1;
+var head_Id = 2;
+var left_leg_Id = 3;
+var right_leg_Id = 4;
+var left_arm_Id = 5;
+var right_arm_Id = 6;
+
+var zombie_1 = [];
+
 var bullets = [];
 var canShoot = 0;
 var keyboard = {};
-var enemy5;
 var pun = 0;
 var tempo = 10;
-var UNITSIZE = 20,
-    MOVESPEED = 30,
-    LOOKSPEED = 1,
-    BULLETMOVESPEED = MOVESPEED * 5,
-    NUMAI = 100,
-    DURATIONTIME = 92000; //in millisec
+var MOVESPEED = 30;
+var LOOKSPEED = 1;
+var BULLETMOVESPEED = MOVESPEED * 5;
+var DURATIONTIME = 150000; //in millisec
+var NZOMBIE = 10;
+var zombie = [];
 var width = window.innerWidth;
 var height = window.innerHeight;
 
-var mouse = {
-    x: 0,
-    y: 0
-};
+var mouse = new THREE.Vector2(0,0);
 var ai = [];
 var updateFcts = [];
 
@@ -153,19 +150,81 @@ function init() {
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
 
-    renderer = new THREE.WebGLRenderer({
-        antialiasing: true
-    });
+    renderer = new THREE.WebGLRenderer({antialiasing: true});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.BasicShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    //projector = new THREE.Raycaster();
-    var vector = new THREE.Vector3();
+    
+    
+    //for ( var i = 0; i < NZOMBIE; i++){
 
-    //camera.position.y = 1.85;
-    //camera.position.z = 200;
+        var body_geometry      = new THREE.BoxGeometry( 0.5, 0.8, 0.5);
+        var neck_geometry      = new THREE.BoxGeometry( 0.15, 0.15, 0.15);
+        var head_geometry      = new THREE.BoxGeometry( 1, 1.5, 0.5);
+        var left_leg_geometry  = new THREE.BoxGeometry( 0.3, 3, 0.5);
+        var right_leg_geometry = new THREE.BoxGeometry( 0.3, 3, 0.5);
+        var left_arm_geometry  = new THREE.BoxGeometry( 0.6, 2, 0.5);
+        var right_arm_geometry = new THREE.BoxGeometry( 0.6, 2, 0.5);
+        
+
+        var body_material      = new THREE.MeshLambertMaterial({color: 0x00ff00});
+        var neck_material      = new THREE.MeshLambertMaterial({color: 0x000000});
+        var head_material      = new THREE.MeshLambertMaterial({color: 0xe107a9});
+        var left_leg_material  = new THREE.MeshLambertMaterial({color: 0x2a4acd});
+        var right_leg_material = new THREE.MeshLambertMaterial({color: 0x2a4acd});
+        var left_arm_material  = new THREE.MeshLambertMaterial({color: 0xfeff11});
+        var right_arm_material = new THREE.MeshLambertMaterial({color: 0xfeff11});
+        
+
+        var body      = new THREE.Mesh( body_geometry, body_material);
+        var neck      = new THREE.Mesh( neck_geometry, neck_material);
+        var head      = new THREE.Mesh( head_geometry, head_material);
+        var left_leg  = new THREE.Mesh( left_leg_geometry, left_leg_material);
+        var right_leg = new THREE.Mesh( right_leg_geometry, right_leg_material);
+        var left_arm  = new THREE.Mesh( left_arm_geometry, left_arm_material);
+        var right_arm = new THREE.Mesh( right_arm_geometry, right_arm_material);
+
+        zombie_1[body_Id]      = body;
+        zombie_1[neck_Id]      = neck;
+        zombie_1[head_Id]      = head;
+        zombie_1[left_leg_Id]  = left_leg;
+        zombie_1[right_leg_Id] = right_leg;
+        zombie_1[left_arm_Id]  = left_arm;
+        zombie_1[right_arm_Id] = right_arm;
+
+        scene.add(body);
+        scene.add(neck);
+        scene.add(head);
+        scene.add(left_leg);
+        scene.add(right_leg);
+        scene.add(left_arm);
+        scene.add(right_arm);
+
+        body.attach(neck);
+        neck.attach(head);
+        body.attach(left_leg);
+        body.attach(right_leg);
+        body.attach(left_arm);
+        body.attach(right_arm);
+        
+        body.position.set(0, 1.5, 0);
+        neck.position.set(0, body.position.y - 1.05, 0);
+        head.position.set();
+        left_leg.position.set();
+        right_leg.position.set();
+        left_arm.position.set();
+        right_arm.position.set();
+
+        //body.updateMatrixWorld();
+        
+        
+        
+
+        
+    //}
+    
     var distance = 1;
     clock = new THREE.Clock();
     controls = new THREE.FirstPersonControls(camera);
@@ -232,26 +291,13 @@ function onResourcesLoaded() {
     //meshes["city"] = models.city.mesh.clone();
     ///meshes["city"].position.set(-5, 10, 4);
     //scene.add(meshes["city"]);
-    //_________________________________WEAPONG SETTINGS_________________________
+    //_________________________________WEAPON SETTINGS_________________________
     meshes["playerweapon"] = models.uzi.mesh.clone();
     meshes["playerweapon"].position.set(0, 2, 0);
     meshes["playerweapon"].scale.set(10, 10, 10);
     scene.add(meshes["playerweapon"]);
     overlay_on();
 }
-
-/*
-function getMapSector(v){
-  var x = Math.floor((v.x + UNITSIZE / 2) / UNITSIZE + mapW/2);
-  var z = Math.floor((v.z + UNITSIZE / 2) / UNITSIZE + mapW/2);
-  return {x: x, z: z};
-}
-*/
-
-function getRandBetween(lo, hi) {
-    return parseInt(Math.floor(Math.random() * (hi - lo + 1)) + lo, 10);
-}
-
 
 function animate() {
 
@@ -342,8 +388,15 @@ function animate() {
         camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
     renderer.render(scene, camera);
+
+    //console.log(body.position.z);
+    if ( zombie_1[body_Id].position.z < 50){
+        zombie_1[body_Id].position.z += 0.03;
+    }
+
 }
 
+/*
 function castRays() {
     var direction = new THREE.Vector3(1000, 5500, 1000);
     var startPoint = camera.position.clone();
@@ -352,15 +405,34 @@ function castRays() {
     scene.updateMatrixWorld(); // required, since you haven't rendered yet
     var rayIntersects = ray.intersectObjects(scene.children, true);
     if (rayIntersects.length > 0) {
-        camera.position.z = camera.position.z - 1.5;
-        camera.position.x = camera.position.x - 1.5;
+        camera.position.z = camera.position.z - 0.2;
+        camera.position.x = camera.position.x - 0.2;
+    }
+}*/
+
+function castRays(){
+    var raycaster = new THREE.Raycaster(); // create once
+    
+    window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
+    
+    raycaster.setFromCamera( mouse, camera );
+
+    var intersects = raycaster.intersectObjects(scene.children, true);
+    if ( intersects.length > 0 ){
+        //console.log(intersects[0].object.position.distanceTo(camera.position));
+        if ( intersects[0].object.position.distanceTo(camera.position) < 3.5 ){
+
+            //intersects[0].object.material.color.set(0xff0000);
+            camera.position.z = camera.position.z - 0.2;
+            camera.position.x = camera.position.x - 0.2;    
+        }
     }
 }
 
-function onDocumentMouseMove(e) {
-    e.preventDefault();
-    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+function onDocumentMouseMove(event) {
+    event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
 function onWindowResize() {
