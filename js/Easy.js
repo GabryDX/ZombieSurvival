@@ -8,21 +8,24 @@ Zombie = function(){
     //scene.add(parallelepiped);
     return parallelepiped
 }*/
+//document.write('<script type"text/javascript" src="js/physi.js"></script>');
 
+//Physijs.scripts.worker = 'js/physijs_worker.js';
+//Physijs.scripts.ammo = 'js/ammo.js';
 
 var scene, camera, renderer, mesh, clock, controls;
 
 var body_Id = 0;
-var neck_Id = 1;
-var head_Id = 2;
-var left_leg_Id = 3;
-var right_leg_Id = 4;
-var left_arm_Id = 5;
-var right_arm_Id = 6;
-var left_eye_Id = 7;
-var right_eye_Id = 8;
-var nose_Id = 9;
-var numNodes = 10;
+//var neck_Id = 1;
+var head_Id = 1;
+var left_leg_Id = 2;
+var right_leg_Id = 3;
+var left_arm_Id = 4;
+var right_arm_Id = 5;
+//var left_eye_Id = 6;
+//var right_eye_Id = 7;
+//var nose_Id = 8;
+var numNodes = 6;
 var zombie_1 = [];
 
 var bullets = [];
@@ -152,50 +155,57 @@ function init() {
     
     
     //for ( var i = 0; i < NZOMBIE; i++){
-
+        var loader = new THREE.TextureLoader();
+        //load('resources/zombie.png', function(texture) {body.background = texture;});
+        
         var body_geometry      = new THREE.BoxGeometry( 0.4, 0.55, 0.25);
-        var neck_geometry      = new THREE.BoxGeometry( 0.1, 0.05, 0.085);
+        //var neck_geometry      = new THREE.BoxGeometry( 0.1, 0.05, 0.085);
         var head_geometry      = new THREE.BoxGeometry( 0.4, 0.25, 0.35);
         var left_leg_geometry  = new THREE.BoxGeometry( 0.2, 0.6, 0.25);
         var right_leg_geometry = new THREE.BoxGeometry( 0.2, 0.6, 0.25);
         var left_arm_geometry  = new THREE.BoxGeometry( 0.19, 0.65, 0.25);
         var right_arm_geometry = new THREE.BoxGeometry( 0.19, 0.65, 0.25);
-        var left_eye_geometry  = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
-        var right_eye_geometry = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
-        var nose_geometry      = new THREE.BoxGeometry( 0.09, 0.045, 0.1)
+        //var left_eye_geometry  = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
+        //var right_eye_geometry = new THREE.BoxGeometry( 0.1, 0.03, 0.1);
+        //var nose_geometry      = new THREE.BoxGeometry( 0.09, 0.045, 0.1)
 
-        var body_material      = new THREE.MeshLambertMaterial({color: 0x00ff00});
-        var neck_material      = new THREE.MeshLambertMaterial({color: 0x000000});
-        var head_material      = new THREE.MeshLambertMaterial({color: 0xe107a9});
+        //var body_material      = new THREE.MeshLambertMaterial({color: 0x00ff00});
+        var body_material      = new THREE.MeshLambertMaterial({map: loader.load('resources/zombie_arancione.png')});
+        var head_material      = new THREE.MeshLambertMaterial({map: loader.load('resources/zombie_arancione.png'), function(texture){
+                                                                                                                        texture.offset(new THREE.Vector2(15,15));
+                                                                                                                    } 
+                                                                                                        });
+        //var neck_material      = new THREE.MeshLambertMaterial({color: 0x000000});
+        //var head_material      = new THREE.MeshLambertMaterial({color: 0xe107a9});
         var left_leg_material  = new THREE.MeshLambertMaterial({color: 0x2a4acd});
         var right_leg_material = new THREE.MeshLambertMaterial({color: 0x2a4acd});
         var left_arm_material  = new THREE.MeshLambertMaterial({color: 0xfeff11});
         var right_arm_material = new THREE.MeshLambertMaterial({color: 0xfeff11});
-        var left_eye_material  = new THREE.MeshLambertMaterial({color: 0x000000});
-        var right_eye_material = new THREE.MeshLambertMaterial({color: 0x000000});
-        var nose_material = new THREE.MeshLambertMaterial({color: 0x000000});
+        //var left_eye_material  = new THREE.MeshLambertMaterial({color: 0x000000});
+        //var right_eye_material = new THREE.MeshLambertMaterial({color: 0x000000});
+        //var nose_material = new THREE.MeshLambertMaterial({color: 0x000000});
         
         var body      = new THREE.Mesh( body_geometry, body_material);
-        var neck      = new THREE.Mesh( neck_geometry, neck_material);
+        //var neck      = new THREE.Mesh( neck_geometry, neck_material);
         var head      = new THREE.Mesh( head_geometry, head_material);
         var left_leg  = new THREE.Mesh( left_leg_geometry, left_leg_material);
         var right_leg = new THREE.Mesh( right_leg_geometry, right_leg_material);
         var left_arm  = new THREE.Mesh( left_arm_geometry, left_arm_material);
         var right_arm = new THREE.Mesh( right_arm_geometry, right_arm_material);
-        var left_eye  = new THREE.Mesh(left_eye_geometry, left_eye_material);
-        var right_eye = new THREE.Mesh(right_eye_geometry, right_eye_material);
-        var nose      = new THREE.Mesh(nose_geometry, nose_material); 
+        //var left_eye  = new THREE.Mesh(left_eye_geometry, left_eye_material);
+        //var right_eye = new THREE.Mesh(right_eye_geometry, right_eye_material);
+        //var nose      = new THREE.Mesh(nose_geometry, nose_material); 
 
         zombie_1[body_Id]      = body;
-        zombie_1[neck_Id]      = neck;
+        //zombie_1[neck_Id]      = neck;
         zombie_1[head_Id]      = head;
         zombie_1[left_leg_Id]  = left_leg;
         zombie_1[right_leg_Id] = right_leg;
         zombie_1[left_arm_Id]  = left_arm;
         zombie_1[right_arm_Id] = right_arm;
-        zombie_1[left_eye_Id]  = left_eye;
-        zombie_1[right_eye_Id] = right_eye;
-        zombie_1[nose_Id]      = nose;
+        //zombie_1[left_eye_Id]  = left_eye;
+        //zombie_1[right_eye_Id] = right_eye;
+        //zombie_1[nose_Id]      = nose;
         /*
         scene.add(body);
         scene.add(neck);
@@ -212,26 +222,27 @@ function init() {
         //Parent.attach(son): method that joints parent and son
         //Parent.detach(son): method that disjoints parent and son
 
-        body.attach(neck);
-        neck.attach(head);
+        //body.attach(neck);
+        body.attach(head);
         body.attach(left_leg);
         body.attach(right_leg);
         body.attach(left_arm);
         body.attach(right_arm);
-        head.attach(left_eye);
-        head.attach(right_eye);
-        head.attach(nose);
+        //head.attach(left_eye);
+        //head.attach(right_eye);
+        //head.attach(nose);
         
         body.position.set(0, 1.5, 0);
-        neck.position.set(0, 0.3, 0);
-        head.position.set(0, 0.15, 0);
+        //neck.position.set(0, 0.3, 0);
+        head.position.set(0, 0.4, 0);
         left_leg.position.set(-0.3, -0.02, 0);
         right_leg.position.set(0.3, -0.02, 0);
         left_arm.position.set(-0.1, -0.6, 0);
         right_arm.position.set(0.1, -0.6, 0);
-        left_eye.position.set(-0.1, 0, -0.15);
-        right_eye.position.set(0.1, 0, -0.15);
-        nose.position.set(0, -0.04, -0.15)
+        //left_eye.position.set(-0.1, 0, -0.15);
+        //right_eye.position.set(0.1, 0, -0.15);
+        //nose.position.set(0, -0.04, -0.15)
+
 
         //body.updateMatrixWorld();
         
@@ -433,9 +444,10 @@ function castRays() {
         camera.position.x = camera.position.x - 0.2;
     }
 }*/
-
+/*
 function castRays(){
-    var raycaster = new THREE.Raycaster(); // create once
+    //var starting_position = camera.position.clone(); 
+    var raycaster = new THREE.Raycaster();
     
     window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
     
@@ -451,6 +463,28 @@ function castRays(){
             camera.position.x = camera.position.x - 0.2;    
         }
     }
+}*/
+
+function castRays(){
+    window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
+    
+    var direction = new THREE.Vector3(1000, 5000, 1000);
+    var starting_position = camera.position.clone();
+    var directionVector = direction.sub(starting_position);
+
+    var raycaster = new THREE.Raycaster( starting_position, directionVector.clone().normalize() );
+    //raycaster.setFromCamera(mouse, camera);
+    scene.updateMatrixWorld();
+
+    var intersects = raycaster.intersectObjects(scene.children, true);
+    if ( intersects.length > 0 ){
+        //console.log(intersects[0].object.position.distanceTo(camera.position));{
+
+            //intersects[0].object.material.color.set(0xff0000);
+            camera.position.z = camera.position.z - 0.2;
+            camera.position.x = camera.position.x - 0.2;    
+    }
+    
 }
 
 function onDocumentMouseMove(event) {
