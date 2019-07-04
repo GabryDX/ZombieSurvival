@@ -444,48 +444,44 @@ function castRays() {
         camera.position.x = camera.position.x - 0.2;
     }
 }*/
-/*
-function castRays(){
-    //var starting_position = camera.position.clone(); 
-    var raycaster = new THREE.Raycaster();
-    
-    window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
-    
-    raycaster.setFromCamera( mouse, camera );
-
-    var intersects = raycaster.intersectObjects(scene.children, true);
-    if ( intersects.length > 0 ){
-        //console.log(intersects[0].object.position.distanceTo(camera.position));
-        if ( intersects[0].object.position.distanceTo(camera.position) < 3.5 ){
-
-            //intersects[0].object.material.color.set(0xff0000);
-            camera.position.z = camera.position.z - 0.2;
-            camera.position.x = camera.position.x - 0.2;    
-        }
-    }
-}*/
 
 function castRays(){
+    
+    var raycaster_right = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 0));
+    var raycaster_left = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 0));
+    var raycaster_backward = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, -1000));
+    var raycaster_frontward = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, 1000));
+    var raycaster = [raycaster_frontward, raycaster_right, raycaster_backward, raycaster_left];
+    
     window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
-    
-    var direction = new THREE.Vector3(1000, 5000, 1000);
-    var starting_position = camera.position.clone();
-    var directionVector = direction.sub(starting_position);
 
-    var raycaster = new THREE.Raycaster( starting_position, directionVector.clone().normalize() );
-    //raycaster.setFromCamera(mouse, camera);
-    scene.updateMatrixWorld();
-
-    var intersects = raycaster.intersectObjects(scene.children, true);
-    if ( intersects.length > 0 ){
-        //console.log(intersects[0].object.position.distanceTo(camera.position));{
-
-            //intersects[0].object.material.color.set(0xff0000);
-            camera.position.z = camera.position.z - 0.2;
-            camera.position.x = camera.position.x - 0.2;    
+    //___________ NB: CAMERA ROTATES COUNTER CLOCKWISE________
+    var direction = new THREE.Vector3();
+    for ( var i = 0; i < 4; i++){
+        raycaster[i].setFromCamera( mouse, camera );    
+        var intersects = raycaster[i].intersectObjects(scene.children, true);
+        if ( intersects.length > 0 && intersects[0].distance <= 8 ){
+            camera.getWorldDirection(direction);
+            //direction.x = ( direction.x + 1) * 250 / 2;
+            //direction.z = ( direction.z - 1) * 250 /2;
+            //direction.y = direction.y ;
+            console.log(direction);
+            theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
+            /*
+            //Frontward
+            if ( i == 0){
+                if ( theta > 0 && theta <= 90 ) camera.position.x -= 0.2;
+                else if ( theta > 90 && theta <= 180 ) camera.position.z += 0.2;
+                else if ( theta > 180 && theta <= 270 ) camera.position.x -= 0.2;
+                else camera.position.z += 
+                
+            
+        
+            }*/
+        }   
     }
-    
 }
+
 
 function onDocumentMouseMove(event) {
     event.preventDefault();
