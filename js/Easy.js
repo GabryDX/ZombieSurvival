@@ -10,8 +10,8 @@ Zombie = function(){
 }*/
 //document.write('<script type"text/javascript" src="js/physi.js"></script>');
 
-//Physijs.scripts.worker = 'js/physijs_worker.js';
-//Physijs.scripts.ammo = 'js/ammo.js';
+Physijs.scripts.worker = './physijs_worker.js';
+Physijs.scripts.ammo = './ammo.js';
 
 var scene, camera, renderer, mesh, clock, controls;
 
@@ -32,9 +32,9 @@ var height = window.innerHeight;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
-    scene: new THREE.Scene(),
+    scene: new Physijs.Scene(),
     camera: new THREE.PerspectiveCamera(45, width / height, 0.3, 100),
-    box: new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({
+    box: new Physijs.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({
         color: 0x4444ff
     }))
 };
@@ -72,7 +72,8 @@ function init() {
 
 
     //____________________________SCENE & CAMERA_______________________________________
-    scene = new THREE.Scene();
+    scene = new Physijs.Scene();
+    scene.setGravity( new THREE.Vector3(0, -30, 0));
     camera = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000);
     
     var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
@@ -142,7 +143,7 @@ function init() {
     
     
     //for ( var i = 0; i < NZOMBIE; i++){   
-     var zombie = new Zombie.zombie();
+     //var zombie = new Zombie.zombie();
         
 
         
@@ -359,12 +360,13 @@ function castRays(){
         raycaster[i].setFromCamera( mouse, camera );    
         var intersects = raycaster[i].intersectObjects(scene.children, true);
         if ( intersects.length > 0 && intersects[0].distance <= 8 ){
-            camera.getWorldDirection(direction);
-            //direction.x = ( direction.x + 1) * 250 / 2;
+            camera.getWorldDirection(direction);;
+            direction.x = - direction.x;
             //direction.z = ( direction.z - 1) * 250 /2;
             //direction.y = direction.y ;
-            console.log(direction);
+            //console.log(direction);
             theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
+            //console.log(theta);
             /*
             //Frontward
             if ( i == 0){

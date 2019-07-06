@@ -1,4 +1,6 @@
 // from @mrdoob http://www.mrdoob.com/lab/javascript/webgl/city/01/
+Physijs.scripts.worker = './physijs_worker.js';
+Physijs.scripts.ammo = './ammo.js';
 
 var THREEx = THREEx || {}
 
@@ -74,12 +76,16 @@ THREEx.ProceduralCity	= function(){
 			new THREE.Vector3(250, 0,250), new THREE.Vector3(250,50,250),new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,0,250),
 			new THREE.Vector3(-250,0,250), new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,50,-250),new THREE.Vector3(-250,0,-250)
 		];
-		var material = new THREE.MeshBasicMaterial({
-   			color: 0xffffff,
-    		side: THREE.DoubleSide,
-    		transparent: true,
-    		opacity: 0
-		});
+		var material = new Physijs.createMaterial(
+			new THREE.MeshBasicMaterial({
+	   			color: 0xffffff,
+	    		side: THREE.DoubleSide,
+	    		transparent: true,
+	    		opacity: 0
+			}),
+			.6, //medium friction
+			.3 //low restitution
+		);
 
 		for (var i = 0; i < roofVertices.length; i++) {
 
@@ -101,7 +107,7 @@ THREEx.ProceduralCity	= function(){
 		    wallGeometry.computeFaceNormals();
 		    wallGeometry.computeVertexNormals();
 
-		    var wallMesh = new THREE.Mesh(wallGeometry, material);
+		    var wallMesh = new Physijs.Mesh(wallGeometry, material);
 		    object3d.add(wallMesh)
   
 		}
