@@ -14,7 +14,9 @@ Physijs.scripts.worker = './physijs_worker.js';
 Physijs.scripts.ammo = './ammo.js';
 
 var scene, camera, renderer, mesh, clock, controls;
-
+var raycaster = [];
+var cube_trick;
+var cube_trick2;
 var bullets = [];
 var canShoot = 0;
 var keyboard = {};
@@ -74,6 +76,10 @@ function init() {
     //____________________________SCENE & CAMERA_______________________________________
     scene = new Physijs.Scene();
     scene.setGravity( new THREE.Vector3(0, -30, 0));
+    scene.addEventListener(
+            'update',
+            function() {scene.simulate( undefined, 1 );}
+    );
     camera = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000);
     
     var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
@@ -131,16 +137,44 @@ function init() {
         })(_key);
     }
 
+
+
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
+    scene.add(camera);
 
+    //Raycasting in 4 directions
+    var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 0));
+    var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 0));
+    var raycaster_S = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, -1000));
+    var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, 1000));
+    var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 1000));
+    var raycaster_NO = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 1000));
+    var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, -1000));
+    var raycaster_SO = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, -1000));
+
+    raycaster = [raycaster_N, raycaster_S, raycaster_E, raycaster_O, raycaster_NO, raycaster_NE, raycaster_SO, raycaster_SE];
+    /*
+    cube_trick = spawnBox();
+    cube_trick.setLinearVelocity(new THREE.Vector3(0,0.55,0));
+    //cube_trick.__dirtyPosition = true; 
+    cube_trick2 = spawnBox();
+    cube_trick2.setLinearVelocity(new THREE.Vector3(0,0,0));
+    cube_trick2.position.z = 50;
+    cube_trick2.material.color.setHex(0x00aabb);
+
+    scene.add(cube_trick);
+    scene.add(cube_trick2);
+
+    cube_trick.setCcdMotionThreshold(0.5);
+    cube_trick.setCcdMotionThreshold(0.5);
+    */
     renderer = new THREE.WebGLRenderer({antialiasing: true});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.BasicShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    
     
     //for ( var i = 0; i < NZOMBIE; i++){   
      //var zombie = new Zombie.zombie();
@@ -206,6 +240,7 @@ function init() {
         }
     }, 1000);
 
+    scene.simulate();
     animate();
 }
 
@@ -226,6 +261,10 @@ function onResourcesLoaded() {
 function animate() {
 
     window.addEventListener('resize', onWindowResize, false);
+
+    //cube_trick.translateZ(0.55);
+    //cube_trick.__dirtyPosition = true;
+    //cube_trick.translateX(0.8);
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
@@ -311,9 +350,10 @@ function animate() {
         camera.position.y - 0.3 + Math.sin(time * 4 + camera.position.x + camera.position.z) * 0.01,
         camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
+    scene.simulate();
     renderer.render(scene, camera);
 
-    //console.log(body.position.z);
+    
     /*
     if ( zombie_1[body_Id].position.z < 50){
         if ( zombie_1[left_leg_Id].rotation.z < 0.5){
@@ -344,42 +384,89 @@ function castRays() {
 
 function castRays(){
     
-    //Raycasting in 4 directions
-    var raycaster_right = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 0));
-    var raycaster_left = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 0));
-    var raycaster_backward = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, -1000));
-    var raycaster_frontward = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, 1000));
     
-    var raycaster = [raycaster_frontward, raycaster_right, raycaster_backward, raycaster_left];
     
     window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
 
     //___________ NB: CAMERA ROTATES COUNTER CLOCKWISE________
     var direction = new THREE.Vector3();
-    for ( var i = 0; i < 4; i++){
+    //_______NB: THE ORIGIN OF THE DIRECTION IS THE CAMERA CENTER. Z-AXIS ALWAYS POINTS UP, X-AXIS ALWAYS POINTS RIGHT________
+            camera.getWorldDirection(direction);;
+            //direction.x = - direction.x;
+            //console.log(direction);
+
+            theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
+            console.log(theta);
+    for ( var i = 0; i < 8; i++){
         raycaster[i].setFromCamera( mouse, camera );    
         var intersects = raycaster[i].intersectObjects(scene.children, true);
-        if ( intersects.length > 0 && intersects[0].distance <= 8 ){
-            camera.getWorldDirection(direction);;
-            direction.x = - direction.x;
-            //direction.z = ( direction.z - 1) * 250 /2;
-            //direction.y = direction.y ;
-            //console.log(direction);
-            theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
-            //console.log(theta);
-            /*
-            //Frontward
-            if ( i == 0){
-                if ( theta > 0 && theta <= 90 ) camera.position.x -= 0.2;
-                else if ( theta > 90 && theta <= 180 ) camera.position.z += 0.2;
-                else if ( theta > 180 && theta <= 270 ) camera.position.x -= 0.2;
-                else camera.position.z += 
-                
+        if ( intersects.length > 0 && intersects[0].distance <= 13 ){
             
-        
-            }*/
+            
+            
+            
+            
+            if ( theta >= 45 && theta < 135){
+                // I'm looking at the left side of the city
+                
+                switch(i){
+                    case 0:
+                        //N
+                        camera.position.x += 1;
+                        break;
+
+                    case 1:
+                        //S
+                        camera.position.x -= 1;
+                        break;
+
+                    case 2:
+                        //E
+                        camera.position.z -= 1;
+                        break;
+
+                    case 3:
+                        //O
+                        camera.position.z += 1;
+                        break;
+
+                    case 4:
+                        //NO
+                        camera.position.x += 1;
+                        camera.position.z += 1;
+                        break;
+
+                    case 5:
+                        //NE
+                        camera.position.x += 1;
+                        camera.position.z -= 1;
+                        break;                    
+
+                    case 6:
+                        //SO
+                        camera.position.x -= 1;
+                        camera.position.z += 1;
+                        break;
+
+                    case 7:
+                        //SE
+                        camera.position.x -= 1;
+                        camera.position.z -= 1;
+                        break;
+                }
+
+            }else if ( theta >= 135 && theta < 225){
+                // I'm looking at the lower side of the city
+
+            }else if ( theta >= 225 && theta < 315){
+                // I'm looking at the right side of the city
+            }else{
+                // I'm looking at the upper side of the city
+            }
+            
         }   
     }
+    
 }
 
 
@@ -406,3 +493,54 @@ function keyUp(event) {
 
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+/*
+function spawnBox(){
+        var cube_trick_geometry = new THREE.BoxGeometry(5,5,5,10,10,10);
+        var handleCollision = function(collided_with, linearVelocity, angularVelocity){
+            switch ( ++this.collisions ){
+                        
+                        case 1:
+                            this.material.color.setHex(0xcc8855);
+                            break;
+                        
+                        case 2:
+                            this.material.color.setHex(0xbb9955);
+                            break;
+                        
+                        case 3:
+                            this.material.color.setHex(0xaaaa55);
+                            break;
+                        
+                        case 4:
+                            this.material.color.setHex(0x99bb55);
+                            break;
+                        
+                        case 5:
+                            this.material.color.setHex(0x88cc55);
+                            break;
+                        
+                        case 6:
+                            this.material.color.setHex(0x77dd55);
+                            break;
+            }
+            console.log("collision detected");
+    };
+    
+        var cube_trick, cube_trick_material;
+
+        cube_trick_material = Physijs.createMaterial( 
+            new THREE.MeshLambertMaterial( {color: 0x00ff00}),
+            .6,
+            .3
+        );
+        cube_trick = new Physijs.BoxMesh(cube_trick_geometry, cube_trick_material, 5);
+        cube_trick.collision = 0;
+        cube_trick.position.set(0,0,0); 
+        cube_trick.addEventListener('collision', handleCollision);
+        //cube_trick.addEventListener('ready', spawnBox);
+        //scene.add(cube_trick);
+    
+        return cube_trick;
+};
+
+*/

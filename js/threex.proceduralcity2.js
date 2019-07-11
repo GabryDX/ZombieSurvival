@@ -68,7 +68,7 @@ THREEx.ProceduralCity	= function(){
 	var lampH	= 3
 
 	this.createWalls = function(){
-		var object3d	= new THREE.Object3D()
+		var object3d	= new THREE.Object3D();
 		//Store vertices clock-wisely
 		var roofVertices = [
 			new THREE.Vector3(-250,0,-250), new THREE.Vector3(-250,50,-250),new THREE.Vector3(250,50,-250),new THREE.Vector3(250,0,-250),
@@ -116,10 +116,14 @@ THREEx.ProceduralCity	= function(){
 
 	this.createSquareGround	= function(){
 		var geometry	= new THREE.PlaneGeometry( 1, 1, 1 );
-		var material	= new THREE.MeshLambertMaterial({
-			color	: 0x222222
-		})
-		var ground	= new THREE.Mesh(geometry, material)
+		var material	= Physijs.createMaterial(
+			new THREE.MeshLambertMaterial({
+				color	: 0x222222
+			}),
+			.8, // high friction
+			.3 // low restitution
+		);
+		var ground	= new Physijs.Mesh(geometry, material,0)
 		ground.lookAt(new THREE.Vector3(0,1,0))
 		ground.scale.x	= (nBlockZ)*blockSizeZ
 		ground.scale.y	= (nBlockX)*blockSizeX
