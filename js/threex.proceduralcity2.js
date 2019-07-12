@@ -116,14 +116,10 @@ THREEx.ProceduralCity	= function(){
 
 	this.createSquareGround	= function(){
 		var geometry	= new THREE.PlaneGeometry( 1, 1, 1 );
-		var material	= Physijs.createMaterial(
-			new THREE.MeshLambertMaterial({
-				color	: 0x222222
-			}),
-			.8, // high friction
-			.3 // low restitution
-		);
-		var ground	= new Physijs.Mesh(geometry, material,0)
+		var material	= new THREE.MeshLambertMaterial({
+			color	: 0x222222
+		})
+		var ground	= new THREE.Mesh(geometry, material)
 		ground.lookAt(new THREE.Vector3(0,1,0))
 		ground.scale.x	= (nBlockZ)*blockSizeZ
 		ground.scale.y	= (nBlockX)*blockSizeX

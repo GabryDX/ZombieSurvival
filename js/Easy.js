@@ -13,6 +13,10 @@ Zombie = function(){
 Physijs.scripts.worker = './physijs_worker.js';
 Physijs.scripts.ammo = './ammo.js';
 
+//var nBlockX = 10;
+//var nBlockZ = 10;
+//var blockSizeX  = 50;
+//var blockSizeZ  = 50;
 var scene, camera, renderer, mesh, clock, controls;
 var raycaster = [];
 var cube_trick;
@@ -74,12 +78,9 @@ function init() {
 
 
     //____________________________SCENE & CAMERA_______________________________________
-    scene = new Physijs.Scene();
-    scene.setGravity( new THREE.Vector3(0, -30, 0));
-    scene.addEventListener(
-            'update',
-            function() {scene.simulate( undefined, 1 );}
-    );
+    scene = new THREE.Scene();
+    //scene.setGravity( new THREE.Vector3(0, -30, 0));
+    
     camera = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000);
     
     var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
@@ -98,6 +99,18 @@ function init() {
     //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
     var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
     scene.add(proceduralCity);
+
+    /*
+    var geometry_ground    = new THREE.PlaneGeometry( 1, 1, 1 );
+    var material_ground    = new THREE.MeshLambertMaterial({
+            color   : 0x222222
+        })
+        var ground  = new THREE.Mesh(geometry_ground, material_ground);
+        ground.lookAt(new THREE.Vector3(0,1,0))
+        ground.scale.x  = (nBlockZ)*blockSizeZ;
+        ground.scale.y  = (nBlockX)*blockSizeX;
+    scene.add(ground);
+    */
 
     //_____________________________________LIGHT________________________________________
     var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
@@ -143,17 +156,42 @@ function init() {
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
 
-    //Raycasting in 4 directions
-    var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 0));
-    var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 0));
-    var raycaster_S = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, -1000));
-    var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, 1000));
-    var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, 1000));
-    var raycaster_NO = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, 1000));
-    var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(1000, 0, -1000));
-    var raycaster_SO = new THREE.Raycaster(camera.position, new THREE.Vector3(-1000, 0, -1000));
+    var cube_trick = new Physijs.BoxMesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
+    cube_trick.position.set(0,0,25);
+    scene.add(cube_trick);
 
-    raycaster = [raycaster_N, raycaster_S, raycaster_E, raycaster_O, raycaster_NO, raycaster_NE, raycaster_SO, raycaster_SE];
+    //Raycasting in 16 directions
+    var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 0));
+    var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 0));
+    
+    var raycaster_S = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, -100));
+    var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, 100));
+    
+    var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 100));
+    var raycaster_NW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 100));
+    
+    var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -100));
+    var raycaster_SW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -100));
+    
+    var raycaster_NNE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, 100));
+    var raycaster_NNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, 100));
+    
+    var raycaster_SSE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, -100));
+    var raycaster_SSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, -100));
+    
+    var raycaster_WNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 30));
+    var raycaster_WSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -30));
+    
+    var raycaster_ENE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 30));
+    var raycaster_ESE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -30));
+    
+
+
+    raycaster = [ raycaster_N, raycaster_S, raycaster_E, raycaster_O, 
+                  raycaster_NW, raycaster_NE, raycaster_SW, raycaster_SE,
+                  raycaster_NNE, raycaster_NNW, raycaster_SSE, raycaster_SSW,
+                  raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
+                 ];
     /*
     cube_trick = spawnBox();
     cube_trick.setLinearVelocity(new THREE.Vector3(0,0.55,0));
@@ -240,7 +278,7 @@ function init() {
         }
     }, 1000);
 
-    scene.simulate();
+    //scene.simulate();
     animate();
 }
 
@@ -285,6 +323,7 @@ function animate() {
 
     requestAnimationFrame(animate);
 
+    //setTimeout( castRays(),300);
     castRays();
 
     // SHOOT BULLET
@@ -350,7 +389,7 @@ function animate() {
         camera.position.y - 0.3 + Math.sin(time * 4 + camera.position.x + camera.position.z) * 0.01,
         camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
-    scene.simulate();
+    //scene.simulate();
     renderer.render(scene, camera);
 
     
@@ -383,90 +422,135 @@ function castRays() {
 }*/
 
 function castRays(){
-    
-    
-    
     window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
 
-    //___________ NB: CAMERA ROTATES COUNTER CLOCKWISE________
+    //____________________NB: CAMERA ROTATES COUNTER CLOCKWISE__________________
     var direction = new THREE.Vector3();
+    
     //_______NB: THE ORIGIN OF THE DIRECTION IS THE CAMERA CENTER. Z-AXIS ALWAYS POINTS UP, X-AXIS ALWAYS POINTS RIGHT________
-            camera.getWorldDirection(direction);;
-            //direction.x = - direction.x;
-            //console.log(direction);
-
-            theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
-            console.log(theta);
-    for ( var i = 0; i < 8; i++){
-        raycaster[i].setFromCamera( mouse, camera );    
+    //camera.getWorldDirection(direction);;
+    //direction.x = - direction.x;
+    //console.log(direction);
+    //theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
+    //console.log(theta);
+    for ( var i = 0; i < 16; i++){
+        //raycaster[i].setFromCamera( mouse, camera );    
         var intersects = raycaster[i].intersectObjects(scene.children, true);
-        if ( intersects.length > 0 && intersects[0].distance <= 13 ){
+        
+        if ( intersects.length > 0 && intersects[0].distance <= 5){
             
-            
-            
-            
-            
-            if ( theta >= 45 && theta < 135){
-                // I'm looking at the left side of the city
-                
-                switch(i){
+            switch(i){
                     case 0:
                         //N
-                        camera.position.x += 1;
+                        camera.position.z -= 1;
+                        //console.log("NORTH");
                         break;
 
                     case 1:
                         //S
-                        camera.position.x -= 1;
+                        camera.position.z += 1;
+                        //console.log("SOUTH");
                         break;
 
                     case 2:
                         //E
-                        camera.position.z -= 1;
+                        camera.position.x -= 1;
+                        //console.log("EAST");
                         break;
 
                     case 3:
-                        //O
-                        camera.position.z += 1;
+                        //W
+                        camera.position.x += 1;
+                        //console.log("WEST");
                         break;
 
                     case 4:
-                        //NO
+                        //NW
                         camera.position.x += 1;
-                        camera.position.z += 1;
+                        camera.position.z -= 1;
+                        //console.log("NORTH-WEST");
                         break;
 
                     case 5:
                         //NE
-                        camera.position.x += 1;
+                        camera.position.x -= 1;
                         camera.position.z -= 1;
+                        //console.log("NORTH-EAST");
                         break;                    
 
                     case 6:
-                        //SO
-                        camera.position.x -= 1;
+                        //SW
+                        camera.position.x += 1;
                         camera.position.z += 1;
+                        //console.log("SOUTH-WEST");
                         break;
 
                     case 7:
                         //SE
                         camera.position.x -= 1;
+                        camera.position.z += 1;
+                        //console.log("SOUTH-EAST");
+                        break;
+
+                    //raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
+                    case 8:
+                        //NNE
+                        camera.position.x -= 0.3;
                         camera.position.z -= 1;
+                        //console.log("NNE");
+                        break;
+
+                    case 9:
+                        //NNW
+                        camera.position.x += 0.3;
+                        camera.position.z -= 1;
+                        //console.log("NNW");
+                        break;
+
+                    case 10:
+                        //SSE
+                        camera.position.x -= 0.3;
+                        camera.position.z += 1;
+                        //console.log("SSE");
+                        break;
+
+                    case 11:
+                        //SSW
+                        camera.position.x += 0.3;
+                        camera.position.z += 1;
+                        //console.log("SSW");
+                        break;
+
+                    case 12:
+                        //WNW
+                        camera.position.x += 1;
+                        camera.position.z -= 0.3;
+                        //console.log("WNW");
+                        break;
+
+                    case 13:
+                        //WSW
+                        camera.position.x += 1;
+                        camera.position.z += 0.3;
+                        //console.log("WNW");
+                        break;
+
+                    case 14:
+                        //ENE
+                        camera.position.x -= 1;
+                        camera.position.z -= 0.3;
+                        //console.log("ENE");
+                        break;
+
+                    case 14:
+                        //ESE
+                        camera.position.x -= 1;
+                        camera.position.z += 0.3;
+                        //console.log("ESE");
                         break;
                 }
-
-            }else if ( theta >= 135 && theta < 225){
-                // I'm looking at the lower side of the city
-
-            }else if ( theta >= 225 && theta < 315){
-                // I'm looking at the right side of the city
-            }else{
-                // I'm looking at the upper side of the city
-            }
-            
         }   
     }
-    
 }
 
 

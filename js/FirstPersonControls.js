@@ -238,8 +238,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		}
 
 		var actualMoveSpeed = delta * this.movementSpeed;
-		//console.log(this.object.position);
-		//console.log(actualMoveSpeed);
+		
+
 
 		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) )
 			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
@@ -249,7 +249,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			//if ( this.object.position.x + actualMoveSpeed > -248.5 && this.object.position.x + actualMoveSpeed < 248.5 && this.object.position.z + actualMoveSpeed> -248.5 && this.object.position.z + actualMoveSpeed < 248.5)
 				this.object.translateZ( actualMoveSpeed );
 		
-
 		if ( this.moveLeft )
 			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
 				this.object.translateX( - actualMoveSpeed );
