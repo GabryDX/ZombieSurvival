@@ -1,5 +1,8 @@
-var zombie = function(){
+function Zombie(){
 		
+
+		this.zombie = [];
+
 		var body_Id = 0;
 		//var neck_Id = 1;
 		var head_Id = 1;
@@ -11,7 +14,7 @@ var zombie = function(){
 		//var right_eye_Id = 7;
 		//var nose_Id = 8;
 		var numNodes = 6;
-		var zombie = [];
+		//var zombie = [];
 
 
 		var loader = new THREE.TextureLoader();
@@ -55,13 +58,13 @@ var zombie = function(){
         //var right_eye = new THREE.Mesh(right_eye_geometry, right_eye_material);
         //var nose      = new THREE.Mesh(nose_geometry, nose_material); 
 
-        zombie[body_Id]      = body;
+        this.zombie[body_Id]      = body;
         //zombie[neck_Id]      = neck;
-        zombie[head_Id]      = head;
-        zombie[left_leg_Id]  = left_leg;
-        zombie[right_leg_Id] = right_leg;
-        zombie[left_arm_Id]  = left_arm;
-        zombie[right_arm_Id] = right_arm;
+        this.zombie[head_Id]      = head;
+        this.zombie[left_leg_Id]  = left_leg;
+        this.zombie[right_leg_Id] = right_leg;
+        this.zombie[left_arm_Id]  = left_arm;
+        this.zombie[right_arm_Id] = right_arm;
         //zombie[left_eye_Id]  = left_eye;
         //zombie[right_eye_Id] = right_eye;
         //zombie[nose_Id]      = nose;
@@ -82,26 +85,24 @@ var zombie = function(){
         //Parent.detach(son): method that disjoints parent and son
 
         //body.attach(neck);
-        body.attach(head);
-        body.attach(left_leg);
-        body.attach(right_leg);
-        body.attach(left_arm);
-        body.attach(right_arm);
+        this.body.attach(head);
+        this.body.attach(left_leg);
+        this.body.attach(right_leg);
+        this.body.attach(left_arm);
+        this.body.attach(right_arm);
         //head.attach(left_eye);
         //head.attach(right_eye);
         //head.attach(nose);
         
-        body.position.set(0, 1.5, 0);
+        this.body.position.set(0, 1.5, 0);
         //neck.position.set(0, 0.3, 0);
-        head.position.set(0, 0.4, 0);
-        left_leg.position.set(-0.3, -0.02, 0);
-        right_leg.position.set(0.3, -0.02, 0);
-        left_arm.position.set(-0.1, -0.6, 0);
-        right_arm.position.set(0.1, -0.6, 0);
+        this.head.position.set(0, 0.4, 0);
+        this.left_leg.position.set(-0.3, -0.02, 0);
+        this.right_leg.position.set(0.3, -0.02, 0);
+        this.left_arm.position.set(-0.1, -0.6, 0);
+        this.right_arm.position.set(0.1, -0.6, 0);
         //left_eye.position.set(-0.1, 0, -0.15);
         //right_eye.position.set(0.1, 0, -0.15);
         //nose.position.set(0, -0.04, -0.15)
-	
-		return zombie;
 
 }

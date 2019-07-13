@@ -80,7 +80,7 @@ THREEx.ProceduralCity	= function(){
 			new THREE.MeshBasicMaterial({
 	   			color: 0xffffff,
 	    		side: THREE.DoubleSide,
-	    		transparent: true,
+	    		//transparent: true,
 	    		opacity: 0
 			}),
 			.6, //medium friction
@@ -406,6 +406,7 @@ THREEx.ProceduralCity	= function(){
 		var sidewalksMesh	= new THREE.Mesh(sidewalksGeometry, material );
 		return sidewalksMesh
 	}
+	
 	this.createSquareBuildings	= function(){
 		var buildingMesh= this.createBuilding()
 		var cityGeometry= new THREE.Geometry();

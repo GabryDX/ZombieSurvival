@@ -173,24 +173,24 @@ function init() {
     var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -100));
     var raycaster_SW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -100));
     
-    var raycaster_NNE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, 100));
-    var raycaster_NNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, 100));
+    //var raycaster_NNE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, 100));
+    //var raycaster_NNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, 100));
     
-    var raycaster_SSE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, -100));
-    var raycaster_SSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, -100));
+    //var raycaster_SSE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, -100));
+    //var raycaster_SSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, -100));
     
-    var raycaster_WNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 30));
-    var raycaster_WSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -30));
+    //var raycaster_WNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 30));
+    //var raycaster_WSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -30));
     
-    var raycaster_ENE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 30));
-    var raycaster_ESE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -30));
+    //var raycaster_ENE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 30));
+    //var raycaster_ESE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -30));
     
 
 
     raycaster = [ raycaster_N, raycaster_S, raycaster_E, raycaster_O, 
                   raycaster_NW, raycaster_NE, raycaster_SW, raycaster_SE,
-                  raycaster_NNE, raycaster_NNW, raycaster_SSE, raycaster_SSW,
-                  raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
+                  //raycaster_NNE, raycaster_NNW, raycaster_SSE, raycaster_SSW,
+                  //raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
                  ];
     /*
     cube_trick = spawnBox();
@@ -213,7 +213,7 @@ function init() {
     renderer.shadowMap.type = THREE.BasicShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    
+    //var zombie = new Zombie();
     //for ( var i = 0; i < NZOMBIE; i++){   
      //var zombie = new Zombie.zombie();
         
@@ -360,6 +360,7 @@ function animate() {
 
     //__________________________________________BULLET CREATION_____________________________________________
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
+        //console.log("DOVREI SPARARE");
         // creates a bullet as a Mesh object
         var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({
             color: 0xAF9B60
@@ -390,6 +391,8 @@ function animate() {
         camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
     meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
     //scene.simulate();
+
+
     renderer.render(scene, camera);
 
     
@@ -433,7 +436,7 @@ function castRays(){
     //console.log(direction);
     //theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
     //console.log(theta);
-    for ( var i = 0; i < 16; i++){
+    for ( var i = 0; i < 8; i++){
         //raycaster[i].setFromCamera( mouse, camera );    
         var intersects = raycaster[i].intersectObjects(scene.children, true);
         
@@ -492,7 +495,7 @@ function castRays(){
                         //console.log("SOUTH-EAST");
                         break;
 
-                    //raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
+                    /*
                     case 8:
                         //NNE
                         camera.position.x -= 0.3;
@@ -542,12 +545,13 @@ function castRays(){
                         //console.log("ENE");
                         break;
 
-                    case 14:
+                    case 15:
                         //ESE
                         camera.position.x -= 1;
                         camera.position.z += 0.3;
                         //console.log("ESE");
                         break;
+                        */
                 }
         }   
     }
