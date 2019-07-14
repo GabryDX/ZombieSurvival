@@ -385,11 +385,13 @@ function animate() {
         controls.update(clock.getDelta()); // only if control is FirstPersonControls
 
     // Set gun in front of camera
-    meshes["playerweapon"].position.set(
-        camera.position.x - Math.sin(camerarotation_y + handGunRightPos) * 0.75,
-        camera.position.y - 0.3 + Math.sin(time * 4 + camera.position.x + camera.position.z) * 0.01,
-        camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
-    meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
+    if (meshes["playerweapon"] != undefined) {
+      meshes["playerweapon"].position.set(
+          camera.position.x - Math.sin(camerarotation_y + handGunRightPos) * 0.75,
+          camera.position.y - 0.3 + Math.sin(time * 4 + camera.position.x + camera.position.z) * 0.01,
+          camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
+      meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
+    }
     //scene.simulate();
 
 
