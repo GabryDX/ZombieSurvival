@@ -239,25 +239,77 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 		
+		//Update position and also avoid collisions!
+		if ( this.moveForward && this.moveRight){
+			
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, this.object.position.z - actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+				
+				this.object.translateZ( - actualMoveSpeed);
+				this.object.translateX(   actualMoveSpeed);
+			}
 
+		} else if (this.moveForward && this.moveLeft){
+			
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, this.object.position.z - actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+				
+				this.object.translateZ( - actualMoveSpeed);
+				this.object.translateX( - actualMoveSpeed);
+			}
 
-		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) )
-			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
+		} else if (this.moveBackward && this.moveRight){
+			
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, this.object.position.z + actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+				
+				this.object.translateZ( actualMoveSpeed);
+				this.object.translateX( actualMoveSpeed);
+			}
+
+		} else if (this.moveBackward && this.moveLeft){
+			
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, this.object.position.z + actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+				
+				this.object.translateZ(   actualMoveSpeed);
+				this.object.translateX( - actualMoveSpeed);
+			}
+
+		} else if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) ){
+			
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(0, 1.8, this.object.position.z - actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
 				this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
 		
-		if ( this.moveBackward ) 
-			//if ( this.object.position.x + actualMoveSpeed > -248.5 && this.object.position.x + actualMoveSpeed < 248.5 && this.object.position.z + actualMoveSpeed> -248.5 && this.object.position.z + actualMoveSpeed < 248.5)
+		} else if ( this.moveBackward ) {
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(0, 1.8, this.object.position.z + actualMoveSpeed) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
 				this.object.translateZ( actualMoveSpeed );
 		
-		if ( this.moveLeft )
-			//if ( this.object.position.x - actualMoveSpeed > -248.5 && this.object.position.x - actualMoveSpeed < 248.5 && this.object.position.z - actualMoveSpeed> -248.5 && this.object.position.z - actualMoveSpeed < 248.5)
+		} else if ( this.moveLeft ){
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, 0) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
 				this.object.translateX( - actualMoveSpeed );
+		}
 		
-		if ( this.moveRight )
-			//if ( this.object.position.x + actualMoveSpeed > -248.5 && this.object.position.x + actualMoveSpeed < 248.5 && this.object.position.z + actualMoveSpeed> -248.5 && this.object.position.z + actualMoveSpeed < 248.5)
+		else if ( this.moveRight ){
+			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, 0) );
+			var intersects = raycast.intersectObjects(scene.children, true);
+			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
 				this.object.translateX( actualMoveSpeed );
+		}
 
-		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
+		else if ( this.moveDown ){
+		 	this.object.translateY( - actualMoveSpeed );
+		}
 
 		
 

@@ -10,8 +10,8 @@ Zombie = function(){
 }*/
 //document.write('<script type"text/javascript" src="js/physi.js"></script>');
 
-Physijs.scripts.worker = './physijs_worker.js';
-Physijs.scripts.ammo = './ammo.js';
+//Physijs.scripts.worker = './physijs_worker.js';
+//Physijs.scripts.ammo = './ammo.js';
 
 //var nBlockX = 10;
 //var nBlockZ = 10;
@@ -38,9 +38,9 @@ var height = window.innerHeight;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
-    scene: new Physijs.Scene(),
+    scene: new THREE.Scene(),
     camera: new THREE.PerspectiveCamera(45, width / height, 0.3, 100),
-    box: new Physijs.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({
+    box: new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshBasicMaterial({
         color: 0x4444ff
     }))
 };
@@ -156,7 +156,7 @@ function init() {
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
 
-    var cube_trick = new Physijs.BoxMesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
+    var cube_trick = new THREE.Mesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
     cube_trick.position.set(0,0,25);
     scene.add(cube_trick);
 
@@ -425,12 +425,12 @@ function castRays() {
         camera.position.x = camera.position.x - 0.2;
     }
 }*/
-
+ 
 function castRays(){
-    window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
+    //window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
 
     //____________________NB: CAMERA ROTATES COUNTER CLOCKWISE__________________
-    var direction = new THREE.Vector3();
+    //var direction = new THREE.Vector3();
     
     //_______NB: THE ORIGIN OF THE DIRECTION IS THE CAMERA CENTER. Z-AXIS ALWAYS POINTS UP, X-AXIS ALWAYS POINTS RIGHT________
     //camera.getWorldDirection(direction);;
@@ -438,10 +438,12 @@ function castRays(){
     //console.log(direction);
     //theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
     //console.log(theta);
-    for ( var i = 0; i < 8; i++){
+    
+    for ( var i = 0; i < 2; i++)
         //raycaster[i].setFromCamera( mouse, camera );    
         var intersects = raycaster[i].intersectObjects(scene.children, true);
         
+        /*
         if ( intersects.length > 0 && intersects[0].distance <= 5){
             
             switch(i){
@@ -553,11 +555,13 @@ function castRays(){
                         camera.position.z += 0.3;
                         //console.log("ESE");
                         break;
-                        */
+                        
                 }
         }   
     }
+    */
 }
+
 
 
 function onDocumentMouseMove(event) {
