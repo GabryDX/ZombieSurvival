@@ -1,4 +1,4 @@
-//import {zombie} from './Zombie.js';
+import {Zombie} from './Zombie.js';
 /*
 Zombie = function(){
     var geometry = new THREE.BoxGeometry( 1, 5, 1);
@@ -31,7 +31,6 @@ var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
 var DURATIONTIME = 150000; //in millisec
 var NZOMBIE = 10;
-var zombie = [];
 
 var width = window.innerWidth;
 var height = window.innerHeight;
@@ -150,6 +149,12 @@ function init() {
         })(_key);
     }
 
+    //______ZOMBIE
+    var zombieClass = new Zombie()
+    var zombie = zombieClass.zombie;//[];
+    for ( var i = 0; i < zombieClass.numNodes; i++)
+        scene.add(zombie[i]);
+
 
 
     camera.position.set(0, player.height, -5);
@@ -223,7 +228,7 @@ function init() {
     
     var distance = 1;
     clock = new THREE.Clock();
-    controls = new THREE.FirstPersonControls(camera);
+    controls = new THREE.FirstPersonControls(camera, scene);
     document.addEventListener('click', function() {
         if (distance > 0) {
             controls.lock();

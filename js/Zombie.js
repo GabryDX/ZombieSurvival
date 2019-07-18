@@ -1,4 +1,4 @@
-function Zombie(){
+export function Zombie(){
 		
 
 		this.zombie = [];
@@ -13,7 +13,7 @@ function Zombie(){
 		//var left_eye_Id = 6;
 		//var right_eye_Id = 7;
 		//var nose_Id = 8;
-		var numNodes = 6;
+		this.numNodes = 6;
 		//var zombie = [];
 
 
@@ -77,30 +77,30 @@ function Zombie(){
         scene.add(left_arm);
         scene.add(right_arm);
         */
-        for ( var i = 0; i < numNodes; i++)
-            scene.add(zombie[i]);
+        // for ( var i = 0; i < numNodes; i++)
+        //     scene.add(zombie[i]);
         
         //___________________HIERACHICAL OBJECT_________________
         //Parent.attach(son): method that joints parent and son
         //Parent.detach(son): method that disjoints parent and son
 
         //body.attach(neck);
-        this.body.attach(head);
-        this.body.attach(left_leg);
-        this.body.attach(right_leg);
-        this.body.attach(left_arm);
-        this.body.attach(right_arm);
+        body.attach(head);
+        body.attach(left_leg);
+        body.attach(right_leg);
+        body.attach(left_arm);
+        body.attach(right_arm);
         //head.attach(left_eye);
         //head.attach(right_eye);
         //head.attach(nose);
         
-        this.body.position.set(0, 1.5, 0);
+        body.position.set(0, 1.5, 0);
         //neck.position.set(0, 0.3, 0);
-        this.head.position.set(0, 0.4, 0);
-        this.left_leg.position.set(-0.3, -0.02, 0);
-        this.right_leg.position.set(0.3, -0.02, 0);
-        this.left_arm.position.set(-0.1, -0.6, 0);
-        this.right_arm.position.set(0.1, -0.6, 0);
+        head.position.set(0, 0.4, 0);
+        left_leg.position.set(-0.3, -0.02, 0);
+        right_leg.position.set(0.3, -0.02, 0);
+        left_arm.position.set(-0.1, -0.6, 0);
+        right_arm.position.set(0.1, -0.6, 0);
         //left_eye.position.set(-0.1, 0, -0.15);
         //right_eye.position.set(0.1, 0, -0.15);
         //nose.position.set(0, -0.04, -0.15)
