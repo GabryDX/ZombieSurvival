@@ -245,8 +245,7 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 			
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, this.object.position.z - actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
-				
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3)){
 				this.object.translateZ( - actualMoveSpeed);
 				this.object.translateX(   actualMoveSpeed);
 			}
@@ -255,7 +254,7 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 			
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, this.object.position.z - actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) ){
 				
 				this.object.translateZ( - actualMoveSpeed);
 				this.object.translateX( - actualMoveSpeed);
@@ -265,8 +264,8 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 			
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, this.object.position.z + actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
-				
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) ){
+			
 				this.object.translateZ( actualMoveSpeed);
 				this.object.translateX( actualMoveSpeed);
 			}
@@ -275,7 +274,7 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 			
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, this.object.position.z + actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) ){
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) ){
 				
 				this.object.translateZ(   actualMoveSpeed);
 				this.object.translateX( - actualMoveSpeed);
@@ -285,26 +284,28 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 			
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(0, 1.8, this.object.position.z - actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) )
+				
 				this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+			
 		
 		} else if ( this.moveBackward ) {
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(0, 1.8, this.object.position.z + actualMoveSpeed) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) )
 				this.object.translateZ( actualMoveSpeed );
 		
 		} else if ( this.moveLeft ){
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x - actualMoveSpeed, 1.8, 0) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) )
 				this.object.translateX( - actualMoveSpeed );
 		}
 		
 		else if ( this.moveRight ){
 			var raycast = new THREE.Raycaster(this.object.position, new THREE.Vector3(this.object.position.x + actualMoveSpeed, 1.8, 0) );
 			var intersects = raycast.intersectObjects(scene.children, true);
-			if ( !(intersects.length > 0 && intersects[0].distance <= 5) )
+			if ( !(intersects.length > 0 && intersects[0].distance <= 3) )
 				this.object.translateX( actualMoveSpeed );
 		}
 

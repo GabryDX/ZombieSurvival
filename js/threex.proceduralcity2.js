@@ -127,11 +127,12 @@ THREEx.ProceduralCity	= function(){
 		return ground
 	}
 	this.createSquareLamps	= function(){
-		var object3d	= new THREE.Object3D()
+		var object3d	= new THREE.Object3D();
+		object3d.id = "50";
 		
 		var lampGeometry= new THREE.CubeGeometry(1,1,1)
 		lampGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
-		var lampMesh	= new THREE.Mesh(lampGeometry)
+		var lampMesh	= new THREE.Mesh(lampGeometry);
 
 		var lightsGeometry	= new THREE.Geometry();
 		var lampsGeometry	= new THREE.Geometry();
@@ -143,7 +144,6 @@ THREEx.ProceduralCity	= function(){
 					//////////////////////////////////////////////////////////////////////////////////
 					//		light								//
 					//////////////////////////////////////////////////////////////////////////////////
-					
 					var lightPosition	= position.clone()
 					lightPosition.y		= sidewalkH+lampH+0.1
 					// set position for block
@@ -211,6 +211,7 @@ THREEx.ProceduralCity	= function(){
 					// merge it with cityGeometry - very important for performance
 					//THREE.GeometryUtils.merge( lampsGeometry, lampMesh )  // old method
 					lampMesh.updateMatrix();
+
 					lampsGeometry.merge(lampMesh.geometry, lampMesh.matrix);					
 				}
 				// south							
@@ -248,7 +249,10 @@ THREEx.ProceduralCity	= function(){
 			vertexColors	: THREE.VertexColors
 		});
 		var lampsMesh	= new THREE.Mesh(lampsGeometry, material );
+
+
 		object3d.add(lampsMesh)
+
 	
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
@@ -278,6 +282,8 @@ THREEx.ProceduralCity	= function(){
 		var lightParticles	= new THREE.Points( lightsGeometry, material );
 		lightParticles.sortParticles = true;
 		object3d.add( lightParticles );
+
+		object3d.name = "lamp";
 
 		return object3d
 	}

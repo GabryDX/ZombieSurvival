@@ -1,26 +1,8 @@
 import {Zombie} from './Zombie.js';
-/*
-Zombie = function(){
-    var geometry = new THREE.BoxGeometry( 1, 5, 1);
-    var material = new THREE.MeshBasicMaterial({color: 0x4aa02c});
-    var parallelepiped = new THREE.Mesh( geometry, material);
 
-    //scene.add(parallelepiped);
-    return parallelepiped
-}*/
-//document.write('<script type"text/javascript" src="js/physi.js"></script>');
-
-//Physijs.scripts.worker = './physijs_worker.js';
-//Physijs.scripts.ammo = './ammo.js';
-
-//var nBlockX = 10;
-//var nBlockZ = 10;
-//var blockSizeX  = 50;
-//var blockSizeZ  = 50;
 var scene, camera, renderer, mesh, clock, controls;
 var raycaster = [];
-var cube_trick;
-var cube_trick2;
+
 var bullets = [];
 var canShoot = 0;
 var keyboard = {};
@@ -31,7 +13,7 @@ var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
 var DURATIONTIME = 150000; //in millisec
 var NZOMBIE = 10;
-
+var zombie;
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -69,6 +51,7 @@ var models = {
           castShadow: false
         }*/
 };
+var zombieClass;
 
 window.onload = init();
 
@@ -98,18 +81,6 @@ function init() {
     //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
     var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
     scene.add(proceduralCity);
-
-    /*
-    var geometry_ground    = new THREE.PlaneGeometry( 1, 1, 1 );
-    var material_ground    = new THREE.MeshLambertMaterial({
-            color   : 0x222222
-        })
-        var ground  = new THREE.Mesh(geometry_ground, material_ground);
-        ground.lookAt(new THREE.Vector3(0,1,0))
-        ground.scale.x  = (nBlockZ)*blockSizeZ;
-        ground.scale.y  = (nBlockX)*blockSizeX;
-    scene.add(ground);
-    */
 
     //_____________________________________LIGHT________________________________________
     var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
@@ -149,34 +120,46 @@ function init() {
         })(_key);
     }
 
-    //______ZOMBIE
-    var zombieClass = new Zombie()
-    var zombie = zombieClass.zombie;//[];
+    //_________________________________ZOMBIE_____________________________________
+    //___________________HIERACHICAL OBJECT_________________
+        //Parent.attach(son): method that joints parent and son
+        //Parent.detach(son): method that disjoints parent and son
+    zombieClass = new Zombie();
+    zombie = zombieClass.zombie;//[];
     for ( var i = 0; i < zombieClass.numNodes; i++)
-        scene.add(zombie[i]);
+    	scene.add(zombie[i]);
+    zombie[zombieClass.body_Id].attach(zombie[zombieClass.head_Id]);
+    zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_leg_Id]);
+    zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_leg_Id]);
+    zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_arm_Id]);
+    zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_arm_Id]);
 
+    //Arm rotations
+    zombie[zombieClass.left_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
+   	zombie[zombieClass.right_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
 
 
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
 
-    var cube_trick = new THREE.Mesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
+    /*var cube_trick = new THREE.Mesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
     cube_trick.position.set(0,0,25);
     scene.add(cube_trick);
+    */
 
     //Raycasting in 16 directions
-    var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 0));
-    var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 0));
+    //var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 0));
+    //var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 0));
     
     var raycaster_S = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, -100));
-    var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, 100));
+   	var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, 100));
     
-    var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 100));
-    var raycaster_NW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 100));
+    //var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 100));
+    //var raycaster_NW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 100));
     
-    var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -100));
-    var raycaster_SW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -100));
+    //var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -100));
+    //var raycaster_SW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -100));
     
     //var raycaster_NNE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, 100));
     //var raycaster_NNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, 100));
@@ -192,40 +175,18 @@ function init() {
     
 
 
-    raycaster = [ raycaster_N, raycaster_S, raycaster_E, raycaster_O, 
-                  raycaster_NW, raycaster_NE, raycaster_SW, raycaster_SE,
+    raycaster = [ raycaster_N, raycaster_S, //raycaster_E, raycaster_O, 
+                  //raycaster_NW, raycaster_NE, raycaster_SW, raycaster_SE,
                   //raycaster_NNE, raycaster_NNW, raycaster_SSE, raycaster_SSW,
                   //raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
                  ];
-    /*
-    cube_trick = spawnBox();
-    cube_trick.setLinearVelocity(new THREE.Vector3(0,0.55,0));
-    //cube_trick.__dirtyPosition = true; 
-    cube_trick2 = spawnBox();
-    cube_trick2.setLinearVelocity(new THREE.Vector3(0,0,0));
-    cube_trick2.position.z = 50;
-    cube_trick2.material.color.setHex(0x00aabb);
-
-    scene.add(cube_trick);
-    scene.add(cube_trick2);
-
-    cube_trick.setCcdMotionThreshold(0.5);
-    cube_trick.setCcdMotionThreshold(0.5);
-    */
+    
     renderer = new THREE.WebGLRenderer({antialiasing: true});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.BasicShadowMap;
     document.body.appendChild(renderer.domElement);
 
-    //var zombie = new Zombie();
-    //for ( var i = 0; i < NZOMBIE; i++){   
-     //var zombie = new Zombie.zombie();
-        
-
-        
-    //}
-    
     var distance = 1;
     clock = new THREE.Clock();
     controls = new THREE.FirstPersonControls(camera, scene);
@@ -289,10 +250,6 @@ function init() {
 
 
 function onResourcesLoaded() {
-    //_________________________________CITY SETTINGS____________________________
-    //meshes["city"] = models.city.mesh.clone();
-    ///meshes["city"].position.set(-5, 10, 4);
-    //scene.add(meshes["city"]);
     //_________________________________WEAPON SETTINGS_________________________
     meshes["playerweapon"] = models.uzi.mesh.clone();
     meshes["playerweapon"].position.set(0, 2, 0);
@@ -305,9 +262,18 @@ function animate() {
 
     window.addEventListener('resize', onWindowResize, false);
 
-    //cube_trick.translateZ(0.55);
-    //cube_trick.__dirtyPosition = true;
-    //cube_trick.translateX(0.8);
+    //spawnZombie();
+
+    if (zombie[zombieClass.body_Id].position.z < 30){
+    	if ( zombie[zombieClass.left_arm_Id].rotation.x < 1){
+    		zombie[zombieClass.left_arm_Id].rotation.x += 0.15;
+    		zombie[zombieClass.right_arm_Id].rotation.x -= 0.15;
+    	}else{
+    		zombie[zombieClass.left_arm_Id].rotation.x -= 0.15;
+    		zombie[zombieClass.right_arm_Id].rotation.x += 0.15;
+    	}
+    	zombie[zombieClass.body_Id].position.z += 0.1;
+	}
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
@@ -430,6 +396,10 @@ function castRays() {
         camera.position.x = camera.position.x - 0.2;
     }
 }*/
+
+function spawnZombie(){
+
+}
  
 function castRays(){
     //window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
