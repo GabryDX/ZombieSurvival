@@ -1,5 +1,4 @@
-export function Zombie(){
-		
+export function Zombie(){		
 
 		this.zombie = [];
 
@@ -80,6 +79,4 @@ export function Zombie(){
         right_leg.position.set(right_leg_geometry.parameters.width/2, right_leg_geometry.parameters.height, 0);
         left_arm.position.set(-(body_geometry.parameters.width+left_arm_geometry.parameters.width)/2, left_leg_geometry.parameters.height+left_arm_geometry.parameters.height*1.3, -right_leg_geometry.parameters.height/4);
         right_arm.position.set((body_geometry.parameters.width+right_arm_geometry.parameters.width)/2, right_leg_geometry.parameters.height+right_arm_geometry.parameters.height*1.3, -right_leg_geometry.parameters.height/4);
-        
-
 }

@@ -12,8 +12,10 @@ var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
 var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 10;
+var NZOMBIE = 50;
 var zombie;
+var zombies = [];
+var zombie_speed = 0.03;
 var width = window.innerWidth;
 var height = window.innerHeight;
 
@@ -52,6 +54,7 @@ var models = {
         }*/
 };
 var zombieClass;
+var zombieClassBig = [];
 
 window.onload = init();
 
@@ -124,20 +127,22 @@ function init() {
     //___________________HIERACHICAL OBJECT_________________
         //Parent.attach(son): method that joints parent and son
         //Parent.detach(son): method that disjoints parent and son
-    zombieClass = new Zombie();
-    zombie = zombieClass.zombie;//[];
-    for ( var i = 0; i < zombieClass.numNodes; i++)
-    	scene.add(zombie[i]);
-    zombie[zombieClass.body_Id].attach(zombie[zombieClass.head_Id]);
-    zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_leg_Id]);
-    zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_leg_Id]);
-    zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_arm_Id]);
-    zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_arm_Id]);
+    // zombieClass = new Zombie();
+    // zombie = zombieClass.zombie;//[];
+    // for ( var i = 0; i < zombieClass.numNodes; i++)
+    // 	scene.add(zombie[i]);
+    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.head_Id]);
+    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_leg_Id]);
+    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_leg_Id]);
+    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_arm_Id]);
+    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_arm_Id]);
 
-    //Arm rotations
-    zombie[zombieClass.left_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
-   	zombie[zombieClass.right_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
+    // //Arm rotations
+    // zombie[zombieClass.left_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
+   	// zombie[zombieClass.right_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
 
+    for ( var i = 0; i < NZOMBIE; i++)
+      spawnZombie();
 
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
@@ -258,22 +263,69 @@ function onResourcesLoaded() {
     overlay_on();
 }
 
+var tilt = false;
 function animate() {
 
     window.addEventListener('resize', onWindowResize, false);
 
-    //spawnZombie();
+    // ------------
+    // Management of camera rotation
+    var camerarotation_y;
+    if (camera.rotation.z == 0)
+        camerarotation_y = Math.PI - camera.rotation.y;
+    else
+        camerarotation_y = camera.rotation.y;
 
-    if (zombie[zombieClass.body_Id].position.z < 30){
-    	if ( zombie[zombieClass.left_arm_Id].rotation.x < 1){
-    		zombie[zombieClass.left_arm_Id].rotation.x += 0.15;
-    		zombie[zombieClass.right_arm_Id].rotation.x -= 0.15;
-    	}else{
-    		zombie[zombieClass.left_arm_Id].rotation.x -= 0.15;
-    		zombie[zombieClass.right_arm_Id].rotation.x += 0.15;
+    // ------------
+
+    // spawnZombie();
+    for ( var i = 0; i < NZOMBIE; i++) {
+      if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
+
+        //zombie[zombieClass.body_Id].rotation.y = Math.atan2( ( camera.position.x - zombie[zombieClass.body_Id].position.x ), ( camera.position.z - zombie[zombieClass.body_Id].position.z ) );
+        // zombie[zombieClass.body_Id].lookAt(camera.position);
+        var v = new THREE.Vector3();
+        v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
+        zombies[i][zombieClassBig[i].body_Id].lookAt(v);
+
+        if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
+          zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
+        } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
+          zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+        }
+        if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
+          zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
+        } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
+          zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+        }
+      }
+
+      if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < -1.8){
+        tilt = true;
+      } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > -1.1){
+        tilt = false;
+      }
+
+    	if (tilt) {
+    		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
+        zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.002;
+    		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
+        zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.002;
+        zombies[i][zombieClassBig[i].left_leg_Id].rotation.x += 0.01;
+        zombies[i][zombieClassBig[i].left_leg_Id].position.z -= 0.003;
+        zombies[i][zombieClassBig[i].right_leg_Id].rotation.x -= 0.01;
+        zombies[i][zombieClassBig[i].right_leg_Id].position.z += 0.003;
+    	} else {
+    		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
+        zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.002;
+    		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
+        zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.002;
+        zombies[i][zombieClassBig[i].left_leg_Id].rotation.x -= 0.01;
+        zombies[i][zombieClassBig[i].left_leg_Id].position.z += 0.003;
+        zombies[i][zombieClassBig[i].right_leg_Id].rotation.x += 0.01;
+        zombies[i][zombieClassBig[i].right_leg_Id].position.z -= 0.003;
     	}
-    	zombie[zombieClass.body_Id].position.z += 0.1;
-	}
+    }
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
@@ -322,12 +374,6 @@ function animate() {
             bulletRightPos = 0.5;
         }
     }
-
-    var camerarotation_y;
-    if (camera.rotation.z == 0)
-        camerarotation_y = Math.PI - camera.rotation.y;
-    else
-        camerarotation_y = camera.rotation.y;
 
     //__________________________________________BULLET CREATION_____________________________________________
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
@@ -398,6 +444,29 @@ function castRays() {
 }*/
 
 function spawnZombie(){
+  var zombieClassSpawn = new Zombie();
+  zombie = zombieClassSpawn.zombie;
+  for ( var i = 0; i < zombieClassSpawn.numNodes; i++)
+    scene.add(zombie[i]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.head_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_leg_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_leg_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_arm_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_arm_Id]);
+
+  //Arm rotations
+  zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
+  zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
+
+  var min = -100;
+  var max = 100;
+  var random_x = Math.random() * (+max - +min) + +min;
+  var random_z = Math.random() * (+max - +min) + +min;
+
+  zombie[zombieClassSpawn.body_Id].position.x = random_x;
+  zombie[zombieClassSpawn.body_Id].position.z = random_z;
+  zombieClassBig.push(zombieClassSpawn);
+  zombies.push(zombie);
 
 }
  
