@@ -20,6 +20,7 @@ export function Zombie(){
         var left_arm_geometry  = new THREE.BoxGeometry( 0.2, 0.6, 0.2);
         var right_arm_geometry = new THREE.BoxGeometry( 0.2, 0.6, 0.2);                                                                                                
 
+        // HEAD
         var texture0 = loader.load( 'resources/ZombieArancione/head_right.png' );
 		var texture1 = loader.load( 'resources/ZombieArancione/head_left.png' );
 		var texture2 = loader.load( 'resources/ZombieArancione/head_top.png' );
@@ -37,6 +38,7 @@ export function Zombie(){
 		];
 		var head_material = new THREE.MeshFaceMaterial( head_materials );
 
+		// BODY
 		texture0 = loader.load( 'resources/ZombieArancione/body_right.png' );
 		texture1 = loader.load( 'resources/ZombieArancione/body_left.png' );
 		texture2 = loader.load( 'resources/ZombieArancione/body_top.png' );
@@ -53,12 +55,80 @@ export function Zombie(){
 		    new THREE.MeshBasicMaterial( { map: texture5 } )
 		];
 		var body_material = new THREE.MeshFaceMaterial( body_materials );
-        var left_leg_material  = new THREE.MeshLambertMaterial({color: 0x2a4acd});
-        var right_leg_material = new THREE.MeshLambertMaterial({color: 0x2a4acd});
-        var left_arm_material  = new THREE.MeshLambertMaterial({color: 0xfeff11});
-        var right_arm_material = new THREE.MeshLambertMaterial({color: 0xfeff11});
-        
-        
+
+		// LEFT LEG
+		texture0 = loader.load( 'resources/ZombieArancione/left_leg_right.png' );
+		texture1 = loader.load( 'resources/ZombieArancione/left_leg_left.png' );
+		texture2 = loader.load( 'resources/ZombieArancione/left_leg_top.png' );
+		texture3 = loader.load( 'resources/ZombieArancione/left_leg_bottom.png' );
+		texture4 = loader.load( 'resources/ZombieArancione/left_leg_back.png' );
+		texture5 = loader.load( 'resources/ZombieArancione/left_leg_front.png' );
+
+        var left_leg_materials = [
+		    new THREE.MeshBasicMaterial( { map: texture0 } ),
+		    new THREE.MeshBasicMaterial( { map: texture1 } ),
+		    new THREE.MeshBasicMaterial( { map: texture2 } ),
+		    new THREE.MeshBasicMaterial( { map: texture3 } ),
+		    new THREE.MeshBasicMaterial( { map: texture4 } ),
+		    new THREE.MeshBasicMaterial( { map: texture5 } )
+		];
+		var left_leg_material = new THREE.MeshFaceMaterial( left_leg_materials );
+
+		// RIGHT LEG
+		texture0 = loader.load( 'resources/ZombieArancione/right_leg_right.png' );
+		texture1 = loader.load( 'resources/ZombieArancione/right_leg_left.png' );
+		texture2 = loader.load( 'resources/ZombieArancione/right_leg_top.png' );
+		texture3 = loader.load( 'resources/ZombieArancione/right_leg_bottom.png' );
+		texture4 = loader.load( 'resources/ZombieArancione/right_leg_back.png' );
+		texture5 = loader.load( 'resources/ZombieArancione/right_leg_front.png' );
+
+        var right_leg_materials = [
+		    new THREE.MeshBasicMaterial( { map: texture0 } ),
+		    new THREE.MeshBasicMaterial( { map: texture1 } ),
+		    new THREE.MeshBasicMaterial( { map: texture2 } ),
+		    new THREE.MeshBasicMaterial( { map: texture3 } ),
+		    new THREE.MeshBasicMaterial( { map: texture4 } ),
+		    new THREE.MeshBasicMaterial( { map: texture5 } )
+		];
+		var right_leg_material = new THREE.MeshFaceMaterial( right_leg_materials );
+
+		// LEFT ARM
+		texture0 = loader.load( 'resources/ZombieArancione/left_arm_right.png' );
+		texture1 = loader.load( 'resources/ZombieArancione/left_arm_left.png' );
+		texture2 = loader.load( 'resources/ZombieArancione/left_arm_top.png' );
+		texture3 = loader.load( 'resources/ZombieArancione/left_arm_bottom.png' );
+		texture4 = loader.load( 'resources/ZombieArancione/left_arm_back.png' );
+		texture5 = loader.load( 'resources/ZombieArancione/left_arm_front.png' );
+
+        var left_arm_materials = [
+		    new THREE.MeshBasicMaterial( { map: texture0 } ),
+		    new THREE.MeshBasicMaterial( { map: texture1 } ),
+		    new THREE.MeshBasicMaterial( { map: texture2 } ),
+		    new THREE.MeshBasicMaterial( { map: texture3 } ),
+		    new THREE.MeshBasicMaterial( { map: texture4 } ),
+		    new THREE.MeshBasicMaterial( { map: texture5 } )
+		];
+		var left_arm_material = new THREE.MeshFaceMaterial( left_arm_materials );
+
+		// RIGHT ARM
+		texture0 = loader.load( 'resources/ZombieArancione/right_arm_right.png' );
+		texture1 = loader.load( 'resources/ZombieArancione/right_arm_left.png' );
+		texture2 = loader.load( 'resources/ZombieArancione/right_arm_top.png' );
+		texture3 = loader.load( 'resources/ZombieArancione/right_arm_bottom.png' );
+		texture4 = loader.load( 'resources/ZombieArancione/right_arm_back.png' );
+		texture5 = loader.load( 'resources/ZombieArancione/right_arm_front.png' );
+
+        var right_arm_materials = [
+		    new THREE.MeshBasicMaterial( { map: texture0 } ),
+		    new THREE.MeshBasicMaterial( { map: texture1 } ),
+		    new THREE.MeshBasicMaterial( { map: texture2 } ),
+		    new THREE.MeshBasicMaterial( { map: texture3 } ),
+		    new THREE.MeshBasicMaterial( { map: texture4 } ),
+		    new THREE.MeshBasicMaterial( { map: texture5 } )
+		];
+		var right_arm_material = new THREE.MeshFaceMaterial( right_arm_materials );
+
+
         var body      = new THREE.Mesh( body_geometry, body_material);
        	var head      = new THREE.Mesh( head_geometry, head_material );
         var left_leg  = new THREE.Mesh( left_leg_geometry, left_leg_material);
