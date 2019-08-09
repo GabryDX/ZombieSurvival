@@ -240,6 +240,7 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 
 		var actualMoveSpeed = delta * this.movementSpeed;
 		
+		/*
 		//Update position and also avoid collisions!
 		if ( this.moveForward && this.moveRight){
 			
@@ -312,7 +313,22 @@ THREE.FirstPersonControls = function ( object, scene, domElement ) {
 		else if ( this.moveDown ){
 		 	this.object.translateY( - actualMoveSpeed );
 		}
+		*/
+		if ( this.moveForward || ( this.autoForward && ! this.moveBackward ) )
+			this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+			
+		if ( this.moveBackward ) 
+			this.object.translateZ( actualMoveSpeed );
+		
+		if ( this.moveLeft )
+			this.object.translateX( - actualMoveSpeed );
+	
+		if ( this.moveRight )
+			this.object.translateX( actualMoveSpeed );
 
+		if ( this.moveDown )
+		 	this.object.translateY( - actualMoveSpeed );
+		
 		
 
 

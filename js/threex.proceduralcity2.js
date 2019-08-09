@@ -1,6 +1,6 @@
 // from @mrdoob http://www.mrdoob.com/lab/javascript/webgl/city/01/
-Physijs.scripts.worker = './physijs_worker.js';
-Physijs.scripts.ammo = './ammo.js';
+//Physijs.scripts.worker = './physijs_worker.js';
+//Physijs.scripts.ammo = './ammo.js';
 
 var THREEx = THREEx || {}
 
@@ -76,16 +76,13 @@ THREEx.ProceduralCity	= function(){
 			new THREE.Vector3(250, 0,250), new THREE.Vector3(250,50,250),new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,0,250),
 			new THREE.Vector3(-250,0,250), new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,50,-250),new THREE.Vector3(-250,0,-250)
 		];
-		var material = new Physijs.createMaterial(
-			new THREE.MeshBasicMaterial({
+		var material = new THREE.MeshBasicMaterial({
 	   			color: 0xffffff,
 	    		side: THREE.DoubleSide,
 	    		//transparent: true,
 	    		opacity: 0
-			}),
-			.6, //medium friction
-			.3 //low restitution
-		);
+		});
+		
 
 		for (var i = 0; i < roofVertices.length; i++) {
 
@@ -107,7 +104,7 @@ THREEx.ProceduralCity	= function(){
 		    wallGeometry.computeFaceNormals();
 		    wallGeometry.computeVertexNormals();
 
-		    var wallMesh = new Physijs.Mesh(wallGeometry, material);
+		    var wallMesh = new THREE.Mesh(wallGeometry, material);
 		    object3d.add(wallMesh)
   
 		}
@@ -389,6 +386,7 @@ THREEx.ProceduralCity	= function(){
 	this.createSquareSideWalks	= function(){
 		var buildingMesh= this.createBuilding()
 		var sidewalksGeometry= new THREE.Geometry();
+		
 		for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
 			for( var blockX = 0; blockX < nBlockX; blockX++){
 				// set position
@@ -396,7 +394,7 @@ THREEx.ProceduralCity	= function(){
 				buildingMesh.position.z	= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 
 				buildingMesh.scale.x	= blockSizeX-roadW
-				buildingMesh.scale.y	= sidewalkH
+				buildingMesh.scale.y	= sidewalkH * 3;
 				buildingMesh.scale.z	= blockSizeZ-roadD
 
 				// merge it with cityGeometry - very important for performance
@@ -406,10 +404,9 @@ THREEx.ProceduralCity	= function(){
 			}
 		}		
 		// build the mesh
-		var material	= new THREE.MeshLambertMaterial({
-			color	: 0x444444
-		});
+		var material	= new THREE.MeshLambertMaterial({color	: 0x444444});
 		var sidewalksMesh	= new THREE.Mesh(sidewalksGeometry, material );
+		
 		return sidewalksMesh
 	}
 	
@@ -448,6 +445,8 @@ THREEx.ProceduralCity	= function(){
 			vertexColors	: THREE.VertexColors
 		});
 		var cityMesh	= new THREE.Mesh(cityGeometry, material );
+
+
 		return cityMesh
 	}
 

@@ -1,5 +1,13 @@
 import {Zombie} from './Zombie.js';
 
+var nBlockX	= 10;
+var nBlockZ	= 10;
+var blockSizeX	= 50;
+var blockSizeZ	= 50;
+var roadW	= 8;
+var roadD	= 8;
+var sidewalkH	= 0.1;
+
 var scene, camera, renderer, mesh, clock, controls;
 var raycaster = [];
 
@@ -18,6 +26,9 @@ var zombies = [];
 var zombie_speed = 0.03;
 var width = window.innerWidth;
 var height = window.innerHeight;
+var bb_side_walks = [];
+var bb_player,box_player;
+var previous_position;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -82,8 +93,32 @@ function init() {
 
     //___________________________PROCEDURAL CITY_______________________________________
     //Basically we have 2 cities: createSquareCity() and createMrDoobCity();
-    var proceduralCity = new THREEx.ProceduralCity().createSquareCity();
+    var proceduralCity = new THREEx.ProceduralCity().createSquareCity();    
     scene.add(proceduralCity);
+
+    var i = 0;
+    var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
+	var buildingMesh = new THREE.Mesh(geometry);
+    for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
+			for( var blockX = 0; blockX < nBlockX; blockX++){
+				// set position
+				buildingMesh.position.x	= (blockX+0.5-nBlockX/2)*blockSizeX
+				buildingMesh.position.z	= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+
+				buildingMesh.scale.x	= blockSizeX-roadW
+				buildingMesh.scale.y	= sidewalkH*3;
+				buildingMesh.scale.z	= blockSizeZ-roadD
+
+				//bb_array[i] = new THREE.BoxHelper(buildingMesh,0xffff00);
+				bb_side_walks[i] = new THREE.Box3().setFromObject(buildingMesh);
+
+				scene.add(bb_side_walks[i]);
+				i++;
+			}
+	}
+    
+
 
     //_____________________________________LIGHT________________________________________
     var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
@@ -123,24 +158,6 @@ function init() {
         })(_key);
     }
 
-    //_________________________________ZOMBIE_____________________________________
-    //___________________HIERACHICAL OBJECT_________________
-        //Parent.attach(son): method that joints parent and son
-        //Parent.detach(son): method that disjoints parent and son
-    // zombieClass = new Zombie();
-    // zombie = zombieClass.zombie;//[];
-    // for ( var i = 0; i < zombieClass.numNodes; i++)
-    // 	scene.add(zombie[i]);
-    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.head_Id]);
-    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_leg_Id]);
-    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_leg_Id]);
-    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.left_arm_Id]);
-    // zombie[zombieClass.body_Id].attach(zombie[zombieClass.right_arm_Id]);
-
-    // //Arm rotations
-    // zombie[zombieClass.left_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
-   	// zombie[zombieClass.right_arm_Id].setRotationFromEuler(new THREE.Euler(55,0,0, 'XYZ'));
-
     for ( var i = 0; i < NZOMBIE; i++)
       spawnZombie();
 
@@ -148,44 +165,15 @@ function init() {
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
 
-    /*var cube_trick = new THREE.Mesh( new THREE.BoxGeometry(3,5,3), new THREE.MeshLambertMaterial({color: 0x00aabb}));
-    cube_trick.position.set(0,0,25);
-    scene.add(cube_trick);
-    */
+    box_player = new THREE.Mesh( new THREE.BoxGeometry(2,2,2), new THREE.MeshBasicMaterial({transparent: true})   );
+    box_player.position.set(0,0,-5);
+    bb_player = new THREE.Box3().setFromObject(box_player);
 
-    //Raycasting in 16 directions
-    //var raycaster_E = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 0));
-    //var raycaster_O = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 0));
-    
-    var raycaster_S = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, -100));
-   	var raycaster_N = new THREE.Raycaster(camera.position, new THREE.Vector3(0, player.height, 100));
-    
-    //var raycaster_NE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 100));
-    //var raycaster_NW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 100));
-    
-    //var raycaster_SE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -100));
-    //var raycaster_SW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -100));
-    
-    //var raycaster_NNE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, 100));
-    //var raycaster_NNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, 100));
-    
-    //var raycaster_SSE = new THREE.Raycaster(camera.position, new THREE.Vector3(30, player.height, -100));
-    //var raycaster_SSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-30, player.height, -100));
-    
-    //var raycaster_WNW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, 30));
-    //var raycaster_WSW = new THREE.Raycaster(camera.position, new THREE.Vector3(-100, player.height, -30));
-    
-    //var raycaster_ENE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, 30));
-    //var raycaster_ESE = new THREE.Raycaster(camera.position, new THREE.Vector3(100, player.height, -30));
-    
+    previous_position = new THREE.Vector3(camera.position);
 
+    scene.add(box_player);
+    scene.add(bb_player);
 
-    raycaster = [ raycaster_N, raycaster_S, //raycaster_E, raycaster_O, 
-                  //raycaster_NW, raycaster_NE, raycaster_SW, raycaster_SE,
-                  //raycaster_NNE, raycaster_NNW, raycaster_SSE, raycaster_SSW,
-                  //raycaster_WNW, raycaster_WSW, raycaster_ENE, raycaster_ESE
-                 ];
-    
     renderer = new THREE.WebGLRenderer({antialiasing: true});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
@@ -266,7 +254,10 @@ function onResourcesLoaded() {
 var tilt = false;
 function animate() {
 
+
     window.addEventListener('resize', onWindowResize, false);
+
+    
 
     // ------------
     // Management of camera rotation
@@ -276,15 +267,27 @@ function animate() {
     else
         camerarotation_y = camera.rotation.y;
 
-    // ------------
+    //_________________________________________PLAYER COLLISION_________________________________
 
-    // spawnZombie();
+    box_player.position.set(camera.position.x,0,camera.position.z);
+    bb_player.setFromObject(box_player);
+	
+	for ( var i = 0; i < bb_side_walks.length; i++){
+    	
+    	if ( bb_player.intersectsBox( bb_side_walks[i]) )
+    		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
+    }
+
+    
+    //______________________________ESSENTIAL FOR PLAYER COLLISION________________________________
+    //It is first initialized as the camera position in the init() function. Hence, it is updated
+    //only if there is NO COLLISION.
+    previous_position = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
+
+    
     for ( var i = 0; i < NZOMBIE; i++) {
       if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
-
-        //zombie[zombieClass.body_Id].rotation.y = Math.atan2( ( camera.position.x - zombie[zombieClass.body_Id].position.x ), ( camera.position.z - zombie[zombieClass.body_Id].position.z ) );
-        // zombie[zombieClass.body_Id].lookAt(camera.position);
-        var v = new THREE.Vector3();
+		var v = new THREE.Vector3();
         v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
         zombies[i][zombieClassBig[i].body_Id].lookAt(v);
 
@@ -346,7 +349,6 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-    //setTimeout( castRays(),300);
     castRays();
 
     // SHOOT BULLET
@@ -409,39 +411,9 @@ function animate() {
           camera.position.z + Math.cos(camerarotation_y + handGunRightPos) * 0.75);
       meshes["playerweapon"].rotation.set(camera.rotation.x, camera.rotation.y - Math.PI, camera.rotation.z);
     }
-    //scene.simulate();
-
-
+    
     renderer.render(scene, camera);
-
-    
-    /*
-    if ( zombie_1[body_Id].position.z < 50){
-        if ( zombie_1[left_leg_Id].rotation.z < 0.5){
-            zombie_1[right_leg_Id].rotation.z += 0.02;   
-            zombie_1[left_leg_Id].rotation.z += 0.02;
-        }else{
-            zombie_1[right_leg_Id].rotation.z -= 0.02;   
-            zombie_1[left_leg_Id].rotation.z -= 0.02;
-        }
-        zombie_1[body_Id].position.z += 0.03;
-    }*/
-    
 }
-
-/*
-function castRays() {
-    var direction = new THREE.Vector3(1000, 5500, 1000);
-    var startPoint = camera.position.clone();
-    var directionVector = direction.sub(startPoint);
-    var ray = new THREE.Raycaster(startPoint, directionVector.clone().normalize());
-    scene.updateMatrixWorld(); // required, since you haven't rendered yet
-    var rayIntersects = ray.intersectObjects(scene.children, true);
-    if (rayIntersects.length > 0) {
-        camera.position.z = camera.position.z - 0.2;
-        camera.position.x = camera.position.x - 0.2;
-    }
-}*/
 
 function spawnZombie(){
   var zombieClassSpawn = new Zombie();
@@ -454,7 +426,6 @@ function spawnZombie(){
   zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_arm_Id]);
   zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_arm_Id]);
 
-  //Arm rotations
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
@@ -471,141 +442,16 @@ function spawnZombie(){
 }
  
 function castRays(){
-    //window.addEventListener('onDocumentMouseMove', onDocumentMouseMove, false);
-
     //____________________NB: CAMERA ROTATES COUNTER CLOCKWISE__________________
-    //var direction = new THREE.Vector3();
-    
     //_______NB: THE ORIGIN OF THE DIRECTION IS THE CAMERA CENTER. Z-AXIS ALWAYS POINTS UP, X-AXIS ALWAYS POINTS RIGHT________
-    //camera.getWorldDirection(direction);;
-    //direction.x = - direction.x;
-    //console.log(direction);
-    //theta = THREE.Math.radToDeg(Math.atan2(direction.x, direction.z));
-    //console.log(theta);
     
     for ( var i = 0; i < 2; i++)
-        //raycaster[i].setFromCamera( mouse, camera );    
-        var intersects = raycaster[i].intersectObjects(scene.children, true);
+        raycaster = new THREE.Raycaster(camera.position, camera.position);
+        var intersects = raycaster.intersectObjects(scene.children, true);
         
-        /*
-        if ( intersects.length > 0 && intersects[0].distance <= 5){
-            
-            switch(i){
-                    case 0:
-                        //N
-                        camera.position.z -= 1;
-                        //console.log("NORTH");
-                        break;
-
-                    case 1:
-                        //S
-                        camera.position.z += 1;
-                        //console.log("SOUTH");
-                        break;
-
-                    case 2:
-                        //E
-                        camera.position.x -= 1;
-                        //console.log("EAST");
-                        break;
-
-                    case 3:
-                        //W
-                        camera.position.x += 1;
-                        //console.log("WEST");
-                        break;
-
-                    case 4:
-                        //NW
-                        camera.position.x += 1;
-                        camera.position.z -= 1;
-                        //console.log("NORTH-WEST");
-                        break;
-
-                    case 5:
-                        //NE
-                        camera.position.x -= 1;
-                        camera.position.z -= 1;
-                        //console.log("NORTH-EAST");
-                        break;                    
-
-                    case 6:
-                        //SW
-                        camera.position.x += 1;
-                        camera.position.z += 1;
-                        //console.log("SOUTH-WEST");
-                        break;
-
-                    case 7:
-                        //SE
-                        camera.position.x -= 1;
-                        camera.position.z += 1;
-                        //console.log("SOUTH-EAST");
-                        break;
-
-                    /*
-                    case 8:
-                        //NNE
-                        camera.position.x -= 0.3;
-                        camera.position.z -= 1;
-                        //console.log("NNE");
-                        break;
-
-                    case 9:
-                        //NNW
-                        camera.position.x += 0.3;
-                        camera.position.z -= 1;
-                        //console.log("NNW");
-                        break;
-
-                    case 10:
-                        //SSE
-                        camera.position.x -= 0.3;
-                        camera.position.z += 1;
-                        //console.log("SSE");
-                        break;
-
-                    case 11:
-                        //SSW
-                        camera.position.x += 0.3;
-                        camera.position.z += 1;
-                        //console.log("SSW");
-                        break;
-
-                    case 12:
-                        //WNW
-                        camera.position.x += 1;
-                        camera.position.z -= 0.3;
-                        //console.log("WNW");
-                        break;
-
-                    case 13:
-                        //WSW
-                        camera.position.x += 1;
-                        camera.position.z += 0.3;
-                        //console.log("WNW");
-                        break;
-
-                    case 14:
-                        //ENE
-                        camera.position.x -= 1;
-                        camera.position.z -= 0.3;
-                        //console.log("ENE");
-                        break;
-
-                    case 15:
-                        //ESE
-                        camera.position.x -= 1;
-                        camera.position.z += 0.3;
-                        //console.log("ESE");
-                        break;
-                        
-                }
-        }   
-    }
-    */
 }
 
+/*
 function detectCollision(object) {
     let originPoint = object.position.clone();
 
@@ -623,7 +469,7 @@ function detectCollision(object) {
     }
 
     return false;
-}
+}*/
 
 
 
@@ -640,64 +486,7 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function keyDown(event) {
-    keyboard[event.keyCode] = true;
-}
-
-function keyUp(event) {
-    keyboard[event.keyCode] = false;
-}
-
+function keyDown(event) {keyboard[event.keyCode] = true;}
+function keyUp(event) {keyboard[event.keyCode] = false;}
 window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
-/*
-function spawnBox(){
-        var cube_trick_geometry = new THREE.BoxGeometry(5,5,5,10,10,10);
-        var handleCollision = function(collided_with, linearVelocity, angularVelocity){
-            switch ( ++this.collisions ){
-                        
-                        case 1:
-                            this.material.color.setHex(0xcc8855);
-                            break;
-                        
-                        case 2:
-                            this.material.color.setHex(0xbb9955);
-                            break;
-                        
-                        case 3:
-                            this.material.color.setHex(0xaaaa55);
-                            break;
-                        
-                        case 4:
-                            this.material.color.setHex(0x99bb55);
-                            break;
-                        
-                        case 5:
-                            this.material.color.setHex(0x88cc55);
-                            break;
-                        
-                        case 6:
-                            this.material.color.setHex(0x77dd55);
-                            break;
-            }
-            console.log("collision detected");
-    };
-    
-        var cube_trick, cube_trick_material;
-
-        cube_trick_material = Physijs.createMaterial( 
-            new THREE.MeshLambertMaterial( {color: 0x00ff00}),
-            .6,
-            .3
-        );
-        cube_trick = new Physijs.BoxMesh(cube_trick_geometry, cube_trick_material, 5);
-        cube_trick.collision = 0;
-        cube_trick.position.set(0,0,0); 
-        cube_trick.addEventListener('collision', handleCollision);
-        //cube_trick.addEventListener('ready', spawnBox);
-        //scene.add(cube_trick);
-    
-        return cube_trick;
-};
-
-*/
