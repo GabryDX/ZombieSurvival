@@ -26,7 +26,7 @@ var zombies = [];
 var zombie_speed = 0.03;
 var width = window.innerWidth;
 var height = window.innerHeight;
-var bb_side_walks = [],bb_zombies = [];
+var bb_side_walks = [],bb_zombies = [], bb_map = [];
 var bb_player,box_player;
 var previous_position;
 var bb_bullet;
@@ -179,6 +179,44 @@ function init() {
     scene.add(box_player);
     scene.add(bb_player);
 
+    //Store vertices clock-wisely
+	var roofVertices = [
+			new THREE.Vector3(-250,0,-250), new THREE.Vector3(-250,50,-250),new THREE.Vector3(250,50,-250),new THREE.Vector3(250,0,-250),
+			new THREE.Vector3(250,0, -250), new THREE.Vector3(250,50,-250),new THREE.Vector3(250,50,250),new THREE.Vector3(250,0,250),
+			new THREE.Vector3(250, 0,250), new THREE.Vector3(250,50,250),new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,0,250),
+			new THREE.Vector3(-250,0,250), new THREE.Vector3(-250,50,250),new THREE.Vector3(-250,50,-250),new THREE.Vector3(-250,0,-250)
+		];
+	var material = new THREE.MeshBasicMaterial({
+	   			color: 0xffffff,
+	    		side: THREE.DoubleSide,
+	    		transparent: true,
+	    		opacity: 0
+	});
+		
+
+	for (var i = 0; i < roofVertices.length; i++) {
+
+    	var v1 = roofVertices[i];
+	    var v2 = roofVertices[(i+1)%roofVertices.length];//wrap last vertex back to start
+	    var wallGeometry = new THREE.Geometry();
+	    wallGeometry.vertices = [
+	        v1,
+	        v2,
+	        new THREE.Vector3(v1.x, 0, v1.z),
+	        new THREE.Vector3(v2.x, 0, v2.z)
+	    ];
+	    //always the same for simple 2-triangle plane
+	    wallGeometry.faces = [new THREE.Face3(0, 1, 2), new THREE.Face3(1, 2, 3)];
+	    wallGeometry.computeFaceNormals();
+	    wallGeometry.computeVertexNormals();
+
+		var wallMesh = new THREE.Mesh(wallGeometry, material);
+		bb_map[i] = new THREE.Box3().setFromObject(wallMesh);
+
+		scene.add(wallMesh)
+  		scene.add(bb_map[i])
+	}
+
     renderer = new THREE.WebGLRenderer({antialiasing: true});
     renderer.setSize(width, height);
     renderer.shadowMap.enabled = true;
@@ -262,7 +300,11 @@ function animate() {
 
     window.addEventListener('resize', onWindowResize, false);
 
-    
+
+    //__________________________END GAME_____________________
+    if ( NZOMBIE == 0){
+
+    } 
 
     // ------------
     // Management of camera rotation
@@ -277,12 +319,20 @@ function animate() {
     box_player.position.set(camera.position.x,0,camera.position.z);
     bb_player.setFromObject(box_player);
 	
+	//Buildings collision
 	for ( var i = 0; i < bb_side_walks.length; i++){
     	
     	if ( bb_player.intersectsBox( bb_side_walks[i]) )
     		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
     }
 
+
+    //Bound walls collision
+	for ( var i = 0; i < bb_map.length; i++){
+    	
+    	if ( bb_player.intersectsBox( bb_map[i]) )
+    		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
+    }    
     
     //______________________________ESSENTIAL FOR PLAYER COLLISION________________________________
     //It is first initialized as the camera position in the init() function. Hence, it is updated
@@ -367,11 +417,14 @@ function animate() {
             continue;
         }
 
+        //Bullet position updates
         bullets[index].position.add(bullets[index].velocity);
 
+        //Bullet boundig box
         bb_bullet = new THREE.Box3().setFromObject(bullets[index]);
         scene.add(bb_bullet);
 
+        //Collision between bullets and zombies
       	for ( var i = 0; i < bb_zombies.length; i++){
         		if ( bb_bullet.intersectsBox(bb_zombies[i]) ){
         			//console.log("COLLISION DETECTED");
@@ -380,6 +433,7 @@ function animate() {
         			scene.remove(bb_bullet);
         			scene.remove(zombies[i][zombieClassBig[i].body_Id]);
         			scene.remove(bb_zombies[i]);
+        			NZOMBIE--;
         		}
         	}
     }

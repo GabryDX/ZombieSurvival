@@ -67,6 +67,7 @@ THREEx.ProceduralCity	= function(){
 	var lampDensityD= 4
 	var lampH	= 3
 
+	/*
 	this.createWalls = function(){
 		var object3d	= new THREE.Object3D();
 		//Store vertices clock-wisely
@@ -109,7 +110,7 @@ THREEx.ProceduralCity	= function(){
   
 		}
 		return object3d
-	}
+	}*/
 
 	this.createSquareGround	= function(){
 		var geometry	= new THREE.PlaneGeometry( 1, 1, 1 );
@@ -468,8 +469,8 @@ THREEx.ProceduralCity	= function(){
 		var groundMesh	= this.createSquareGround()
 		object3d.add(groundMesh)	
 
-		var wallMesh = this.createWalls()
-		object3d.add(wallMesh)
+		//var wallMesh = this.createWalls()
+		//object3d.add(wallMesh)
 		
 		return object3d
 	}
