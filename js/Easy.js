@@ -14,22 +14,23 @@ var raycaster = [];
 var bullets = [];
 var canShoot = 0;
 var keyboard = {};
-var pun = 0;
+var score = 0;
 var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
 var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 10;
+var NZOMBIE = 20;
 var zombie;
 var zombies = [];
-var zombie_speed = 0.03;
+var zombie_speed = 0.04;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [];
 var bb_player,box_player;
 var previous_position;
 var bb_bullet;
+var eaten = false;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -67,6 +68,7 @@ var models = {
 };
 var zombieClass;
 var zombieClassBig = [];
+var zombieAlive = [];
 
 window.onload = init();
 
@@ -99,8 +101,8 @@ function init() {
 
     var i = 0;
     var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
-	var buildingMesh = new THREE.Mesh(geometry);
+  	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
+  	var buildingMesh = new THREE.Mesh(geometry);
     for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
 			for( var blockX = 0; blockX < nBlockX; blockX++){
 				// set position
@@ -159,6 +161,7 @@ function init() {
         })(_key);
     }
 
+    // ZOMBIE SPAWNING
     for ( var i = 0; i < NZOMBIE; i++){
      	spawnZombie();
      	bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].head_Id]);
@@ -169,7 +172,8 @@ function init() {
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
 
-    box_player = new THREE.Mesh( new THREE.BoxGeometry(2,2,2), new THREE.MeshBasicMaterial({transparent: true})   );
+    // height 20 to allow collision with zombies
+    box_player = new THREE.Mesh( new THREE.BoxGeometry(2,20,2), new THREE.MeshBasicMaterial({transparent: true}) );
     box_player.position.set(0,0,-5);
     bb_player = new THREE.Box3().setFromObject(box_player);
 
@@ -214,7 +218,7 @@ function init() {
 		bb_map[i] = new THREE.Box3().setFromObject(wallMesh);
 
 		scene.add(wallMesh)
-  		scene.add(bb_map[i])
+  	scene.add(bb_map[i])
 	}
 
     renderer = new THREE.WebGLRenderer({antialiasing: true});
@@ -234,7 +238,7 @@ function init() {
     }, false);
     document.addEventListener('pointerlockchange', function() {
         //controls.unlock();
-        if (document.pointerLockElement == null && distance > 0) {
+        if (document.pointerLockElement == null && distance > 0 && !eaten && score != NZOMBIE) {
             overlay_on();
         }
     }, false);
@@ -264,19 +268,25 @@ function init() {
         distance = countDownDate - now1;
 
         var sec = Math.floor(distance / 1000);
-        document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + pun + "</span>";
+        document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + score + "&nbsp&nbsp&nbsp Zombies: " + (NZOMBIE - score) + "</span>";
 
         // If the count down is finished, write some text
-        if (distance < 0) {
-            overlay_off();
-            document.exitPointerLock();
-            document.removeEventListener('click', function() {
-                controls.lock();
-            }, false);
-            clearInterval(x);
-            document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
-            document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + pun + "</span>" + "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
-            $(renderer.domElement).fadeOut();
+        if (distance <0 || eaten || score == NZOMBIE) {
+          overlay_off();
+          document.exitPointerLock();
+          document.removeEventListener('click', function() {
+              controls.lock();
+          }, false);
+          clearInterval(x);
+          if (distance < 0) {
+              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
+          } else if (eaten) {
+              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE BEEN EATEN!</h1></span>";
+          } else if (score == NZOMBIE) {
+              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE SURVIVED!</h1></span>";
+          }
+          document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + score + "</span>" + "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
+          $(renderer.domElement).fadeOut();
         }
     }, 1000);
 
@@ -300,12 +310,6 @@ function animate() {
 
     window.addEventListener('resize', onWindowResize, false);
 
-
-    //__________________________END GAME_____________________
-    if ( NZOMBIE == 0){
-
-    } 
-
     // ------------
     // Management of camera rotation
     var camerarotation_y;
@@ -326,13 +330,12 @@ function animate() {
     		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
     }
 
-
     //Bound walls collision
-	for ( var i = 0; i < bb_map.length; i++){
+	  for ( var i = 0; i < bb_map.length; i++){
     	
     	if ( bb_player.intersectsBox( bb_map[i]) )
     		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
-    }    
+    }   
     
     //______________________________ESSENTIAL FOR PLAYER COLLISION________________________________
     //It is first initialized as the camera position in the init() function. Hence, it is updated
@@ -341,52 +344,70 @@ function animate() {
 
     
     for ( var i = 0; i < NZOMBIE; i++) {
-      if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
-		var v = new THREE.Vector3();
-        v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
-        zombies[i][zombieClassBig[i].body_Id].lookAt(v);
-
-        if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-          zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
-        } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-          zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+      if (zombieAlive[i]) {
+        if (NZOMBIE == score - 1) {
+          zombie_speed = 0.1;
         }
-        if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-          zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
-        } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-          zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+
+        if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
+          var v = new THREE.Vector3();
+          v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
+          zombies[i][zombieClassBig[i].body_Id].lookAt(v);
+
+          if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
+            zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
+          } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
+            zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+          }
+          if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
+            zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
+          } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
+            zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+          }
         }
-      }
 
-      //Bounding box updates
-      bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].head_Id]);
+        //Bounding box updates
+        bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].head_Id]);
 
-      if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
-        tilt = true;
-      } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
-        tilt = false;
-      }
+        if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
+          tilt = true;
+        } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
+          tilt = false;
+        }
 
-    	if (tilt) {
-        zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
-        zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.002;
-        zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
-        zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.002;
-        zombies[i][zombieClassBig[i].left_leg_Id].rotation.x -= 0.01;
-        zombies[i][zombieClassBig[i].left_leg_Id].position.z += 0.003;
-        zombies[i][zombieClassBig[i].right_leg_Id].rotation.x += 0.01;
-        zombies[i][zombieClassBig[i].right_leg_Id].position.z -= 0.003;
+      	if (tilt) {
+          zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
+          zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.002;
+          zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
+          zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.002;
+          zombies[i][zombieClassBig[i].left_leg_Id].rotation.x -= 0.01;
+          zombies[i][zombieClassBig[i].left_leg_Id].position.z += 0.003;
+          zombies[i][zombieClassBig[i].right_leg_Id].rotation.x += 0.01;
+          zombies[i][zombieClassBig[i].right_leg_Id].position.z -= 0.003;
+        } else {
+      		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
+          zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.002;
+      		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
+          zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.002;
+          zombies[i][zombieClassBig[i].left_leg_Id].rotation.x += 0.01;
+          zombies[i][zombieClassBig[i].left_leg_Id].position.z -= 0.003;
+          zombies[i][zombieClassBig[i].right_leg_Id].rotation.x -= 0.01;
+          zombies[i][zombieClassBig[i].right_leg_Id].position.z += 0.003;
+      	}
+
+        if (bb_zombies[i].intersectsBox(bb_player)) {
+          eaten = true;
+        }
       } else {
-    		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
-        zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.002;
-    		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
-        zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.002;
-        zombies[i][zombieClassBig[i].left_leg_Id].rotation.x += 0.01;
-        zombies[i][zombieClassBig[i].left_leg_Id].position.z -= 0.003;
-        zombies[i][zombieClassBig[i].right_leg_Id].rotation.x -= 0.01;
-        zombies[i][zombieClassBig[i].right_leg_Id].position.z += 0.003;
-    	}
+        zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
+
+        if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
+          scene.remove(zombies[i][zombieClassBig[i].body_Id]);
+          scene.remove(bb_zombies[i]);
+        }
+      }
     }
+
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
@@ -431,11 +452,13 @@ function animate() {
         			bullets[index].alive = false;
         			scene.remove(bullets[index]);
         			scene.remove(bb_bullet);
-        			scene.remove(zombies[i][zombieClassBig[i].body_Id]);
-        			scene.remove(bb_zombies[i]);
-        			NZOMBIE--;
+              // zombie death rotation
+              if (zombieAlive[i]) {
+                zombieAlive[i] = false;
+                score += 1;
+              }
         		}
-        	}
+        }
     }
 
     //________________________________WEAPON ZOOM___________________________
@@ -521,6 +544,7 @@ function spawnZombie(){
   zombie[zombieClassSpawn.body_Id].position.z = random_z;
   zombieClassBig.push(zombieClassSpawn);
   zombies.push(zombie);
+  zombieAlive.push(true);
 
 }
  
