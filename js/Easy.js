@@ -26,9 +26,10 @@ var zombies = [];
 var zombie_speed = 0.03;
 var width = window.innerWidth;
 var height = window.innerHeight;
-var bb_side_walks = [];
+var bb_side_walks = [],bb_zombies = [];
 var bb_player,box_player;
 var previous_position;
+var bb_bullet;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -158,8 +159,11 @@ function init() {
         })(_key);
     }
 
-    for ( var i = 0; i < NZOMBIE; i++)
-      spawnZombie();
+    for ( var i = 0; i < NZOMBIE; i++){
+     	spawnZombie();
+     	bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].head_Id]);
+     	scene.add(bb_zombies[i]);
+    }
 
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
@@ -169,6 +173,7 @@ function init() {
     box_player.position.set(0,0,-5);
     bb_player = new THREE.Box3().setFromObject(box_player);
 
+    //Player previous position
     previous_position = new THREE.Vector3(camera.position);
 
     scene.add(box_player);
@@ -281,7 +286,7 @@ function animate() {
     
     //______________________________ESSENTIAL FOR PLAYER COLLISION________________________________
     //It is first initialized as the camera position in the init() function. Hence, it is updated
-    //only if there is NO COLLISION.
+    //only iff there is NO COLLISION.
     previous_position = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 
     
@@ -302,6 +307,9 @@ function animate() {
           zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
         }
       }
+
+      //Bounding box updates
+      bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].head_Id]);
 
       if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
         tilt = true;
@@ -360,6 +368,20 @@ function animate() {
         }
 
         bullets[index].position.add(bullets[index].velocity);
+
+        bb_bullet = new THREE.Box3().setFromObject(bullets[index]);
+        scene.add(bb_bullet);
+
+      	for ( var i = 0; i < bb_zombies.length; i++){
+        		if ( bb_bullet.intersectsBox(bb_zombies[i]) ){
+        			//console.log("COLLISION DETECTED");
+        			bullets[index].alive = false;
+        			scene.remove(bullets[index]);
+        			scene.remove(bb_bullet);
+        			scene.remove(zombies[i][zombieClassBig[i].body_Id]);
+        			scene.remove(bb_zombies[i]);
+        		}
+        	}
     }
 
     //________________________________WEAPON ZOOM___________________________
@@ -381,21 +403,28 @@ function animate() {
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
         //console.log("DOVREI SPARARE");
         // creates a bullet as a Mesh object
-        var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({
-            color: 0xAF9B60
-        }));
+        var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({color: 0xAF9B60}));
         // must change to weapon position later
         bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
         // set the velocity of the bullet
         bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y)).normalize();
         bullet.alive = true;
-        setTimeout(function() {
+
+        
+
+        
+        
+        
+        setTimeout(function() {       
             bullet.alive = false;
             scene.remove(bullet);
         }, 1000);
         // add to scene, array, and set the delay to 10 frames
         bullets.push(bullet);
         scene.add(bullet);
+        
+        
+        
         canShoot = 10;
     }
     if (canShoot > 0) canShoot -= 1;
@@ -450,27 +479,6 @@ function castRays(){
         var intersects = raycaster.intersectObjects(scene.children, true);
         
 }
-
-/*
-function detectCollision(object) {
-    let originPoint = object.position.clone();
-
-    for (var i = 0; i < object.geometry.vertices.length; i++) {
-        var localVertex = object.geometry.vertices[i].clone();
-        var globalVertex = localVertex.applyMatrix4(object.matrix);
-        var directionVector = globalVertex.sub( object.position );
-
-        var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-
-        var collisionResults = ray.intersectObjects( this.collidableMeshList );
-         if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-               return true;           
-        }
-    }
-
-    return false;
-}*/
-
 
 
 function onDocumentMouseMove(event) {
