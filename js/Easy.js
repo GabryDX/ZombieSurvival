@@ -1,4 +1,5 @@
 import {Zombie} from './Zombie.js';
+import {ZombieGiant} from './ZombieGiant.js';
 
 var nBlockX	= 10;
 var nBlockZ	= 10;
@@ -24,6 +25,7 @@ var NZOMBIE = 20;
 var zombie;
 var zombies = [];
 var zombie_speed = 0.04;
+var zombie_giant_life = 10;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [];
@@ -101,28 +103,26 @@ function init() {
 
     var i = 0;
     var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-  	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
-  	var buildingMesh = new THREE.Mesh(geometry);
+    geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
+    var buildingMesh = new THREE.Mesh(geometry);
     for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
-			for( var blockX = 0; blockX < nBlockX; blockX++){
-				// set position
-				buildingMesh.position.x	= (blockX+0.5-nBlockX/2)*blockSizeX
-				buildingMesh.position.z	= (blockZ+0.5-nBlockZ/2)*blockSizeZ
+      for( var blockX = 0; blockX < nBlockX; blockX++){
+        // set position
+        buildingMesh.position.x = (blockX+0.5-nBlockX/2)*blockSizeX
+        buildingMesh.position.z = (blockZ+0.5-nBlockZ/2)*blockSizeZ
 
-				buildingMesh.scale.x	= blockSizeX-roadW
-				buildingMesh.scale.y	= sidewalkH*3;
-				buildingMesh.scale.z	= blockSizeZ-roadD
+        buildingMesh.scale.x  = blockSizeX-roadW
+        buildingMesh.scale.y  = sidewalkH*3;
+        buildingMesh.scale.z  = blockSizeZ-roadD
 
-				//bb_array[i] = new THREE.BoxHelper(buildingMesh,0xffff00);
-				bb_side_walks[i] = new THREE.Box3().setFromObject(buildingMesh);
+        //bb_array[i] = new THREE.BoxHelper(buildingMesh,0xffff00);
+        bb_side_walks[i] = new THREE.Box3().setFromObject(buildingMesh);
 
-				scene.add(bb_side_walks[i]);
-				i++;
-			}
-	}
+        scene.add(bb_side_walks[i]);
+        i++;
+      }
+    }
     
-
-
     //_____________________________________LIGHT________________________________________
     var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
     light.position.set(1, 1, 0.25);
@@ -162,11 +162,15 @@ function init() {
     }
 
     // ZOMBIE SPAWNING
-    for ( var i = 0; i < NZOMBIE; i++){
+    for ( var i = 0; i < NZOMBIE-1; i++){
      	spawnZombie();
      	bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].head_Id]);
      	scene.add(bb_zombies[i]);
     }
+    spawnZombieGiant();
+    bb_zombies[NZOMBIE-1] = new THREE.Box3().setFromObject(zombies[NZOMBIE-1][zombieClassBig[NZOMBIE-1].left_leg_Id]);
+    bb_zombies[NZOMBIE-1] = bb_zombies[NZOMBIE-1].union(new THREE.Box3().setFromObject(zombies[NZOMBIE-1][zombieClassBig[NZOMBIE-1].right_leg_Id]));
+    scene.add(bb_zombies[NZOMBIE-1]);
 
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
@@ -289,6 +293,7 @@ function init() {
           $(renderer.domElement).fadeOut();
         }
     }, 1000);
+    countDownDate += 1000;
 
     //scene.simulate();
     animate();
@@ -343,68 +348,73 @@ function animate() {
     //only iff there is NO COLLISION.
     previous_position = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 
-    
-    for ( var i = 0; i < NZOMBIE; i++) {
-      if (zombieAlive[i]) {
-        if (NZOMBIE == score - 1) 
-          zombie_speed = 0.1;
-        
+    if (!overlayIsOn) {
+      for ( var i = 0; i < NZOMBIE; i++) {
+        if (zombieAlive[i]) {
+          if (NZOMBIE == score - 1) 
+            zombie_speed = 0.2;
+          
 
-        if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
-          var v = new THREE.Vector3();
-          v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
-          zombies[i][zombieClassBig[i].body_Id].lookAt(v);
+          if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
+            var v = new THREE.Vector3();
+            v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
+            zombies[i][zombieClassBig[i].body_Id].lookAt(v);
 
-          if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-            zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
-          } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-            zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+            if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
+            } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+            }
+            if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
+            } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+            }
           }
-          if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-            zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
-          } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-            zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+
+          //Bounding box updates
+          bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].head_Id]);
+          if (i == NZOMBIE-1) {
+            bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].left_leg_Id]);
+            bb_zombies[i].union(new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].right_leg_Id]));
           }
-        }
 
-        //Bounding box updates
-        bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].head_Id]);
+          if (zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
+            tilt = true;
+          } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
+            tilt = false;
+          }
 
-        if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
-          tilt = true;
-        } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
-          tilt = false;
-        }
+        	if (tilt) {
+            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.002;
+            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.002;
+            zombies[i][zombieClassBig[i].left_leg_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].left_leg_Id].position.z += 0.003;
+            zombies[i][zombieClassBig[i].right_leg_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].right_leg_Id].position.z -= 0.003;
+          } else {
+        		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.002;
+        		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.002;
+            zombies[i][zombieClassBig[i].left_leg_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].left_leg_Id].position.z -= 0.003;
+            zombies[i][zombieClassBig[i].right_leg_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].right_leg_Id].position.z += 0.003;
+        	}
 
-      	if (tilt) {
-          zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
-          zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.002;
-          zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
-          zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.002;
-          zombies[i][zombieClassBig[i].left_leg_Id].rotation.x -= 0.01;
-          zombies[i][zombieClassBig[i].left_leg_Id].position.z += 0.003;
-          zombies[i][zombieClassBig[i].right_leg_Id].rotation.x += 0.01;
-          zombies[i][zombieClassBig[i].right_leg_Id].position.z -= 0.003;
+          if (bb_zombies[i].intersectsBox(bb_player)) {
+            eaten = true;
+          }
         } else {
-      		zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
-          zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.002;
-      		zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
-          zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.002;
-          zombies[i][zombieClassBig[i].left_leg_Id].rotation.x += 0.01;
-          zombies[i][zombieClassBig[i].left_leg_Id].position.z -= 0.003;
-          zombies[i][zombieClassBig[i].right_leg_Id].rotation.x -= 0.01;
-          zombies[i][zombieClassBig[i].right_leg_Id].position.z += 0.003;
-      	}
+          zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
 
-        if (bb_zombies[i].intersectsBox(bb_player)) {
-          eaten = true;
-        }
-      } else {
-        zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
-
-        if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
-          scene.remove(zombies[i][zombieClassBig[i].body_Id]);
-          scene.remove(bb_zombies[i]);
+          if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
+            scene.remove(zombies[i][zombieClassBig[i].body_Id]);
+            scene.remove(bb_zombies[i]);
+          }
         }
       }
     }
@@ -448,17 +458,25 @@ function animate() {
 
         //Collision between bullets and zombies
       	for ( var i = 0; i < NZOMBIE; i++){
+          if (zombieAlive[i]) {
         		if ( bb_bullet.intersectsBox(bb_zombies[i]) ){
         			//console.log("COLLISION DETECTED");
         			bullets[index].alive = false;
         			scene.remove(bullets[index]);
         			scene.remove(bb_bullet);
               // zombie death rotation
-              if (zombieAlive[i]) {
+              if (i == NZOMBIE-1) {
+                zombie_giant_life -= 1;
+                if (zombie_giant_life == 0) {
+                  zombieAlive[i] = false;
+                  score += 1;
+                }
+              } else {
                 zombieAlive[i] = false;
                 score += 1;
               }
-        		}
+            }
+      		}
         }
     }
 
@@ -482,11 +500,11 @@ function animate() {
         
         var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({color: 0xAF9B60}));
         
- 		bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
+ 		    bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
         bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y)).normalize();
         bullet.alive = true;
 		
-		setTimeout(function() {       
+		    setTimeout(function() {       
             bullet.alive = false;
             scene.remove(bullet);
         }, 1000);
@@ -538,7 +556,33 @@ function spawnZombie(){
   zombieClassBig.push(zombieClassSpawn);
   zombies.push(zombie);
   zombieAlive.push(true);
+}
 
+
+function spawnZombieGiant(){
+  var zombieClassSpawn = new ZombieGiant();
+  zombie = zombieClassSpawn.zombie;
+  for ( var i = 0; i < zombieClassSpawn.numNodes; i++)
+    scene.add(zombie[i]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.head_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_leg_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_leg_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_arm_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_arm_Id]);
+
+  zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
+  zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
+
+  var min = -100;
+  var max = 100;
+  var random_x = Math.random() * (+max - +min) + +min;
+  var random_z = Math.random() * (+max - +min) + +min;
+
+  zombie[zombieClassSpawn.body_Id].position.x = random_x;
+  zombie[zombieClassSpawn.body_Id].position.z = random_z;
+  zombieClassBig.push(zombieClassSpawn);
+  zombies.push(zombie);
+  zombieAlive.push(true);
 }
  
 
