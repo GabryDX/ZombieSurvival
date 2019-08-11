@@ -197,7 +197,7 @@ function init() {
 	    		opacity: 0
 	});
 		
-
+	//Adding 4 transparent walls along all the 4 sides of the map in order to do not let the player going out 
 	for (var i = 0; i < roofVertices.length; i++) {
 
     	var v1 = roofVertices[i];
@@ -218,7 +218,7 @@ function init() {
 		bb_map[i] = new THREE.Box3().setFromObject(wallMesh);
 
 		scene.add(wallMesh)
-  	scene.add(bb_map[i])
+  		scene.add(bb_map[i])
 	}
 
     renderer = new THREE.WebGLRenderer({antialiasing: true});
@@ -305,6 +305,7 @@ function onResourcesLoaded() {
 }
 
 var tilt = false;
+
 function animate() {
 
 
@@ -318,25 +319,25 @@ function animate() {
     else
         camerarotation_y = camera.rotation.y;
 
-    //_________________________________________PLAYER COLLISION_________________________________
+    //________________________________PLAYER COLLISION_________________________________
 
     box_player.position.set(camera.position.x,0,camera.position.z);
     bb_player.setFromObject(box_player);
 	
-	//Buildings collision
+	//Buildings collision walls collision
 	for ( var i = 0; i < bb_side_walks.length; i++){
     	
-    	if ( bb_player.intersectsBox( bb_side_walks[i]) )
-    		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
+    	if ( bb_map[i] != undefined){
+    		if ( bb_player.intersectsBox( bb_map[i]) || bb_player.intersectsBox( bb_side_walks[i]))
+    			camera.position.set(previous_position.x,previous_position.y,previous_position.z);
+    	}
+
+    	else{
+    		if ( bb_player.intersectsBox( bb_side_walks[i]) )
+    			camera.position.set(previous_position.x,previous_position.y,previous_position.z);
+    	}
     }
 
-    //Bound walls collision
-	  for ( var i = 0; i < bb_map.length; i++){
-    	
-    	if ( bb_player.intersectsBox( bb_map[i]) )
-    		camera.position.set(previous_position.x,previous_position.y,previous_position.z);
-    }   
-    
     //______________________________ESSENTIAL FOR PLAYER COLLISION________________________________
     //It is first initialized as the camera position in the init() function. Hence, it is updated
     //only iff there is NO COLLISION.
@@ -345,9 +346,9 @@ function animate() {
     
     for ( var i = 0; i < NZOMBIE; i++) {
       if (zombieAlive[i]) {
-        if (NZOMBIE == score - 1) {
+        if (NZOMBIE == score - 1) 
           zombie_speed = 0.1;
-        }
+        
 
         if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
           var v = new THREE.Vector3();
@@ -446,7 +447,7 @@ function animate() {
         scene.add(bb_bullet);
 
         //Collision between bullets and zombies
-      	for ( var i = 0; i < bb_zombies.length; i++){
+      	for ( var i = 0; i < NZOMBIE; i++){
         		if ( bb_bullet.intersectsBox(bb_zombies[i]) ){
         			//console.log("COLLISION DETECTED");
         			bullets[index].alive = false;
@@ -478,32 +479,24 @@ function animate() {
 
     //__________________________________________BULLET CREATION_____________________________________________
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
-        //console.log("DOVREI SPARARE");
-        // creates a bullet as a Mesh object
+        
         var bullet = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), new THREE.MeshBasicMaterial({color: 0xAF9B60}));
-        // must change to weapon position later
-        bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
-        // set the velocity of the bullet
+        
+ 		bullet.position.set(meshes["playerweapon"].position.x /*- bulletRightPos*/, meshes["playerweapon"].position.y + 0.15, meshes["playerweapon"].position.z);
         bullet.velocity = new THREE.Vector3(-Math.sin(camerarotation_y), 0, Math.cos(camerarotation_y)).normalize();
         bullet.alive = true;
-
-        
-
-        
-        
-        
-        setTimeout(function() {       
+		
+		setTimeout(function() {       
             bullet.alive = false;
             scene.remove(bullet);
         }, 1000);
         // add to scene, array, and set the delay to 10 frames
+        
         bullets.push(bullet);
         scene.add(bullet);
-        
-        
-        
         canShoot = 10;
     }
+    
     if (canShoot > 0) canShoot -= 1;
 
     if (!overlayIsOn)
@@ -548,6 +541,7 @@ function spawnZombie(){
 
 }
  
+
 function castRays(){
     //____________________NB: CAMERA ROTATES COUNTER CLOCKWISE__________________
     //_______NB: THE ORIGIN OF THE DIRECTION IS THE CAMERA CENTER. Z-AXIS ALWAYS POINTS UP, X-AXIS ALWAYS POINTS RIGHT________

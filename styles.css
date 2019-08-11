@@ -31,3 +31,34 @@ body{
   -o-background-size: cover;
   background-size: cover;
 }
+
+.diff{
+  margin-bottom: 5%;
+}
+
+.fa{
+  width: 10%;
+  height: 7.5%;
+  border-radius: 30px;
+  border-color: #f62217;
+}
+
+.fa:hover{
+  background-color: #000;
+  color: #f62217;
+}
+
+.fa-btnEasy{
+  float: left;
+  margin-left: 13.5%;
+}
+
+.fa-btnMedium{
+  float: left;
+  margin-left: 21%;
+}
+
+.fa-btnHard{
+  float: left;
+  margin-left: 21%;
+}
