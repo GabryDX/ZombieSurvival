@@ -12,14 +12,14 @@ var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
-var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 19; //20
-var NZOMBIE_G = 1; //1
+var DURATIONTIME = 50000; //in millisec
+var NZOMBIE = 50; //20
+var NZOMBIE_G = 10; //1
 var zombie;
 var zombies = [];
-var zombie_speed = 0.04;
-var zombie_max_speed = 0.2;
-var zombie_giant_life = 10;
+var zombie_speed = 0.08;
+var zombie_max_speed = 0.4;
+var zombie_giant_life = 50;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [];
@@ -345,7 +345,7 @@ function animate() {
     previous_position = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 
     if (!overlayIsOn) {
-      if (NZOMBIE + NZOMBIE_G == killed + 1) 
+      if (NZOMBIE + NZOMBIE_G == killed - 1) 
         zombie_speed = zombie_max_speed;
 
       for ( var i = 0; i < NZOMBIE; i++) {
@@ -420,14 +420,14 @@ function animate() {
             zombies[i][zombieClassBig[i].body_Id].lookAt(v);
 
             if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed*2;
+              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
             } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed*2;
+              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
             }
             if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed*2;
+              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
             } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed*2;
+              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
             }
           }
 
@@ -629,22 +629,6 @@ function spawnZombie(){
   var max = 100;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
-  var d = 5;
-
-  if (random_x < d && random_x > -d) {
-    if (Math.random() == 0) {
-      random_x = d;
-    } else {
-      random_x = -d;
-    }
-  }
-  if (random_z < d && random_z > -d) {
-    if (Math.random() == 0) {
-      random_z = d;
-    } else {
-      random_z = -d;
-    }
-  }
 
   zombie[zombieClassSpawn.body_Id].position.x = random_x;
   zombie[zombieClassSpawn.body_Id].position.z = random_z;
@@ -674,22 +658,6 @@ function spawnZombieGiant(){
   var max = 100;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
-  var d = 10;
-
-  if (random_x < d && random_x > -d) {
-    if (Math.random() == 0) {
-      random_x = d;
-    } else {
-      random_x = -d;
-    }
-  }
-  if (random_z < d && random_z > -d) {
-    if (Math.random() == 0) {
-      random_z = d;
-    } else {
-      random_z = -d;
-    }
-  }
 
   zombie[zombieClassSpawn.body_Id].position.x = random_x;
   zombie[zombieClassSpawn.body_Id].position.z = random_z;
