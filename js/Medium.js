@@ -1,8 +1,17 @@
 import {Zombie} from './Zombie.js';
 import {ZombieGiant} from './ZombieGiant.js';
 
+var nBlockX	= 10;
+var nBlockZ	= 10;
+var blockSizeX	= 50;
+var blockSizeZ	= 50;
+var roadW	= 8;
+var roadD	= 8;
+var sidewalkH	= 0.1;
+
 var scene, camera, renderer, mesh, clock, controls;
 var raycaster = [];
+
 var bullets = [];
 var canShoot = 0;
 var keyboard = {};
@@ -11,13 +20,12 @@ var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
-var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 20;
+var DURATIONTIME = 100000; //in millisec
+var NZOMBIE = 30;
 var zombie;
 var zombies = [];
-var zombie_speed = 0.04;
-var zombie_max_speed = 0.2;
-var zombie_giant_life = 10;
+var zombie_speed = 0.08;
+var zombie_giant_life = 20;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [];
@@ -25,14 +33,6 @@ var bb_player,box_player;
 var previous_position;
 var bb_bullet;
 var eaten = false;
-var tilt = false;
-var nBlockX	= 10;
-var nBlockZ	= 10;
-var blockSizeX	= 50;
-var blockSizeZ	= 50;
-var roadW	= 8;
-var roadD	= 8;
-var sidewalkH	= 0.1;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -50,6 +50,7 @@ var player = {
 var meshes = {};
 var loadingManager = null;
 var RESOURCES_LOADED = false;
+
 var models = {
     uzi: {
         obj: "models/uziGold.obj",
@@ -57,6 +58,15 @@ var models = {
         mesh: null,
         castShadow: false
     }
+    /*
+        city: {
+          //obj:"models/city1/Street environment_V01.obj",
+          //mtl:"models/city1/Street environment_V01.mtl",
+          obj:"models/city5/sehir.obj",
+          mtl:"models/city5/sehir.mtl",
+          mesh: null,
+          castShadow: false
+        }*/
 };
 var zombieClass;
 var zombieClassBig = [];
@@ -77,7 +87,6 @@ function init() {
     var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
     scene.fog = new THREE.FogExp2(0xd0e0f0, 0.0025);
     
-	//Box before the game
     loadingScreen.box.position.set(0, 0, 5);
     loadingScreen.camera.lookAt(loadingScreen.box.position);
     loadingScreen.scene.add(loadingScreen.box);
@@ -92,7 +101,6 @@ function init() {
     var proceduralCity = new THREEx.ProceduralCity().createSquareCity();    
     scene.add(proceduralCity);
 
-	//Taking each sidewalk in order to avoid collision with buildings
     var i = 0;
     var geometry = new THREE.CubeGeometry( 1, 1, 1 );
     geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.5, 0 ) );
@@ -110,7 +118,7 @@ function init() {
         //bb_array[i] = new THREE.BoxHelper(buildingMesh,0xffff00);
         bb_side_walks[i] = new THREE.Box3().setFromObject(buildingMesh);
 
-        //scene.add(bb_side_walks[i]);
+        scene.add(bb_side_walks[i]);
         i++;
       }
     }
@@ -157,12 +165,12 @@ function init() {
     for ( var i = 0; i < NZOMBIE-1; i++){
      	spawnZombie();
      	bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].head_Id]);
-     	//scene.add(bb_zombies[i]);
+     	scene.add(bb_zombies[i]);
     }
     spawnZombieGiant();
     bb_zombies[NZOMBIE-1] = new THREE.Box3().setFromObject(zombies[NZOMBIE-1][zombieClassBig[NZOMBIE-1].left_leg_Id]);
     bb_zombies[NZOMBIE-1] = bb_zombies[NZOMBIE-1].union(new THREE.Box3().setFromObject(zombies[NZOMBIE-1][zombieClassBig[NZOMBIE-1].right_leg_Id]));
-    //scene.add(bb_zombies[NZOMBIE-1]);
+    scene.add(bb_zombies[NZOMBIE-1]);
 
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
@@ -176,10 +184,9 @@ function init() {
     //Player previous position
     previous_position = new THREE.Vector3(camera.position);
 
-    //scene.add(box_player);
-    //scene.add(bb_player);
-	
-    //____Adding 4 transparent walls along all the 4 sides of the map in order to do not let the player going out_______
+    scene.add(box_player);
+    scene.add(bb_player);
+
     //Store vertices clock-wisely
 	var roofVertices = [
 			new THREE.Vector3(-250,0,-250), new THREE.Vector3(-250,50,-250),new THREE.Vector3(250,50,-250),new THREE.Vector3(250,0,-250),
@@ -194,7 +201,7 @@ function init() {
 	    		opacity: 0
 	});
 		
-	
+	//Adding 4 transparent walls along all the 4 sides of the map in order to do not let the player going out 
 	for (var i = 0; i < roofVertices.length; i++) {
 
     	var v1 = roofVertices[i];
@@ -215,7 +222,7 @@ function init() {
 		bb_map[i] = new THREE.Box3().setFromObject(wallMesh);
 
 		scene.add(wallMesh)
-  		//scene.add(bb_map[i])
+  		scene.add(bb_map[i])
 	}
 
     renderer = new THREE.WebGLRenderer({antialiasing: true});
@@ -288,6 +295,7 @@ function init() {
     }, 1000);
     countDownDate += 1000;
 
+    //scene.simulate();
     animate();
 }
 
@@ -301,6 +309,7 @@ function onResourcesLoaded() {
     overlay_on();
 }
 
+var tilt = false;
 
 function animate() {
 
@@ -314,6 +323,7 @@ function animate() {
         camerarotation_y = Math.PI - camera.rotation.y;
     else
         camerarotation_y = camera.rotation.y;
+
     //________________________________PLAYER COLLISION_________________________________
 
     box_player.position.set(camera.position.x,0,camera.position.z);
@@ -342,7 +352,7 @@ function animate() {
       for ( var i = 0; i < NZOMBIE; i++) {
         if (zombieAlive[i]) {
           if (NZOMBIE == score - 1) 
-            zombie_speed = zombie_max_speed;
+            zombie_speed *= 4;
           
 
           if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
@@ -403,11 +413,12 @@ function animate() {
 
           if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
             scene.remove(zombies[i][zombieClassBig[i].body_Id]);
-            //scene.remove(bb_zombies[i]);
+            scene.remove(bb_zombies[i]);
           }
         }
       }
     }
+
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
@@ -443,7 +454,7 @@ function animate() {
 
         //Bullet boundig box
         bb_bullet = new THREE.Box3().setFromObject(bullets[index]);
-        //scene.add(bb_bullet);
+        scene.add(bb_bullet);
 
         //Collision between bullets and zombies
       	for ( var i = 0; i < NZOMBIE; i++){
@@ -452,7 +463,7 @@ function animate() {
         			//console.log("COLLISION DETECTED");
         			bullets[index].alive = false;
         			scene.remove(bullets[index]);
-        			//scene.remove(bb_bullet);
+        			scene.remove(bb_bullet);
               // zombie death rotation
               if (i == NZOMBIE-1) {
                 zombie_giant_life -= 1;
@@ -468,6 +479,7 @@ function animate() {
       		}
         }
     }
+
     //________________________________WEAPON ZOOM___________________________
     var handGunRightPos = Math.PI / 6;
     var bulletRightPos = 0.5;
@@ -482,6 +494,7 @@ function animate() {
             bulletRightPos = 0.5;
         }
     }
+
     //__________________________________________BULLET CREATION_____________________________________________
     if (controls.shoot && canShoot <= 0 && !overlayIsOn) {
         
@@ -593,7 +606,8 @@ function onDocumentMouseMove(event) {
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-	renderer.setSize(window.innerWidth, window.innerHeight);
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function keyDown(event) {keyboard[event.keyCode] = true;}

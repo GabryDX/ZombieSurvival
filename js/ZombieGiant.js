@@ -21,12 +21,12 @@ export function ZombieGiant(){
         var right_arm_geometry = new THREE.BoxGeometry( 2, 6, 2);                                                                                                
 
         // HEAD
-        var texture0 = loader.load( 'resources/ZombieArancione/head_right.png' );
-		var texture1 = loader.load( 'resources/ZombieArancione/head_left.png' );
-		var texture2 = loader.load( 'resources/ZombieArancione/head_top.png' );
-		var texture3 = loader.load( 'resources/ZombieArancione/head_bottom.png' );
-		var texture4 = loader.load( 'resources/ZombieArancione/head_back.png' );
-		var texture5 = loader.load( 'resources/ZombieArancione/head_front.png' );
+        var texture0 = loader.load( 'resources/ZombieGiant/head_right.png' );
+		var texture1 = loader.load( 'resources/ZombieGiant/head_left.png' );
+		var texture2 = loader.load( 'resources/ZombieGiant/head_top.png' );
+		var texture3 = loader.load( 'resources/ZombieGiant/head_bottom.png' );
+		var texture4 = loader.load( 'resources/ZombieGiant/head_back.png' );
+		var texture5 = loader.load( 'resources/ZombieGiant/head_front.png' );
 
         var head_materials = [
 		    new THREE.MeshBasicMaterial( { map: texture0 } ),
