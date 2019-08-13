@@ -10,7 +10,8 @@ export function ZombieGiant(){
 		this.right_leg_bottom_Id = 5;
 		this.left_arm_Id = 6;
 		this.right_arm_Id = 7;
-		this.numNodes = 8;
+		this.bottom_cube_Id = 8;
+		this.numNodes = 9;
 		
 		var loader = new THREE.TextureLoader();
         
@@ -22,7 +23,8 @@ export function ZombieGiant(){
         var right_leg_top_geometry = new THREE.BoxGeometry( 2, 3, 2);
         var right_leg_bottom_geometry = new THREE.BoxGeometry( 2, 3, 2);
         var left_arm_geometry  = new THREE.BoxGeometry( 2, 6, 2);
-        var right_arm_geometry = new THREE.BoxGeometry( 2, 6, 2);                                                                                                
+        var right_arm_geometry = new THREE.BoxGeometry( 2, 6, 2);
+        var bottom_cube_geometry = new THREE.BoxGeometry( 2, 10, 4);
 
         // HEAD
         var texture0 = loader.load( 'resources/ZombieGiant/head_right.png' );
@@ -168,6 +170,14 @@ export function ZombieGiant(){
 		];
 		var right_arm_material = new THREE.MeshFaceMaterial( right_arm_materials );
 
+		// BOTTOM CUBE
+		var bottom_cube_material = new THREE.MeshBasicMaterial({
+	   			color: 0xffffff,
+	    		side: THREE.DoubleSide,
+	    		transparent: true,
+	    		opacity: 0
+		});
+
 
         var body      = new THREE.Mesh( body_geometry, body_material);
        	var head      = new THREE.Mesh( head_geometry, head_material );
@@ -177,6 +187,7 @@ export function ZombieGiant(){
         var right_leg_bottom = new THREE.Mesh( right_leg_bottom_geometry, right_leg_bottom_material);
         var left_arm  = new THREE.Mesh( left_arm_geometry, left_arm_material);
         var right_arm = new THREE.Mesh( right_arm_geometry, right_arm_material);
+        var bottom_cube = new THREE.Mesh( bottom_cube_geometry, bottom_cube_material);
        
         this.zombie[this.body_Id]      = body;
         this.zombie[this.head_Id]      = head;
@@ -186,8 +197,9 @@ export function ZombieGiant(){
         this.zombie[this.right_leg_bottom_Id] = right_leg_bottom;
         this.zombie[this.left_arm_Id]  = left_arm;
         this.zombie[this.right_arm_Id] = right_arm;
-        
-        var base_len = left_leg_top_geometry.parameters.height/2 + left_leg_bottom_geometry.parameters.height/2
+        this.zombie[this.bottom_cube_Id] = bottom_cube;
+
+        var base_len = left_leg_top_geometry.parameters.height/2 + left_leg_bottom_geometry.parameters.height/2;
         body.position.set(0, base_len+body_geometry.parameters.height, 0);
         head.position.set(0, base_len+body_geometry.parameters.height+head_geometry.parameters.height+0.1, 0);
         left_leg_top.position.set(-left_leg_top_geometry.parameters.width/2, base_len+left_leg_top_geometry.parameters.height/2, 0);
@@ -196,4 +208,5 @@ export function ZombieGiant(){
         right_leg_bottom.position.set(right_leg_bottom_geometry.parameters.width/2, base_len/2, 0);
         left_arm.position.set(-(body_geometry.parameters.width+left_arm_geometry.parameters.width)/2, base_len+left_arm_geometry.parameters.height*1.3, -base_len/4);
         right_arm.position.set((body_geometry.parameters.width+right_arm_geometry.parameters.width)/2, base_len+right_arm_geometry.parameters.height*1.3, -base_len/4);
+        bottom_cube.position.set(0, 0, 0);
 }

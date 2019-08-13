@@ -1,5 +1,6 @@
 import {Zombie} from './Zombie.js';
 import {ZombieGiant} from './ZombieGiant.js';
+import {ZombieHulk} from './ZombieHulk.js';
 
 var scene, camera, renderer, mesh, clock, controls;
 var raycaster = [];
@@ -12,14 +13,17 @@ var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
-var DURATIONTIME = 50000; //in millisec
-var NZOMBIE = 50; //20
-var NZOMBIE_G = 10; //1
+var DURATIONTIME = 150000; //in millisec
+var NZOMBIE = 200; //20
+var NZOMBIE_G = 20; //1
+var NZOMBIE_H = 50;
 var zombie;
 var zombies = [];
-var zombie_speed = 0.08;
-var zombie_max_speed = 0.4;
-var zombie_giant_life = 50;
+var zombie_speed = 0;
+var zombie_max_speed = 0.2;
+var zombie_life = 1;
+var zombie_giant_life = 10;
+var zombie_hulk_life = 5;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [];
@@ -29,6 +33,7 @@ var bb_bullet;
 var eaten = false;
 var tilt = false;
 var tiltG = false;
+var tiltH = false;
 var nBlockX	= 10;
 var nBlockZ	= 10;
 var blockSizeX	= 50;
@@ -63,8 +68,7 @@ var models = {
 };
 var zombieClass;
 var zombieClassBig = [];
-var zombieAlive = [];
-var zombieGlife = [];
+var zombieLife = [];
 
 window.onload = init();
 
@@ -167,7 +171,10 @@ function init() {
       spawnZombieGiant();
       bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].left_leg_bottom_Id]);
       bb_zombies[i] = bb_zombies[i].union(new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].right_leg_bottom_Id]));
-      zombieGlife[i-NZOMBIE] = zombie_giant_life;
+    }
+    for ( var i = NZOMBIE+NZOMBIE_G; i < NZOMBIE+NZOMBIE_G+NZOMBIE_H; i++){
+      spawnZombieHulk();
+      bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].body_Id]);
     }
 
     camera.position.set(0, player.height, -5);
@@ -234,14 +241,14 @@ function init() {
     clock = new THREE.Clock();
     controls = new THREE.FirstPersonControls(camera, scene);
     document.addEventListener('click', function() {
-        if (distance > 0) {
+        if (distance > 0 && !eaten && killed != NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
             controls.lock();
         }
         overlay_off();
     }, false);
     document.addEventListener('pointerlockchange', function() {
         //controls.unlock();
-        if (document.pointerLockElement == null && distance > 0 && !eaten && killed != NZOMBIE+NZOMBIE_G) {
+        if (document.pointerLockElement == null && distance > 0 && !eaten && killed != NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
             overlay_on();
         }
     }, false);
@@ -270,27 +277,27 @@ function init() {
         // Find the distance between now an the count down date
         distance = countDownDate - now1;
 
-        var sec = Math.floor(distance / 1000);
-        document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + score + "&nbsp&nbsp&nbsp Zombies: " + (NZOMBIE + NZOMBIE_G - killed) + "</span>";
+        // var sec = Math.floor(distance / 1000);
+        // document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + score + "&nbsp&nbsp&nbsp Zombies: " + (NZOMBIE + NZOMBIE_G + NZOMBIE_H - killed) + "</span>";
 
-        // If the count down is finished, write some text
-        if (distance <0 || eaten || killed == NZOMBIE+NZOMBIE_G) {
-          overlay_off();
-          document.exitPointerLock();
-          document.removeEventListener('click', function() {
-              controls.lock();
-          }, false);
-          clearInterval(x);
-          if (distance < 0) {
-              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
-          } else if (eaten) {
-              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE BEEN EATEN!</h1></span>";
-          } else if (killed == NZOMBIE+NZOMBIE_G) {
-              document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE SURVIVED!</h1></span>";
-          }
-          document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + score + "</span>" + "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
-          $(renderer.domElement).fadeOut();
-        }
+        // // If the count down is finished, write some text
+        // if (distance < 0 || eaten || killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
+        //   overlay_off();
+        //   document.exitPointerLock();
+        //   document.removeEventListener('click', function() {
+        //       controls.lock();
+        //   }, false);
+        //   clearInterval(x);
+        //   if (distance < 0) {
+        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
+        //   } else if (eaten) {
+        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE BEEN EATEN!</h1></span>";
+        //   } else if (killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
+        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE SURVIVED!</h1></span>";
+        //   }
+        //   document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + score + "</span>" + "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
+        //   $(renderer.domElement).fadeOut();
+        // }
     }, 1000);
     countDownDate += 1000;
 
@@ -345,11 +352,12 @@ function animate() {
     previous_position = new THREE.Vector3(camera.position.x,camera.position.y,camera.position.z);
 
     if (!overlayIsOn) {
-      if (NZOMBIE + NZOMBIE_G == killed - 1) 
+      if (NZOMBIE + NZOMBIE_G + NZOMBIE_H == killed + 1) 
         zombie_speed = zombie_max_speed;
 
+      // ZOMBIE NORMAL ANIMATION
       for ( var i = 0; i < NZOMBIE; i++) {
-        if (zombieAlive[i]) {
+        if (zombieLife[i] > 0) {
           if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
             var v = new THREE.Vector3();
             v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
@@ -401,7 +409,7 @@ function animate() {
         	}
 
           if (bb_zombies[i].intersectsBox(bb_player)) {
-            eaten = true;
+            // eaten = true;
           }
         } else {
           zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
@@ -412,22 +420,23 @@ function animate() {
           }
         }
       }
+      // ZOMBIE GIANT ANIMATION
       for ( var i = NZOMBIE; i < NZOMBIE+NZOMBIE_G; i++) {
-        if (zombieAlive[i]) {
+        if (zombieLife[i] > 0) {
           if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
             var v = new THREE.Vector3();
             v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
             zombies[i][zombieClassBig[i].body_Id].lookAt(v);
 
             if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed;
+              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed*2;
             } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed;
+              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed*2;
             }
             if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed;
+              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed*2;
             } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed;
+              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed*2;
             }
           }
 
@@ -485,8 +494,93 @@ function animate() {
             }
           }
 
+          // if (bb_zombies[i].intersectsBox(bb_player)) {
+          //   eaten = true;
+          // }
+        } else {
+          zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
+
+          if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
+            scene.remove(zombies[i][zombieClassBig[i].body_Id]);
+            //scene.remove(bb_zombies[i]);
+          }
+        }
+      }
+      // ZOMBIE HULK ANIMATION
+      for ( var i = NZOMBIE+NZOMBIE_G; i < NZOMBIE+NZOMBIE_G+NZOMBIE_H; i++) {
+        if (zombieLife[i] > 0) {
+          if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
+            var v = new THREE.Vector3();
+            v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
+            zombies[i][zombieClassBig[i].body_Id].lookAt(v);
+
+            if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed*1.5;
+            } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed*1.5;
+            }
+            if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed*1.5;
+            } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
+              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed*1.5;
+            }
+          }
+
+          //Bounding box updates
+          bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].body_Id]);
+
+          if (zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
+            tiltH = true;
+          } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
+            tiltH = false;
+          }
+
+          if (tiltH) {
+            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.004;
+            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.004;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x -= 0.02;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z += 0.006;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y += 0.002;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x += 0.02;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z -= 0.006;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y -= 0.002;
+            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x < 0) {
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x += 0.025;
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z -= 0.008;
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y -= 0.004;
+            }
+            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x > -0.5) {
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x -= 0.025;
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z += 0.008;
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y += 0.004;
+            }
+          } else {
+            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
+            zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.004;
+            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
+            zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.004;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x += 0.02;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z -= 0.006;
+            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y -= 0.002;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x -= 0.02;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z += 0.006;
+            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y += 0.002;
+            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x > -0.5) {
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x -= 0.025;
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z += 0.008;
+              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y += 0.004;
+            }
+            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x < 0) {
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x += 0.025;
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z -= 0.008;
+              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y -= 0.004;
+            }
+          }
+
           if (bb_zombies[i].intersectsBox(bb_player)) {
-            eaten = true;
+            // eaten = true;
           }
         } else {
           zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
@@ -536,25 +630,24 @@ function animate() {
         //scene.add(bb_bullet);
 
         //Collision between bullets and zombies
-      	for ( var i = 0; i < NZOMBIE+NZOMBIE_G; i++){
-          if (zombieAlive[i]) {
+      	for ( var i = 0; i < NZOMBIE+NZOMBIE_G+NZOMBIE_H; i++){
+          if (zombieLife[i] > 0) {
         		if ( bb_bullet.intersectsBox(bb_zombies[i]) ){
         			//console.log("COLLISION DETECTED");
         			bullets[index].alive = false;
         			scene.remove(bullets[index]);
         			//scene.remove(bb_bullet);
               // zombie death rotation
-              if (i >= NZOMBIE) {
-                zombieGlife[i-NZOMBIE] -= 1;
-                if (zombieGlife[i-NZOMBIE] == 0) {
-                  zombieAlive[i] = false;
-                  score += zombie_giant_life;
-                  killed += 1;
-                }
-              } else {
-                zombieAlive[i] = false;
-                score += 1;
+              zombieLife[i] -= 1;
+              if (zombieLife[i] == 0) {
                 killed += 1;
+                if (i >= NZOMBIE+NZOMBIE_G) {
+                  score += zombie_hulk_life;
+                } else if (i >= NZOMBIE) {
+                  score += zombie_giant_life;
+                } else {
+                  score += zombie_life;
+                }
               }
             }
       		}
@@ -625,16 +718,32 @@ function spawnZombie(){
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
-  var min = -100;
-  var max = 100;
+  var min = -20;
+  var max = 20;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
+  var d = 1;
+
+  if (random_x < d && random_x > -d) {
+    if (Math.random() == 0) {
+      random_x = d;
+    } else {
+      random_x = -d;
+    }
+  }
+  if (random_z < d && random_z > -d) {
+    if (Math.random() == 0) {
+      random_z = d;
+    } else {
+      random_z = -d;
+    }
+  }
 
   zombie[zombieClassSpawn.body_Id].position.x = random_x;
   zombie[zombieClassSpawn.body_Id].position.z = random_z;
   zombieClassBig.push(zombieClassSpawn);
   zombies.push(zombie);
-  zombieAlive.push(true);
+  zombieLife.push(zombie_life);
 }
 
 
@@ -654,16 +763,77 @@ function spawnZombieGiant(){
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
-  var min = -100;
-  var max = 100;
+  var min = -20;
+  var max = 20;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
+  var d = 5;
+
+  if (random_x < d && random_x > -d) {
+    if (Math.random() == 0) {
+      random_x = d;
+    } else {
+      random_x = -d;
+    }
+  }
+  if (random_z < d && random_z > -d) {
+    if (Math.random() == 0) {
+      random_z = d;
+    } else {
+      random_z = -d;
+    }
+  }
 
   zombie[zombieClassSpawn.body_Id].position.x = random_x;
   zombie[zombieClassSpawn.body_Id].position.z = random_z;
   zombieClassBig.push(zombieClassSpawn);
   zombies.push(zombie);
-  zombieAlive.push(true);
+  zombieLife.push(zombie_giant_life);
+}
+
+function spawnZombieHulk(){
+  var zombieClassSpawn = new ZombieHulk();
+  zombie = zombieClassSpawn.zombie;
+  for ( var i = 0; i < zombieClassSpawn.numNodes; i++)
+    scene.add(zombie[i]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.big_body_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.head_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_leg_top_Id]);
+  zombie[zombieClassSpawn.left_leg_top_Id].attach(zombie[zombieClassSpawn.left_leg_bottom_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_leg_top_Id]);
+  zombie[zombieClassSpawn.right_leg_top_Id].attach(zombie[zombieClassSpawn.right_leg_bottom_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_arm_Id]);
+  zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_arm_Id]);
+
+  zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
+  zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
+
+  var min = -20;
+  var max = 20;
+  var random_x = Math.random() * (+max - +min) + +min;
+  var random_z = Math.random() * (+max - +min) + +min;
+  var d = 5;
+
+  if (random_x < d && random_x > -d) {
+    if (Math.random() == 0) {
+      random_x = d;
+    } else {
+      random_x = -d;
+    }
+  }
+  if (random_z < d && random_z > -d) {
+    if (Math.random() == 0) {
+      random_z = d;
+    } else {
+      random_z = -d;
+    }
+  }
+
+  zombie[zombieClassSpawn.body_Id].position.x = random_x;
+  zombie[zombieClassSpawn.body_Id].position.z = random_z;
+  zombieClassBig.push(zombieClassSpawn);
+  zombies.push(zombie);
+  zombieLife.push(zombie_hulk_life);
 }
  
 
