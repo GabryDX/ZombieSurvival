@@ -26,7 +26,7 @@ var zombie_giant_life = 10;
 var zombie_hulk_life = 5;
 var width = window.innerWidth;
 var height = window.innerHeight;
-var bb_side_walks = [],bb_zombies = [], bb_map = [];
+var bb_side_walks = [],bb_zombies = [], bb_map = [],lights = [];
 var bb_player,box_player;
 var previous_position;
 var bb_bullet;
@@ -41,6 +41,15 @@ var blockSizeZ	= 50;
 var roadW	= 8;
 var roadD	= 8;
 var sidewalkH	= 0.1;
+var lampDensityW= 4;
+var lampDensityD= 4;
+var lampH   = 3;
+var sidewalkW   = 2;
+var sidewalkH   = 0.1;
+var sidewalkD   = 2;
+var sphereSize = 1;
+var lights_helper = [];
+var light_index = 0;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -127,6 +136,67 @@ function init() {
     var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
     light.position.set(1, 1, 0.25);
     scene.add(light);
+
+    for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
+        for( var blockX = 0; blockX < nBlockX; blockX++){
+               
+                function addLampLight(pos){                
+                    var light = new THREE.PointLight(0xffff00, 0.02, 100);
+                    
+                    var lightPosition = pos.clone();
+                    lightPosition.y     = sidewalkH+lampH+0.1;
+                    lightPosition.x     += (blockX+0.5-nBlockX/2)*blockSizeX;
+                    lightPosition.z     += (blockZ+0.5-nBlockZ/2)*blockSizeZ;
+
+                    light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
+                    light.name = "lamp_" + light_index.toString();
+                    light_index++;
+                    //console.log(light.name);
+                    lights.push(light);
+                    lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
+                    
+                    
+                }  
+                // south                            
+                var position    = new THREE.Vector3();
+                for(var i = 0; i < lampDensityW+1; i++){
+                    position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+                    position.z  = -0.5*(blockSizeZ-roadD-sidewalkD);
+                    addLampLight(position);
+                }
+                // north
+                for(var i = 0; i < lampDensityW+1; i++){
+                    position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+                    position.z  = +0.5*(blockSizeZ-roadD-sidewalkD);
+                    addLampLight(position);
+                }
+                // east
+                for(var i = 1; i < lampDensityD; i++){
+                    position.x  = +0.5*(blockSizeX-roadW-sidewalkW);
+                    position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+                    addLampLight(position);
+                }
+                // west
+                for(var i = 1; i < lampDensityD; i++){
+                    position.x  = -0.5*(blockSizeX-roadW-sidewalkW);
+                    position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+                    addLampLight(position);
+                }
+
+
+        }
+    }
+
+    //pointLight.position.set( 10, 10, 10 );
+    //scene.add( pointLight );
+    
+    //var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize ); 
+    //scene.add( pointLightHelper );
+
+
+    
+    
+        
 
     for (var _key in models) {
         (function(key) {
@@ -319,6 +389,25 @@ function animate() {
 
 
     window.addEventListener('resize', onWindowResize, false);
+
+    //Lights turn on and off
+    for ( var i = 0; i < lights.length; i++){
+        if ( !scene.getObjectByName("lamp_" + i.toString()) ){
+            if ( camera.position.distanceTo(lights[i].position) < 15){
+                scene.add(lights[i]);
+                scene.add(lights_helper[i]);
+            }
+        }else{
+            if ( camera.position.distanceTo(lights[i].position) >= 15){
+                scene.remove(lights[i]);
+                scene.remove(lights_helper[i]);
+            }
+        }
+
+        //scene.add(lights[i]);
+        //var pointLightHelper = new THREE.PointLightHelper( lights[i], sphereSize ); 
+        //scene.add(pointLightHelper);
+    }
 
     // ------------
     // Management of camera rotation

@@ -139,6 +139,7 @@ THREEx.ProceduralCity	= function(){
 				// lampMesh.position.x	= 0
 				// lampMesh.position.z	= 0
 				function addLamp(position){
+					
 					//////////////////////////////////////////////////////////////////////////////////
 					//		light								//
 					//////////////////////////////////////////////////////////////////////////////////
@@ -149,6 +150,7 @@ THREEx.ProceduralCity	= function(){
 					lightPosition.z		+= (blockZ+0.5-nBlockZ/2)*blockSizeZ
 
 					lightsGeometry.vertices.push(lightPosition );
+					
 					//////////////////////////////////////////////////////////////////////////////////
 					//		head								//
 					//////////////////////////////////////////////////////////////////////////////////
@@ -251,7 +253,7 @@ THREEx.ProceduralCity	= function(){
 
 		object3d.add(lampsMesh)
 
-	
+		
 		//////////////////////////////////////////////////////////////////////////////////
 		//		comment								//
 		//////////////////////////////////////////////////////////////////////////////////
@@ -280,6 +282,7 @@ THREEx.ProceduralCity	= function(){
 		var lightParticles	= new THREE.Points( lightsGeometry, material );
 		lightParticles.sortParticles = true;
 		object3d.add( lightParticles );
+		
 
 		object3d.name = "lamp";
 
