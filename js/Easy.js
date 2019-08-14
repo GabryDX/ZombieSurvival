@@ -47,8 +47,8 @@ var lampH   = 3;
 var sidewalkW   = 2;
 var sidewalkH   = 0.1;
 var sidewalkD   = 2;
-var sphereSize = 1;
-var lights_helper = [];
+//var sphereSize = 1;
+//var lights_helper = [];
 var light_index = 0;
 
 var mouse = new THREE.Vector2(0,0);
@@ -141,7 +141,7 @@ function init() {
         for( var blockX = 0; blockX < nBlockX; blockX++){
                
                 function addLampLight(pos){                
-                    var light = new THREE.PointLight(0xffff00, 0.02, 100);
+                    var light = new THREE.PointLight(0xffff00, 0.07, 100);
                     
                     var lightPosition = pos.clone();
                     lightPosition.y     = sidewalkH+lampH+0.1;
@@ -153,7 +153,7 @@ function init() {
                     light_index++;
                     //console.log(light.name);
                     lights.push(light);
-                    lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
+                    //lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
                     
                     
                 }  
@@ -393,14 +393,14 @@ function animate() {
     //Lights turn on and off
     for ( var i = 0; i < lights.length; i++){
         if ( !scene.getObjectByName("lamp_" + i.toString()) ){
-            if ( camera.position.distanceTo(lights[i].position) < 15){
+            if ( camera.position.distanceTo(lights[i].position) < 6){
                 scene.add(lights[i]);
-                scene.add(lights_helper[i]);
+                //scene.add(lights_helper[i]);
             }
         }else{
-            if ( camera.position.distanceTo(lights[i].position) >= 15){
+            if ( camera.position.distanceTo(lights[i].position) >= 6){
                 scene.remove(lights[i]);
-                scene.remove(lights_helper[i]);
+                //scene.remove(lights_helper[i]);
             }
         }
 
