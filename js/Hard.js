@@ -13,17 +13,17 @@ var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
-var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 16; //20
-var NZOMBIE_G = 1; //1
-var NZOMBIE_H = 3; //3;
+var DURATIONTIME = 100000; //in millisec
+var NZOMBIE = 30; //20
+var NZOMBIE_G = 3; //1
+var NZOMBIE_H = 7; //3;
 var zombie;
 var zombies = [];
-var zombie_speed = 0.04;
+var zombie_speed = 0.05;
 var zombie_max_speed = zombie_speed*2;
-var zombie_life = 1;
-var zombie_giant_life = 10;
-var zombie_hulk_life = 5;
+var zombie_life = 2;
+var zombie_giant_life = 15;
+var zombie_hulk_life = 7;
 var width = window.innerWidth;
 var height = window.innerHeight;
 var bb_side_walks = [],bb_zombies = [], bb_map = [],lights = [];

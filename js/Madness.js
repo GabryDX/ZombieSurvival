@@ -13,20 +13,20 @@ var tempo = 10;
 var MOVESPEED = 30;
 var LOOKSPEED = 1;
 var BULLETMOVESPEED = MOVESPEED * 5;
-var DURATIONTIME = 150000; //in millisec
-var NZOMBIE = 200; //20
-var NZOMBIE_G = 20; //1
-var NZOMBIE_H = 50;
+var DURATIONTIME = 100000; //in millisec
+var NZOMBIE = 30; //20
+var NZOMBIE_G = 3; //1
+var NZOMBIE_H = 7; //3;
 var zombie;
 var zombies = [];
-var zombie_speed = 0;
-var zombie_max_speed = 0.2;
-var zombie_life = 1;
-var zombie_giant_life = 10;
-var zombie_hulk_life = 5;
+var zombie_speed = 0.06;
+var zombie_max_speed = zombie_speed*2;
+var zombie_life = 5;
+var zombie_giant_life = 30;
+var zombie_hulk_life = 10;
 var width = window.innerWidth;
 var height = window.innerHeight;
-var bb_side_walks = [],bb_zombies = [], bb_map = [];
+var bb_side_walks = [],bb_zombies = [], bb_map = [],lights = [];
 var bb_player,box_player;
 var previous_position;
 var bb_bullet;
@@ -41,6 +41,15 @@ var blockSizeZ	= 50;
 var roadW	= 8;
 var roadD	= 8;
 var sidewalkH	= 0.1;
+var lampDensityW= 4;
+var lampDensityD= 4;
+var lampH   = 3;
+var sidewalkW   = 2;
+var sidewalkH   = 0.1;
+var sidewalkD   = 2;
+//var sphereSize = 1;
+//var lights_helper = [];
+var light_index = 0;
 
 var mouse = new THREE.Vector2(0,0);
 var loadingScreen = {
@@ -83,8 +92,9 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, width / height, 0.3, 1000);
     
     var texture_scene = new THREE.TextureLoader().load('resources/cielo_rosso.jpg', function(texture) {scene.background = texture;});
-    scene.fog = new THREE.FogExp2(0xd0e0f0, 0.0025);
-    
+    // scene.fog = new THREE.FogExp2(0xd0e0f0, 0.0025);
+    scene.fog = new THREE.FogExp2(0x960000, 0.005);
+
 	//Box before the game
     loadingScreen.box.position.set(0, 0, 5);
     loadingScreen.camera.lookAt(loadingScreen.box.position);
@@ -124,9 +134,69 @@ function init() {
     }
     
     //_____________________________________LIGHT________________________________________
-    var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
+    // var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
+    var light = new THREE.HemisphereLight(0xfffff0, 0x960000, 1.25);  // 960000 or ff3200
     light.position.set(1, 1, 0.25);
     scene.add(light);
+
+    // for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
+    //     for( var blockX = 0; blockX < nBlockX; blockX++){
+               
+    //             function addLampLight(pos){                
+    //                 var light = new THREE.PointLight(0xffc800, 0.1, 100);  // 0xffff00
+                    
+    //                 var lightPosition = pos.clone();
+    //                 lightPosition.y     = sidewalkH+lampH+0.1;
+    //                 lightPosition.x     += (blockX+0.5-nBlockX/2)*blockSizeX;
+    //                 lightPosition.z     += (blockZ+0.5-nBlockZ/2)*blockSizeZ;
+
+    //                 light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
+    //                 light.name = "lamp_" + light_index.toString();
+    //                 light_index++;
+    //                 //console.log(light.name);
+    //                 lights.push(light);
+    //                 //lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
+                    
+                    
+    //             }  
+    //             // south                            
+    //             var position    = new THREE.Vector3();
+    //             for(var i = 0; i < lampDensityW+1; i++){
+    //                 position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+    //                 position.z  = -0.5*(blockSizeZ-roadD-sidewalkD);
+    //                 addLampLight(position);
+    //             }
+    //             // north
+    //             for(var i = 0; i < lampDensityW+1; i++){
+    //                 position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+    //                 position.z  = +0.5*(blockSizeZ-roadD-sidewalkD);
+    //                 addLampLight(position);
+    //             }
+    //             // east
+    //             for(var i = 1; i < lampDensityD; i++){
+    //                 position.x  = +0.5*(blockSizeX-roadW-sidewalkW);
+    //                 position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+    //                 addLampLight(position);
+    //             }
+    //             // west
+    //             for(var i = 1; i < lampDensityD; i++){
+    //                 position.x  = -0.5*(blockSizeX-roadW-sidewalkW);
+    //                 position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+    //                 addLampLight(position);
+    //             }
+
+
+    //     }
+    // }
+
+    //pointLight.position.set( 10, 10, 10 );
+    //scene.add( pointLight );
+    
+    //var pointLightHelper = new THREE.PointLightHelper( pointLight, sphereSize ); 
+    //scene.add( pointLightHelper );
+
+    
+        
 
     for (var _key in models) {
         (function(key) {
@@ -277,27 +347,27 @@ function init() {
         // Find the distance between now an the count down date
         distance = countDownDate - now1;
 
-        // var sec = Math.floor(distance / 1000);
-        // document.getElementById("time").innerHTML = "<span style='font-family: Impact; font-size: 15px; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + score + "&nbsp&nbsp&nbsp Zombies: " + (NZOMBIE + NZOMBIE_G + NZOMBIE_H - killed) + "</span>";
+        var sec = Math.floor(distance / 1000);
+        document.getElementById("time").innerHTML = "<span id='border_text' style='font-family: Impact; font-size: 1vw; color:#00FF00'>  Remaining time: " + sec + " sec" + "&nbsp&nbsp&nbsp Score: " + score + "&nbsp&nbsp&nbsp Zombies: " + (NZOMBIE + NZOMBIE_G + NZOMBIE_H - killed) + "</span>";
 
-        // // If the count down is finished, write some text
-        // if (distance < 0 || eaten || killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
-        //   overlay_off();
-        //   document.exitPointerLock();
-        //   document.removeEventListener('click', function() {
-        //       controls.lock();
-        //   }, false);
-        //   clearInterval(x);
-        //   if (distance < 0) {
-        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
-        //   } else if (eaten) {
-        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE BEEN EATEN!</h1></span>";
-        //   } else if (killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
-        //       document.getElementById("time").innerHTML = "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE SURVIVED!</h1></span>";
-        //   }
-        //   document.getElementById("ris").innerHTML = "<span style='font-family: Impact; font-size: 60px; color:#00FF00'><h1> Score:  " + score + "</span>" + "<br /><span style='font-family: Impact; font-size: 60px; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
-        //   $(renderer.domElement).fadeOut();
-        // }
+        // If the count down is finished, write some text
+        if (distance < 0 || eaten || killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
+          overlay_off();
+          document.exitPointerLock();
+          document.removeEventListener('click', function() {
+              controls.lock();
+          }, false);
+          clearInterval(x);
+          if (distance < 0) {
+              document.getElementById("time").innerHTML = "<br /><span id='border_text' style='font-family: Impact; font-size: 4vw; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>TIME OUT!</h1></span>";
+          } else if (eaten) {
+              document.getElementById("time").innerHTML = "<br /><span id='border_text' style='font-family: Impact; font-size: 4vw; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE BEEN EATEN!</h1></span>";
+          } else if (killed == NZOMBIE+NZOMBIE_G+NZOMBIE_H) {
+              document.getElementById("time").innerHTML = "<br /><span id='border_text'style='font-family: Impact; font-size: 4vw; color:#00FF00'>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp <h1>YOU HAVE SURVIVED!</h1></span>";
+          }
+          document.getElementById("ris").innerHTML = "<span id='border_text' style='font-family: Impact; font-size: 3.5vw; color:#00FF00'><h1> Score:  " + score + "&nbsp Killed: " + killed + "</span>" + "<br /><span id='border_text' style='font-family: Impact; font-size: 2.5vw; color:#00FF00'>" + "<a href='index.html'> Restart</a>" + "</h1></span>";
+          $(renderer.domElement).fadeOut();
+        }
     }, 1000);
     countDownDate += 1000;
 
@@ -319,6 +389,25 @@ function animate() {
 
 
     window.addEventListener('resize', onWindowResize, false);
+
+    //Lights turn on and off
+    // for ( var i = 0; i < lights.length; i++){
+    //     if ( !scene.getObjectByName("lamp_" + i.toString()) ){
+    //         if ( camera.position.distanceTo(lights[i].position) < 6){
+    //             scene.add(lights[i]);
+    //             //scene.add(lights_helper[i]);
+    //         }
+    //     }else{
+    //         if ( camera.position.distanceTo(lights[i].position) >= 6){
+    //             scene.remove(lights[i]);
+    //             //scene.remove(lights_helper[i]);
+    //         }
+    //     }
+
+    //     //scene.add(lights[i]);
+    //     //var pointLightHelper = new THREE.PointLightHelper( lights[i], sphereSize ); 
+    //     //scene.add(pointLightHelper);
+    // }
 
     // ------------
     // Management of camera rotation
@@ -409,7 +498,7 @@ function animate() {
         	}
 
           if (bb_zombies[i].intersectsBox(bb_player)) {
-            // eaten = true;
+            eaten = true;
           }
         } else {
           zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
@@ -423,20 +512,20 @@ function animate() {
       // ZOMBIE GIANT ANIMATION
       for ( var i = NZOMBIE; i < NZOMBIE+NZOMBIE_G; i++) {
         if (zombieLife[i] > 0) {
-          if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
+          if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z != undefined) {
             var v = new THREE.Vector3();
-            v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
-            zombies[i][zombieClassBig[i].body_Id].lookAt(v);
+            v.subVectors(zombies[i][zombieClassBig[i].bottom_cube_Id].position, camera.position).add(zombies[i][zombieClassBig[i].bottom_cube_Id].position);
+            zombies[i][zombieClassBig[i].bottom_cube_Id].lookAt(v);
 
-            if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed*2;
-            } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed*2;
+            if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.x < camera.position.x - 0.05) {
+              zombies[i][zombieClassBig[i].bottom_cube_Id].position.x += zombie_speed*2;
+            } else if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.x > camera.position.x + 0.05) {
+              zombies[i][zombieClassBig[i].bottom_cube_Id].position.x -= zombie_speed*2;
             }
-            if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed*2;
-            } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed*2;
+            if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z < camera.position.z - 0.05) {
+              zombies[i][zombieClassBig[i].bottom_cube_Id].position.z += zombie_speed*2;
+            } else if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z > camera.position.z + 0.05) {
+              zombies[i][zombieClassBig[i].bottom_cube_Id].position.z -= zombie_speed*2;
             }
           }
 
@@ -494,14 +583,14 @@ function animate() {
             }
           }
 
-          // if (bb_zombies[i].intersectsBox(bb_player)) {
-          //   eaten = true;
-          // }
+          if (bb_zombies[i].intersectsBox(bb_player)) {
+            eaten = true;
+          }
         } else {
-          zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
+          zombies[i][zombieClassBig[i].bottom_cube_Id].rotation.y += 0.1;
 
-          if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
-            scene.remove(zombies[i][zombieClassBig[i].body_Id]);
+          if (Math.round(zombies[i][zombieClassBig[i].bottom_cube_Id].rotation.y) >= 4) {
+            scene.remove(zombies[i][zombieClassBig[i].bottom_cube_Id]);
             //scene.remove(bb_zombies[i]);
           }
         }
@@ -580,7 +669,7 @@ function animate() {
           }
 
           if (bb_zombies[i].intersectsBox(bb_player)) {
-            // eaten = true;
+            eaten = true;
           }
         } else {
           zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
@@ -718,24 +807,26 @@ function spawnZombie(){
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
-  var min = -20;
-  var max = 20;
+  var min = -100;
+  var max = 100;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
-  var d = 1;
-
+  var d = 10;
+  
   if (random_x < d && random_x > -d) {
-    if (Math.random() == 0) {
-      random_x = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_x = d + r;
     } else {
-      random_x = -d;
+      random_x = -d - r;
     }
   }
   if (random_z < d && random_z > -d) {
-    if (Math.random() == 0) {
-      random_z = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_z = d + r;
     } else {
-      random_z = -d;
+      random_z = -d - r;
     }
   }
 
@@ -759,33 +850,36 @@ function spawnZombieGiant(){
   zombie[zombieClassSpawn.right_leg_top_Id].attach(zombie[zombieClassSpawn.right_leg_bottom_Id]);
   zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.left_arm_Id]);
   zombie[zombieClassSpawn.body_Id].attach(zombie[zombieClassSpawn.right_arm_Id]);
+  zombie[zombieClassSpawn.bottom_cube_Id].attach(zombie[zombieClassSpawn.body_Id]);
 
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
-  var min = -20;
-  var max = 20;
+  var min = -100;
+  var max = 100;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
-  var d = 5;
+  var d = 20;
 
   if (random_x < d && random_x > -d) {
-    if (Math.random() == 0) {
-      random_x = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_x = d + r;
     } else {
-      random_x = -d;
+      random_x = -d - r;
     }
   }
   if (random_z < d && random_z > -d) {
-    if (Math.random() == 0) {
-      random_z = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_z = d + r;
     } else {
-      random_z = -d;
+      random_z = -d - r;
     }
   }
 
-  zombie[zombieClassSpawn.body_Id].position.x = random_x;
-  zombie[zombieClassSpawn.body_Id].position.z = random_z;
+  zombie[zombieClassSpawn.bottom_cube_Id].position.x = random_x;
+  zombie[zombieClassSpawn.bottom_cube_Id].position.z = random_z;
   zombieClassBig.push(zombieClassSpawn);
   zombies.push(zombie);
   zombieLife.push(zombie_giant_life);
@@ -808,24 +902,26 @@ function spawnZombieHulk(){
   zombie[zombieClassSpawn.left_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
   zombie[zombieClassSpawn.right_arm_Id].setRotationFromEuler(new THREE.Euler(-55,0,0, 'XYZ'));
 
-  var min = -20;
-  var max = 20;
+  var min = -100;
+  var max = 100;
   var random_x = Math.random() * (+max - +min) + +min;
   var random_z = Math.random() * (+max - +min) + +min;
-  var d = 5;
+  var d = 15;
 
   if (random_x < d && random_x > -d) {
-    if (Math.random() == 0) {
-      random_x = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_x = d + r;
     } else {
-      random_x = -d;
+      random_x = -d - r;
     }
   }
   if (random_z < d && random_z > -d) {
-    if (Math.random() == 0) {
-      random_z = d;
+    var r = Math.random();
+    if (Math.round(r) == 0) {
+      random_z = d + r;
     } else {
-      random_z = -d;
+      random_z = -d - r;
     }
   }
 
