@@ -159,10 +159,10 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.copy(position)
 					lampMesh.position.y	= sidewalkH+lampH
 					// add poll offset				
-					lampMesh.scale.set(0.2,0.2,0.2)
+					lampMesh.scale.set(0.3,0.3,0.3)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
-						lampMesh.geometry.faces[i].color.set('white' );
+						lampMesh.geometry.faces[i].color.set(0x000000);
 					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
@@ -180,10 +180,10 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.copy(position)
 					lampMesh.position.y	+= sidewalkH
 					// add poll offset				
-					lampMesh.scale.set(0.1,lampH,0.1)
+					lampMesh.scale.set(0.15,lampH,0.15)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
-						lampMesh.geometry.faces[i].color.set('grey' );
+						lampMesh.geometry.faces[i].color.set(0xffffff );
 					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX
@@ -200,10 +200,10 @@ THREEx.ProceduralCity	= function(){
 					lampMesh.position.copy(position)
 					lampMesh.position.y	+= sidewalkH
 					// add poll offset				
-					lampMesh.scale.set(0.12,0.4,0.12)
+					lampMesh.scale.set(0.25,0.65,0.25)
 					// colorify
 					for(var i = 0; i < lampMesh.geometry.faces.length; i++ ) {
-						lampMesh.geometry.faces[i].color.set('maroon' );
+						lampMesh.geometry.faces[i].color.set(0x412000);
 					}					
 					// set position for block
 					lampMesh.position.x	+= (blockX+0.5-nBlockX/2)*blockSizeX

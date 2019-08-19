@@ -136,59 +136,59 @@ function init() {
     
     //_____________________________________LIGHT________________________________________
     // var light = new THREE.HemisphereLight(0xfffff0, 0x101020, 1.25);
-    var light = new THREE.HemisphereLight(0xfffff0, 0x960000, 1.25);  // 960000 or ff3200
-    light.position.set(1, 1, 0.25);
-    scene.add(light);
+    //var light = new THREE.HemisphereLight(0xfffff0, 0x960000, 1.25);  // 960000 or ff3200
+    //light.position.set(1, 1, 0.25);
+    //scene.add(light);
 
-    // for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
-    //     for( var blockX = 0; blockX < nBlockX; blockX++){
+     for( var blockZ = 0; blockZ < nBlockZ; blockZ++){
+         for( var blockX = 0; blockX < nBlockX; blockX++){
                
-    //             function addLampLight(pos){                
-    //                 var light = new THREE.PointLight(0xffc800, 0.1, 100);  // 0xffff00
+                 function addLampLight(pos){                
+                     var light = new THREE.PointLight(0xffc800, 0.1, 100);  // 0xffff00
                     
-    //                 var lightPosition = pos.clone();
-    //                 lightPosition.y     = sidewalkH+lampH+0.1;
-    //                 lightPosition.x     += (blockX+0.5-nBlockX/2)*blockSizeX;
-    //                 lightPosition.z     += (blockZ+0.5-nBlockZ/2)*blockSizeZ;
+                     var lightPosition = pos.clone();
+                     lightPosition.y     = sidewalkH+lampH+0.1;
+                     lightPosition.x     += (blockX+0.5-nBlockX/2)*blockSizeX;
+                     lightPosition.z     += (blockZ+0.5-nBlockZ/2)*blockSizeZ;
 
-    //                 light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
-    //                 light.name = "lamp_" + light_index.toString();
-    //                 light_index++;
-    //                 //console.log(light.name);
-    //                 lights.push(light);
-    //                 //lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
+                     light.position.set(lightPosition.x, lightPosition.y, lightPosition.z);
+                     light.name = "lamp_" + light_index.toString();
+                     light_index++;
+                     //console.log(light.name);
+                     lights.push(light);
+                     //lights_helper.push(new THREE.PointLightHelper( light, sphereSize ));
                     
                     
-    //             }  
-    //             // south                            
-    //             var position    = new THREE.Vector3();
-    //             for(var i = 0; i < lampDensityW+1; i++){
-    //                 position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
-    //                 position.z  = -0.5*(blockSizeZ-roadD-sidewalkD);
-    //                 addLampLight(position);
-    //             }
-    //             // north
-    //             for(var i = 0; i < lampDensityW+1; i++){
-    //                 position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
-    //                 position.z  = +0.5*(blockSizeZ-roadD-sidewalkD);
-    //                 addLampLight(position);
-    //             }
-    //             // east
-    //             for(var i = 1; i < lampDensityD; i++){
-    //                 position.x  = +0.5*(blockSizeX-roadW-sidewalkW);
-    //                 position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
-    //                 addLampLight(position);
-    //             }
-    //             // west
-    //             for(var i = 1; i < lampDensityD; i++){
-    //                 position.x  = -0.5*(blockSizeX-roadW-sidewalkW);
-    //                 position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
-    //                 addLampLight(position);
-    //             }
+                 }  
+                 // south                            
+                 var position    = new THREE.Vector3();
+                 for(var i = 0; i < lampDensityW+1; i++){
+                     position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+                     position.z  = -0.5*(blockSizeZ-roadD-sidewalkD);
+                     addLampLight(position);
+                 }
+                 // north
+                 for(var i = 0; i < lampDensityW+1; i++){
+                     position.x  = (i/lampDensityW-0.5)*(blockSizeX-roadW-sidewalkW);
+                     position.z  = +0.5*(blockSizeZ-roadD-sidewalkD);
+                     addLampLight(position);
+                 }
+                 // east
+                 for(var i = 1; i < lampDensityD; i++){
+                     position.x  = +0.5*(blockSizeX-roadW-sidewalkW);
+                     position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+                     addLampLight(position);
+                 }
+                 // west
+                 for(var i = 1; i < lampDensityD; i++){
+                     position.x  = -0.5*(blockSizeX-roadW-sidewalkW);
+                     position.z  = (i/lampDensityD-0.5)*(blockSizeZ-roadD-sidewalkD);
+                     addLampLight(position);
+                 }
 
 
-    //     }
-    // }
+         }
+    }
 
     //pointLight.position.set( 10, 10, 10 );
     //scene.add( pointLight );
@@ -233,21 +233,12 @@ function init() {
     }
 
     // ZOMBIE SPAWNING
-    for ( var i = 0; i < NZOMBIE; i++){
+    for ( var i = 0; i < 5; i++){
      	spawnZombie();
      	bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].head_Id]);
      	//scene.add(bb_zombies[i]);
     }
-    for ( var i = NZOMBIE; i < NZOMBIE+NZOMBIE_G; i++){
-      spawnZombieGiant();
-      bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].left_leg_bottom_Id]);
-      bb_zombies[i] = bb_zombies[i].union(new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].right_leg_bottom_Id]));
-    }
-    for ( var i = NZOMBIE+NZOMBIE_G; i < NZOMBIE+NZOMBIE_G+NZOMBIE_H; i++){
-      spawnZombieHulk();
-      bb_zombies[i] = new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].body_Id]);
-    }
-
+    
     camera.position.set(0, player.height, -5);
     camera.lookAt(new THREE.Vector3(0, player.height, 0));
     scene.add(camera);
@@ -398,30 +389,29 @@ function animate() {
 
     //laser_point.position.set((window.innerWidth) * 2 - 1, -(window.innerHeight) * 2 + 1, camera.position.z + 50) ;
 
-    /*
     //Lights turn on and off
     
 
         for ( var i = 0; i < lights.length; i++){
              if ( !scene.getObjectByName("lamp_" + i.toString()) ){
-                 if ( camera.position.distanceTo(lights[i].position) < 6){
+                 if ( camera.position.distanceTo(lights[i].position) < 13){
                      scene.add(lights[i]);
                      //scene.add(lights_helper[i]);
                  }
             }else{
-                 if ( camera.position.distanceTo(lights[i].position) >= 6){
+                 if ( camera.position.distanceTo(lights[i].position) >= 13){
                      scene.remove(lights[i]);
                      //scene.remove(lights_helper[i]);
                  }
             }
         }
-    
+  
     
     //     //scene.add(lights[i]);
     //     //var pointLightHelper = new THREE.PointLightHelper( lights[i], sphereSize ); 
     //     //scene.add(pointLightHelper);
     // }
-    */
+
     // ------------
     // Management of camera rotation
     var camerarotation_y;
@@ -458,7 +448,7 @@ function animate() {
         zombie_speed = zombie_max_speed;
 
       // ZOMBIE NORMAL ANIMATION
-      for ( var i = 0; i < NZOMBIE; i++) {
+      for ( var i = 0; i < 5; i++) {
         if (zombieLife[i] > 0) {
           if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
             var v = new THREE.Vector3();
@@ -521,179 +511,11 @@ function animate() {
             //scene.remove(bb_zombies[i]);
           }
         }
-      }
-      // ZOMBIE GIANT ANIMATION
-      for ( var i = NZOMBIE; i < NZOMBIE+NZOMBIE_G; i++) {
-        if (zombieLife[i] > 0) {
-          if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z != undefined) {
-            var v = new THREE.Vector3();
-            v.subVectors(zombies[i][zombieClassBig[i].bottom_cube_Id].position, camera.position).add(zombies[i][zombieClassBig[i].bottom_cube_Id].position);
-            zombies[i][zombieClassBig[i].bottom_cube_Id].lookAt(v);
-
-            if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.x < camera.position.x - 0.05) {
-              zombies[i][zombieClassBig[i].bottom_cube_Id].position.x += zombie_speed*2;
-            } else if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.x > camera.position.x + 0.05) {
-              zombies[i][zombieClassBig[i].bottom_cube_Id].position.x -= zombie_speed*2;
-            }
-            if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z < camera.position.z - 0.05) {
-              zombies[i][zombieClassBig[i].bottom_cube_Id].position.z += zombie_speed*2;
-            } else if (zombies[i][zombieClassBig[i].bottom_cube_Id].position.z > camera.position.z + 0.05) {
-              zombies[i][zombieClassBig[i].bottom_cube_Id].position.z -= zombie_speed*2;
-            }
-          }
-
-          //Bounding box updates
-          bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].left_leg_bottom_Id]);
-          bb_zombies[i].union(new THREE.Box3().setFromObject(zombies[i][zombieClassBig[i].right_leg_bottom_Id]));
-
-          if (zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
-            tiltG = true;
-          } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
-            tiltG = false;
-          }
-
-          if (tiltG) {
-            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
-            zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.02;
-            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
-            zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x -= 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z += 0.03;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y += 0.01;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x += 0.02;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z -= 0.03;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y -= 0.01;
-            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x < 0) {
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x += 0.025;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z -= 0.04;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y -= 0.02;
-            }
-            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x > -0.5) {
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x -= 0.025;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z += 0.04;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y += 0.02;
-            }
-          } else {
-            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
-            zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.02;
-            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
-            zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x += 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z -= 0.03;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y -= 0.01;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x -= 0.02;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z += 0.03;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y += 0.01;
-            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x > -0.5) {
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x -= 0.025;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z += 0.04;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y += 0.02;
-            }
-            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x < 0) {
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x += 0.025;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z -= 0.04;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y -= 0.02;
-            }
-          }
-
-          if (bb_zombies[i].intersectsBox(bb_player)) {
-            eaten = true;
-          }
-        } else {
-          zombies[i][zombieClassBig[i].bottom_cube_Id].rotation.y += 0.1;
-
-          if (Math.round(zombies[i][zombieClassBig[i].bottom_cube_Id].rotation.y) >= 4) {
-            scene.remove(zombies[i][zombieClassBig[i].bottom_cube_Id]);
-            //scene.remove(bb_zombies[i]);
-          }
-        }
-      }
-      // ZOMBIE HULK ANIMATION
-      for ( var i = NZOMBIE+NZOMBIE_G; i < NZOMBIE+NZOMBIE_G+NZOMBIE_H; i++) {
-        if (zombieLife[i] > 0) {
-          if (zombies[i][zombieClassBig[i].body_Id].position.z != undefined) {
-            var v = new THREE.Vector3();
-            v.subVectors(zombies[i][zombieClassBig[i].body_Id].position, camera.position).add(zombies[i][zombieClassBig[i].body_Id].position);
-            zombies[i][zombieClassBig[i].body_Id].lookAt(v);
-
-            if (zombies[i][zombieClassBig[i].body_Id].position.x < camera.position.x - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x += zombie_speed*1.5;
-            } else if (zombies[i][zombieClassBig[i].body_Id].position.x > camera.position.x + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.x -= zombie_speed*1.5;
-            }
-            if (zombies[i][zombieClassBig[i].body_Id].position.z < camera.position.z - 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z += zombie_speed*1.5;
-            } else if (zombies[i][zombieClassBig[i].body_Id].position.z > camera.position.z + 0.05) {
-              zombies[i][zombieClassBig[i].body_Id].position.z -= zombie_speed*1.5;
-            }
-          }
-
-          //Bounding box updates
-          bb_zombies[i].setFromObject(zombies[i][zombieClassBig[i].body_Id]);
-
-          if (zombies[i][zombieClassBig[i].left_arm_Id].rotation.x > 1.8){
-            tiltH = true;
-          } else if ( zombies[i][zombieClassBig[i].left_arm_Id].rotation.x < 1.1){
-            tiltH = false;
-          }
-
-          if (tiltH) {
-            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x -= 0.01;
-            zombies[i][zombieClassBig[i].left_arm_Id].position.y -= 0.004;
-            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x += 0.01;
-            zombies[i][zombieClassBig[i].right_arm_Id].position.y += 0.004;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x -= 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z += 0.006;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y += 0.002;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x += 0.02;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z -= 0.006;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y -= 0.002;
-            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x < 0) {
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x += 0.025;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z -= 0.008;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y -= 0.004;
-            }
-            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x > -0.5) {
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x -= 0.025;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z += 0.008;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y += 0.004;
-            }
-          } else {
-            zombies[i][zombieClassBig[i].left_arm_Id].rotation.x += 0.01;
-            zombies[i][zombieClassBig[i].left_arm_Id].position.y += 0.004;
-            zombies[i][zombieClassBig[i].right_arm_Id].rotation.x -= 0.01;
-            zombies[i][zombieClassBig[i].right_arm_Id].position.y -= 0.004;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].rotation.x += 0.02;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.z -= 0.006;
-            zombies[i][zombieClassBig[i].left_leg_top_Id].position.y -= 0.002;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].rotation.x -= 0.02;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.z += 0.006;
-            zombies[i][zombieClassBig[i].right_leg_top_Id].position.y += 0.002;
-            if (zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x > -0.5) {
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].rotation.x -= 0.025;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.z += 0.008;
-              zombies[i][zombieClassBig[i].left_leg_bottom_Id].position.y += 0.004;
-            }
-            if (zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x < 0) {
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].rotation.x += 0.025;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.z -= 0.008;
-              zombies[i][zombieClassBig[i].right_leg_bottom_Id].position.y -= 0.004;
-            }
-          }
-
-          if (bb_zombies[i].intersectsBox(bb_player)) {
-            eaten = true;
-          }
-        } else {
-          zombies[i][zombieClassBig[i].body_Id].rotation.y += 0.1;
-
-          if (Math.round(zombies[i][zombieClassBig[i].body_Id].rotation.y) >= 4) {
-            scene.remove(zombies[i][zombieClassBig[i].body_Id]);
-            //scene.remove(bb_zombies[i]);
-          }
-        }
-      }
+    
     }
+}
+ 
+    
 
     var time = Date.now() * 0.0005;
     var delta = clock.getDelta(),
