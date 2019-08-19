@@ -68,8 +68,15 @@ body{
   margin-left: 11%;
 }
 
-.fa-btnTest{
+.fa-btnDark{
   clear:  both;
   margin-left: -86.5%;
   margin-top: 4.5%;
+}
+
+.tutorial{
+  clear:  both;
+  color: #f62217;
+  font-family: Impact;
+  font-size: 2vw;
 }
